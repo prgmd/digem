@@ -1,0 +1,20 @@
+# Web scraping
+requests==2.31.0
+beautifulsoup4==4.12.3
+feedparser==6.0.11
+lxml==5.1.0
+
+# Data validation
+pydantic==2.6.1
+
+# Database
+supabase==2.3.4
+
+# Redis
+upstash-redis==0.3.0
+
+# AI/Translation
+google-generativeai==0.3.2
+
+# Utilities
+python-dotenv==1.0.1
