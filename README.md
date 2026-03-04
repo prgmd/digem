@@ -52,7 +52,7 @@ pip install -r requirements.txt
   - 3개 칼럼 성공적으로 저장 확인
 - [x] 카테고리 필터링 기능 추가
   - Photo Gallery 제외
-  - Interview, Afterword, Lists & Guides 등만 수집
+  - Interview, Afterword 등만 수집
 - [x] 파일 구조 개선
   - scripts 폴더 단일화
   - pitchfork_scraper.py, google_translator.py, database_loader.py
