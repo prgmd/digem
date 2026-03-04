@@ -3,9 +3,22 @@ from datetime import datetime
 from typing import List, Dict
 import requests
 from bs4 import BeautifulSoup
+from google_translator import GeminiTranslator
+from database_loader import SupabaseLoader
+import time
 
 class pitchforkScraper:
     RSS_URL = "https://pitchfork.com/feed/feed-features/rss"
+
+    ALLOWED_CATEGORIES = [
+        'Features / Interview',
+        'Features / Afterword',
+        'Features / Festival Report',
+        'Features / Cover Story',
+        'Features / Longform',
+        'Features / Rising',
+        'Features / 5-10-15-20'
+    ]
 
     def __init__(self):
         self.session = requests.Session()
@@ -21,6 +34,11 @@ class pitchforkScraper:
             for entry in feed.entries[:limit]:
                 feature_data = self._parse_entry(entry)
                 if feature_data:
+                    category = feature_data.get('category', '').lower()
+                    if category and category not in [c.lower() for c in self.ALLOWED_CATEGORIES]:
+                        print(f"제외됨 ({category}): {feature_data['title'][:50]}...")
+                        continue
+
                     features.append(feature_data)
             
             print(f'{len(features)}개 수집 완료')
@@ -48,6 +66,12 @@ class pitchforkScraper:
                 data['thumbnail_url'] = entry['media_thumbnail'][0].get('url', '')
             else:
                 data['thumbnail_url'] = None
+
+            # 카테고리 추출 (신규)
+            if 'tags' in entry and entry['tags']:
+                data['category'] = entry['tags'][0].get('term', '')
+            else:
+                data['category'] = ''
 
             return data
         except Exception as e:
@@ -97,30 +121,70 @@ class pitchforkScraper:
             print('페이지 가져오기 오류', e)
             return ''
 
-
 def main():
     print('Pitchfork 크롤링을 시작합니다...')
     scraper = pitchforkScraper()
+    translator = GeminiTranslator()
+    loader = SupabaseLoader()
+
     features = scraper.fetch_latest_reviews(limit = 5)
 
-    if features:
-        print('가져온 칼럼들 목록 출력')
-        for i, review in enumerate(features, 1):
-            print(f"\n{i}. {review['title']}")
-            print(f"   저자: {review['author']}")
-            print(f"   날짜: {review['published_at']}")
-            print(f"   URL: {review['source_url']}")
-            print(f"   요약: {review['summary'][:100]}...")
+    # RSS 피드 가져오기
+    if not features:
+        print('컬럼이 없습니다.')
+        return
+
+    print(f'\n📋 RSS에서 {len(features)}개 칼럼 발견')
+
+    # 중복 제거
+    print('\n' + '=' * 60)
+    print('🔍 중복 체크 중...')
+    print('=' * 60)
+    new_features = loader.filter_new_articles(features)
+
+    # 중복 제거
+    new_features = loader.filter_new_articles(features)
+    if not new_features:
+        print('이미 모든 칼럼이 DB에 저장되어 있습니다. 수고!')
+        return
+
+    for i, feature in enumerate(new_features, 1):    
+        full_content = scraper.fetch_full_content(feature['source_url'])
+        if full_content:
+            print(f"\n(전체 {len(full_content)}자)")
+            print(f'{feature['title']}')
+            print(f"{full_content[:200]}...\n")
+        else:
+            print('본문 추출 실패. 스킵하겠습니다.')
+            continue        
         
-        # 테스트로 첫 번째 리뷰 전체 내용 가져오기
-        if features:
-            # print("\n" + "=" * 60)
-            # print("📖 첫 번째 리뷰 전체 내용 가져오기:")
-            # print("=" * 60)
-            full_content = scraper.fetch_full_content(features[0]['source_url'])
-            if full_content:
-                print(f"\n{full_content}")
-                print(f"\n(전체 {len(full_content)}자)")
+        # 번역 요청
+        result = translator.translate_article(feature['title'], full_content)
+        if result['status'] == 'success':
+            print('번역 완료')
+            print(f" [번역된 제목]: {result['title_ko']}")
+            print(f" [번역된 본문]: {result['content_ko'][:500]}...")
+        else:
+            print('번역 실패. 스킵하겠습니다.')
+            continue
+
+        article_data = {
+            'title': feature['title'],
+            'content_en': full_content,
+            'content_ko': result['content_ko'],
+            'source': feature['source'],
+            'source_url': feature['source_url'],
+            'author': feature['author'],
+            'published_at': feature['published_at'],
+        }
+
+        success = loader.save_article(article_data)
+        if not success:
+            print('DB 저장 실패.')
+
+        # Rate Limit 방지용 코드
+        if i < len(new_features):
+            time.sleep(10)
 
 # 호출마다 자동 실행되는 걸 방지함 (직접 실행할 때만 코드 돌리도록)
 if __name__ == "__main__":

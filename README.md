@@ -3,6 +3,16 @@
 
 ---
 
+## 실행 (가상환경 설정)
+```
+git clone https://github.com/prgmd/digem.git
+python -m venv venv
+source venv/Scripts/activate
+pip install -r requirements.txt
+```
+
+---
+
 ## 📌 프로젝트 개요
 
 **목적:**
@@ -27,14 +37,33 @@
   - figcaption 필터링 (사진 캡션 제외)
   - 저작권 문구 이후 컨텐츠 제외
 
-#### 🚧 진행 중
-- [ ] Pitchfork 크롤러 고도화
-  - 다양한 게시글 타입 테스트
-  - 본문 추출 로직 강화
+### **2026-03-04 (Day 2)**
+#### ✅ 완료
+- [x] Gemini 2.5 Flash 번역 모듈 구현
+  - 제목 번역 (아티스트명 원문 병기)
+  - 본문 번역 (음악 용어 보존)
+  - 재시도 로직 (타임아웃 대응)
+- [x] Supabase 데이터 저장 로직 구현
+  - articles 테이블 INSERT
+  - 중복 체크 (source_url 기준)
+  - 새 칼럼만 필터링
+- [x] 전체 파이프라인 통합 및 테스트
+  - RSS 파싱 → 크롤링 → 번역 → DB 저장
+  - 3개 칼럼 성공적으로 저장 확인
+- [x] 카테고리 필터링 기능 추가
+  - Photo Gallery 제외
+  - Interview, Afterword, Lists & Guides 등만 수집
+- [x] 파일 구조 개선
+  - scripts 폴더 단일화
+  - pitchfork_scraper.py, google_translator.py, database_loader.py
+
+#### 🚧 이슈
+- [x] 간헐적 Gemini API 타임아웃 (504 에러)
+  - 해결 방안: 재시도 로직 강화 필요
 
 #### 📋 다음 단계
+- [ ] 재시도 로직 개선 (Exponential Backoff)
+- [ ] Cloudflare R2 백업 로직 구현
+- [ ] DLQ 패턴 구현 (Upstash Redis)
 - [ ] 다른 웹진 크롤러 추가 (Stereogum, Consequence)
-- [ ] Gemini 번역 모듈 구현
-- [ ] Supabase 데이터 삽입 로직
-- [ ] DLQ 패턴 구현 (Redis)
 - [ ] GitHub Actions 워크플로우 작성
