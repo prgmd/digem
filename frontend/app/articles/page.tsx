@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 import Sidebar from '@/components/Sidebar'
@@ -16,7 +16,7 @@ interface Article {
   content_ko: string
 }
 
-const SOURCES = ['Pitchfork', 'Rolling Stone', 'NME', 'The Wire', 'Stereogum']
+const SOURCES = ['Pitchfork', 'Rolling Stone']
 
 const ARTICLES: Article[] = []
 
@@ -25,12 +25,20 @@ export default function ArticlesPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [selectedSource, setSelectedSource] = useState<string | null>(null)
   const [isExiting, setIsExiting] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [fadeIn] = useState(() => {
     if (typeof sessionStorage === 'undefined') return true
     const skip = sessionStorage.getItem('nofade')
     if (skip) { sessionStorage.removeItem('nofade'); return false }
     return true
   })
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const handleExitToHome = () => {
     setIsExiting(true)
@@ -43,6 +51,9 @@ export default function ArticlesPage() {
 
   const currentArticle = ARTICLES.find((a: Article) => a.id === selectedId) || null
 
+  const showSidebar = !isMobile || selectedId === null
+  const showDetail = !isMobile || selectedId !== null
+
   return (
     <div style={{
       height: '100vh',
@@ -53,15 +64,23 @@ export default function ArticlesPage() {
     }}>
       <CategoryHeader onLogoClick={handleExitToHome} currentCategory="articles" />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        <Sidebar
-          articles={filteredArticles}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          sources={SOURCES}
-          selectedSource={selectedSource}
-          onSourceSelect={setSelectedSource}
-        />
-        <ArticleDetail article={currentArticle} />
+        {showSidebar && (
+          <Sidebar
+            articles={filteredArticles}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            sources={SOURCES}
+            selectedSource={selectedSource}
+            onSourceSelect={setSelectedSource}
+            fullWidth={isMobile}
+          />
+        )}
+        {showDetail && (
+          <ArticleDetail
+            article={currentArticle}
+            onBack={isMobile ? () => setSelectedId(null) : undefined}
+          />
+        )}
       </div>
     </div>
   )

@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 
 interface Article {
   id: number
@@ -17,6 +16,7 @@ interface SidebarProps {
   sources: string[]
   selectedSource: string | null
   onSourceSelect: (source: string | null) => void
+  fullWidth?: boolean
 }
 
 export default function Sidebar({
@@ -26,79 +26,39 @@ export default function Sidebar({
   sources,
   selectedSource,
   onSourceSelect,
+  fullWidth,
 }: SidebarProps) {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const allSources = [null, ...sources]
 
   return (
     <aside style={{
-      width: '480px',
+      width: fullWidth ? '100%' : '480px',
       height: '100%',
-      borderRight: '1px solid var(--border)',
+      borderRight: fullWidth ? 'none' : '1px solid var(--border)',
       padding: '2rem',
       overflowY: 'auto',
+      flexShrink: 0,
     }}>
-      {/* 출처 드롭다운 */}
-      <div style={{ marginBottom: '2rem', position: 'relative' }}>
-        <button
-          onClick={() => setDropdownOpen(prev => !prev)}
-          style={{
-            width: '100%',
-            background: 'none',
-            border: '1px solid var(--border)',
-            color: 'var(--text-color)',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            padding: '0.5rem 0.75rem',
-            textAlign: 'left',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <span>{selectedSource ?? 'All'}</span>
-          <span style={{ fontSize: '0.7rem', color: 'var(--meta-color)' }}>{dropdownOpen ? '▲' : '▼'}</span>
-        </button>
-
-        {dropdownOpen && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            width: '100%',
-            backgroundColor: '#0d0d0d',
-            border: '1px solid var(--border)',
-            borderTop: 'none',
-            zIndex: 10,
-          }}>
-            <div
-              onClick={() => { onSourceSelect(null); setDropdownOpen(false) }}
-              style={{
-                padding: '0.5rem 0.75rem',
-                cursor: 'pointer',
-                fontSize: '0.9rem',
-                color: selectedSource === null ? 'var(--text-color)' : 'var(--meta-color)',
-                fontWeight: selectedSource === null ? 'bold' : 'normal',
-              }}
-            >
-              All
-            </div>
-            {sources.map(src => (
-              <div
-                key={src}
-                onClick={() => { onSourceSelect(src); setDropdownOpen(false) }}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  color: selectedSource === src ? 'var(--text-color)' : 'var(--meta-color)',
-                  fontWeight: selectedSource === src ? 'bold' : 'normal',
-                }}
-              >
-                {src}
-              </div>
-            ))}
-          </div>
-        )}
+      {/* 출처 탭 */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+        {allSources.map(src => (
+          <button
+            key={src ?? 'all'}
+            onClick={() => onSourceSelect(src)}
+            style={{
+              background: selectedSource === src ? 'var(--selected-bg)' : 'none',
+              border: '1px solid var(--border)',
+              color: selectedSource === src ? 'var(--text-color)' : 'var(--meta-color)',
+              fontSize: '0.85rem',
+              padding: '0.35rem 0.85rem',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              transition: 'background-color 0.15s, color 0.15s',
+            }}
+          >
+            {src ?? 'All'}
+          </button>
+        ))}
       </div>
 
       <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '1.5rem 0' }} />
@@ -115,6 +75,7 @@ export default function Sidebar({
               cursor: 'pointer',
               borderRadius: '4px',
               backgroundColor: selectedId === article.id ? 'var(--selected-bg)' : 'transparent',
+              color: selectedId === article.id ? 'var(--text-color)' : 'inherit',
               transition: 'background-color 0.2s',
             }}
             onMouseEnter={(e) => {

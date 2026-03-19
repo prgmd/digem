@@ -40,7 +40,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
         flexShrink: 0,
       }}>
         {/* 로고 */}
-        <div onClick={onLogoClick} style={{ cursor: 'pointer' }}>
+        <div onClick={onLogoClick} style={{ cursor: 'pointer', padding: '0.5rem 1.5rem 0.5rem 0', margin: '-0.5rem 0' }}>
           <span style={{ fontFamily: 'bjorkfont, sans-serif', fontSize: '2rem', color: 'var(--text-color)', lineHeight: 1 }}>
             d
           </span>
