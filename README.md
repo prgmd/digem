@@ -67,3 +67,40 @@ pip install -r requirements.txt
 - [ ] DLQ 패턴 구현 (Upstash Redis)
 - [ ] 다른 웹진 크롤러 추가 (Stereogum, Consequence)
 - [ ] GitHub Actions 워크플로우 작성
+
+### **2026-03-19 (Day 3)**
+#### ✅ 완료
+- [x] Next.js 프론트엔드 초기 세팅 (`digem/frontend`)
+  - `digem-test` 작업 내용 전체 이식 (로고 이미지 제외)
+  - 불필요 코드 제거 (Tailwind 임포트, Geist 폰트, grain 애니메이션, 픽셀 그리드 오버레이 등)
+- [x] 디자인 토큰 정립 (globals.css)
+  - 색상 4종으로 통일: 옅은 베이지(`#E8D5A0`), 검정(`#000`), 짙은 초록(`#0a3d2e`), 메타(`#8a7a5a`)
+  - CSS 커스텀 프로퍼티 (`--text-color`, `--meta-color`, `--border`, `--hover-bg`, `--selected-bg` 등)
+- [x] Animated Mesh Gradient 배경 구현
+  - `MeshBackground.tsx` 컴포넌트 생성 (blurred div 3개)
+  - `requestAnimationFrame` + lerp(0.04)로 마우스 추적 그래디언트 이동
+  - `layout.tsx`에 전역 적용
+- [x] 페이지 전환 애니메이션 통일
+  - 홈 입장: `heroSlideUp`, `heroSlideInLeft`, `heroSlideInRight` 순차 애니메이션
+  - 카테고리 페이지 입장: `pageFadeIn 0.4s`, 퇴장: `pageFadeOut 0.35s`
+  - 카테고리 간 이동 시 전환 효과 제거 (`sessionStorage` `nofade` 플래그)
+- [x] Articles 페이지 리디자인
+  - 출처 필터를 드롭다운 단일 선택 방식으로 변경 (All 포함)
+  - 햄버거 버튼 → 오른쪽 슬라이드 패널 네비게이션 (`menuSlideInRight/OutRight`)
+  - 좌측 사이드바 너비 확장 (`480px`)
+- [x] Albums 페이지 신규 생성
+  - 지역 / 유형 / 연도 / 월 필터 (select)
+  - 앨범 그리드 (`auto-fill minmax(180px, 1fr)`), 카드별 staggered fadeIn
+- [x] `CategoryHeader` 공유 컴포넌트 추출
+  - 로고(좌) + 햄버거(우) + 오른쪽 슬라이드 패널을 단일 컴포넌트로 분리
+  - Props: `onLogoClick`, `currentCategory`
+  - Articles, Albums 페이지에 공통 적용
+
+#### 🚧 이슈
+- [x] 카테고리 간 이동 시 메시 그래디언트 플래시 현상
+  - 해결: `sessionStorage` 플래그로 카테고리→카테고리 이동 시 `pageFadeIn` 스킵
+
+#### 📋 다음 단계
+- [ ] 백엔드 API 연동 (articles, albums 실데이터 연결)
+- [ ] Albums 페이지 앨범 아트 이미지 처리
+- [ ] 모바일 반응형 레이아웃 대응
