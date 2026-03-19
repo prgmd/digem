@@ -26,6 +26,7 @@ export default function ArticlesPage() {
   const [selectedSource, setSelectedSource] = useState<string | null>(null)
   const [isExiting, setIsExiting] = useState(false)
   const [fadeIn] = useState(() => {
+    if (typeof sessionStorage === 'undefined') return true
     const skip = sessionStorage.getItem('nofade')
     if (skip) { sessionStorage.removeItem('nofade'); return false }
     return true
