@@ -14,9 +14,10 @@ interface Article {
 
 interface ArticleDetailProps {
   article: Article | null
+  onBack?: () => void
 }
 
-export default function ArticleDetail({ article }: ArticleDetailProps) {
+export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const [language, setLanguage] = useState<'ko' | 'en'>('ko')
 
   if (!article) {
@@ -47,39 +48,55 @@ export default function ArticleDetail({ article }: ArticleDetailProps) {
       flex: 1,
       padding: '3rem 4rem',
       overflowY: 'auto',
-      height: '100vh',
+      height: '100%',
       filter: 'blur(0.3px)',
       animation: 'fadeIn 0.5s'
     }}>
-      {/* 언어 토글 */}
-      <div style={{ marginBottom: '2rem', textAlign: 'right' }}>
-        <button
-          onClick={() => setLanguage('en')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            marginRight: '1rem',
-            fontWeight: language === 'en' ? 'bold' : 'normal'
-          }}
-        >
-          원문
-        </button>
-        <button
-          onClick={() => setLanguage('ko')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            fontWeight: language === 'ko' ? 'bold' : 'normal'
-          }}
-        >
-          번역
-        </button>
+      {/* 모바일 뒤로가기 + 언어 토글 */}
+      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: onBack ? 'space-between' : 'flex-end', alignItems: 'center' }}>
+        {onBack && (
+          <button
+            onClick={onBack}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--meta-color)',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+            }}
+          >
+            ← 목록
+          </button>
+        )}
+        <div>
+          <button
+            onClick={() => setLanguage('en')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              marginRight: '1rem',
+              fontWeight: language === 'en' ? 'bold' : 'normal'
+            }}
+          >
+            원문
+          </button>
+          <button
+            onClick={() => setLanguage('ko')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              fontWeight: language === 'ko' ? 'bold' : 'normal'
+            }}
+          >
+            번역
+          </button>
+        </div>
       </div>
 
       {/* 제목 */}

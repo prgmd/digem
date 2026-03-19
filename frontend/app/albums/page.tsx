@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import CategoryHeader from '@/components/CategoryHeader'
@@ -38,6 +38,14 @@ const formatDate = (dateString: string) => {
 export default function AlbumsPage() {
   const router = useRouter()
   const [isExiting, setIsExiting] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
   const [fadeIn] = useState(() => {
     if (typeof sessionStorage === 'undefined') return true
     const skip = sessionStorage.getItem('nofade')
@@ -100,8 +108,9 @@ export default function AlbumsPage() {
       {/* 필터 */}
       <div style={{
         display: 'flex',
-        gap: '1rem',
-        padding: '1.25rem 2rem',
+        flexWrap: 'wrap',
+        gap: '0.6rem',
+        padding: isMobile ? '1rem' : '1.25rem 2rem',
         borderBottom: '1px solid var(--border)',
         flexShrink: 0,
       }}>
@@ -128,11 +137,11 @@ export default function AlbumsPage() {
       </div>
 
       {/* 앨범 그리드 */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '1rem' : '2rem' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-          gap: '1.75rem',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(180px, 1fr))',
+          gap: isMobile ? '1rem' : '1.75rem',
         }}>
           {filteredAlbums.map((album, index) => (
             <div

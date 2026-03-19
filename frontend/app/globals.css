@@ -89,6 +89,23 @@ body {
   to   { transform: translateX(100%); }
 }
 
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dropdownOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-6px); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero-logo { font-size: 5rem !important; }
+  .hero-tagline { font-size: 0.8rem !important; }
+  .hero-nav { gap: 3rem !important; }
+}
+
 /* Home page entrance animations */
 .hero-logo {
   animation: heroSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;

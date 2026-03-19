@@ -29,7 +29,7 @@ export default function Home() {
         style={{ width: '200px', border: 'none', borderTop: '1px solid var(--border)' }}
       />
 
-      <nav style={{ display: 'flex', gap: '4rem', alignItems: 'center' }}>
+      <nav className="hero-nav" style={{ display: 'flex', gap: '4rem', alignItems: 'center' }}>
         <Link
           href="/articles"
           className="hero-nav-left"
