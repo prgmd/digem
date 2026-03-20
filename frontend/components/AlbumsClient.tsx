@@ -66,6 +66,8 @@ export default function AlbumsClient({ albums }: Props) {
   const [selectedMonth, setSelectedMonth] = useState('all')
   const [featuredOnly, setFeaturedOnly] = useState(false)
   const [page, setPage] = useState(1)
+  const [navigating, setNavigating] = useState(false)
+  const [hoveredArtist, setHoveredArtist] = useState<string | null>(null)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -74,8 +76,7 @@ export default function AlbumsClient({ albums }: Props) {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  // 필터 바뀌면 페이지 초기화
-  useEffect(() => { setPage(1) }, [selectedRegion, selectedType, selectedYear, selectedMonth, featuredOnly])
+  const setFilter = <T,>(setter: (v: T) => void) => (v: T) => { setter(v); setPage(1) }
 
   const handleExitToHome = () => {
     setIsExiting(true)
@@ -121,24 +122,36 @@ export default function AlbumsClient({ albums }: Props) {
         borderBottom: '1px solid var(--border)',
         flexShrink: 0,
       }}>
-        <button style={tabStyle(featuredOnly)} onClick={() => setFeaturedOnly(v => !v)}>추천</button>
-        <select value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)} style={selectStyle}>
+        <button style={tabStyle(featuredOnly)} onClick={() => { setFeaturedOnly(v => !v); setPage(1) }}>추천</button>
+        <select value={selectedRegion} onChange={e => setFilter(setSelectedRegion)(e.target.value)} style={selectStyle}>
           <option value="all">지역</option>
           <option value="국내">국내</option>
           <option value="해외">해외</option>
         </select>
-        <select value={selectedType} onChange={e => setSelectedType(e.target.value)} style={selectStyle}>
+        <select value={selectedType} onChange={e => setFilter(setSelectedType)(e.target.value)} style={selectStyle}>
           <option value="all">유형</option>
           <option value="정규">정규</option>
           <option value="EP">EP</option>
         </select>
-        <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={selectStyle}>
+        <select value={selectedYear} onChange={e => setFilter(setSelectedYear)(e.target.value)} style={selectStyle}>
           {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? '연도' : y}</option>)}
         </select>
-        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={selectStyle}>
+        <select value={selectedMonth} onChange={e => setFilter(setSelectedMonth)(e.target.value)} style={selectStyle}>
           {availableMonths.map(m => <option key={m} value={m}>{m === 'all' ? '월' : `${m}월`}</option>)}
         </select>
       </div>
+
+      {/* 네비게이션 로딩 오버레이 */}
+      {navigating && (
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'rgba(0,0,0,0.5)' }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%',
+            border: '2px solid var(--meta-color)',
+            borderTopColor: 'var(--text-color)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+        </div>
+      )}
 
       {/* 앨범 그리드 */}
       <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '1rem' : '2rem' }}>
@@ -151,7 +164,6 @@ export default function AlbumsClient({ albums }: Props) {
             <div key={album.id} style={{
               opacity: 0,
               animation: `fadeIn 0.5s ease-in-out ${index * 30}ms forwards`,
-              cursor: 'pointer',
             }}>
               <div style={{
                 width: '100%',
@@ -193,16 +205,18 @@ export default function AlbumsClient({ albums }: Props) {
                   </span>
                 )}
               </div>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
+              <p style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
                 {album.title}
               </p>
               <p
-                onClick={(e) => { e.stopPropagation(); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
-                style={{ fontSize: '0.8rem', color: 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer' }}
+                onClick={(e) => { e.stopPropagation(); setNavigating(true); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
+                onMouseEnter={() => setHoveredArtist(album.id)}
+                onMouseLeave={() => setHoveredArtist(null)}
+                style={{ fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer', transition: 'color 0.15s' }}
               >
                 {album.artist}
               </p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--meta-color)', opacity: 0.65 }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--meta-color)' }}>
                 {album.region}{album.album_type ? ` · ${album.album_type}` : ''}{album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
               </p>
             </div>
