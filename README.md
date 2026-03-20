@@ -142,9 +142,55 @@ pip install -r requirements.txt
 - [x] Vercel 배포 시 `supabaseUrl is required` 오류
   - 해결: `.gitignore`의 `lib/` 규칙으로 `frontend/lib/supabase.ts` 미포함 → 예외 규칙 추가
 
-#### 📋 다음 단계
-- [ ] Supabase `articles` 테이블 `title_ko`, `thumbnail_url` 컬럼 추가 (ALTER TABLE)
+#### 📋 다음 단계 (Day 4 이후)
+- [x] Supabase `articles` 테이블 `title_ko`, `thumbnail_url` 컬럼 추가
 - [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
 - [ ] 썸네일 도메인 확인 후 `next/image` + `remotePatterns` 전환
-- [ ] Albums 페이지 실데이터 연결
-- [ ] 모바일 반응형 레이아웃 대응
+
+---
+
+### **2026-03-20 (Day 4 - 후반)**
+#### ✅ 완료
+- [x] Albums 페이지 Supabase 연동 및 Server Component 전환
+  - `app/albums/page.tsx` → Server Component, `components/AlbumsClient.tsx` 분리
+  - 기본 필터 전부 `all`, 페이지당 30개 번호 페이지네이션
+  - `is_featured` 컬럼 추가 및 추천 탭 필터 구현
+- [x] 멜론 스크래퍼 파이프라인 완성
+  - `melon_scraper.py` 신규 작성 (국내/해외 정규/EP 수집)
+  - `database_loader.py` 앨범 저장 메서드 추가 (`save_album`, `filter_new_albums`)
+  - 앨범 저장 시 `artists` 테이블 `get_or_create` + `album_artists` 자동 연결
+- [x] 아티스트 페이지 신규 생성
+  - `app/artists/[name]/page.tsx` — 아티스트명 기반 라우팅, album_artists 조인으로 앨범 목록 fetch
+  - `components/ArtistClient.tsx` — 뒤로가기 + 아티스트명 + 앨범 그리드 (간결한 구성)
+  - Albums 그리드에서 아티스트명 클릭 시 이동
+- [x] 번역 프롬프트 개선
+  - 아티스트명 첫 언급만 한글(영문) 병기, 이후 한글만 사용
+  - 앨범명·싱글명·곡명 원문 유지
+  - 장르·음악 용어 등 생소한 단어에 한해 병기 유지
+- [x] ArticleDetail UX 개선
+  - 원문 전환 시 제목도 영어 원제로 변경
+  - 썸네일 본문 바로 위로 이동
+  - 썸네일 로딩 완료 후 본문과 함께 표시 (스피너 로딩 UI)
+  - 본문 양쪽 맞춤 (`text-align: justify`) + `word-break: keep-all`
+  - 본문 영역 중앙 정렬 (`margin: 0 auto`)
+- [x] 추천작(`is_featured`) 강조 디자인
+  - 썸네일 초록 outline 테두리
+  - 왼쪽 상단 초록 배경 흰 글자 `d` 뱃지 (bjorkfont)
+- [x] 모바일 반응형 개선
+  - `html { font-size: 14px }` 모바일 전체 글씨 축소
+  - CategoryHeader, Sidebar, ArticleDetail 모바일 패딩 축소
+- [x] `tools/melon_seed.py` 신규 작성
+  - Selenium 기반 일회성 대량 시딩 스크립트 (국내/해외 각 N페이지)
+  - `tools/` 폴더로 메인 파이프라인과 분리
+- [x] ArticleDetail 본문 max-width 760px 제한 + 스크롤 렉 개선
+  - mesh blob `filter: blur` 70px 축소 + `will-change: transform` + `translateZ(0)` 추가
+
+#### 🚧 이슈
+- [ ] 멜론 API 페이지네이션 미지원 — `startIndex`, `pageIndex` 등 모든 파라미터 무시됨
+  - `tools/melon_seed.py` Selenium으로 우회 (hash URL 방식)
+
+#### 📋 다음 단계
+- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
+- [ ] 썸네일 도메인 확인 후 `next/image` + `remotePatterns` 전환
+- [ ] 아티스트 페이지 라우팅 UUID 기반으로 전환
+- [ ] Rolling Stone 스크래퍼 추가

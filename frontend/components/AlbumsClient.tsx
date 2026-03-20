@@ -177,7 +177,7 @@ export default function AlbumsClient({ albums }: Props) {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     zIndex: 1,
                     lineHeight: 1,
-                    paddingTop: '4px',
+                    paddingTop: '3px',
                     paddingRight: '6px',
                   }}>d</span>
                 )}
