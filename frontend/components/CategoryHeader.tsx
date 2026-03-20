@@ -30,7 +30,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
 
   return (
     <>
-      <header style={{
+      <header className="category-header" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

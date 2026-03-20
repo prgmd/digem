@@ -56,7 +56,7 @@ export default function Sidebar({
       width: fullWidth ? '100%' : '480px',
       height: '100%',
       borderRight: fullWidth ? 'none' : '1px solid var(--border)',
-      padding: '2rem',
+      padding: fullWidth ? '1rem' : '2rem',
       overflowY: 'auto',
       flexShrink: 0,
     }}>
