@@ -104,3 +104,47 @@ pip install -r requirements.txt
 - [ ] 백엔드 API 연동 (articles, albums 실데이터 연결)
 - [ ] Albums 페이지 앨범 아트 이미지 처리
 - [ ] 모바일 반응형 레이아웃 대응
+
+### **2026-03-20 (Day 4)**
+#### ✅ 완료
+- [x] Supabase 연동 및 Server Component 전환
+  - `lib/supabase.ts` 생성 (클라이언트 설정)
+  - `app/articles/page.tsx` → Server Component (`async` 함수, `published_at` 내림차순 fetch)
+  - UI/인터랙션 로직 `components/ArticlesClient.tsx`로 분리 (`'use client'`)
+- [x] Articles 출처 필터 구조 변경
+  - NME, The Wire, Stereogum 제거 → All, Pitchfork, Rolling Stone 3종 고정 탭 버튼
+- [x] 사이드바 출처 아이콘 표기
+  - Pitchfork: SVG 로고 (`/files/pitchfork.svg`) + `filter: invert(1)`로 흰색 처리
+  - Rolling Stone: `RS` 텍스트 배지
+- [x] 번역 제목(`title_ko`) 파이프라인 통합
+  - `pitchfork_scrapers.py` `article_data`에 `title_ko` 추가
+  - `database_loader.py` `save_article()`에 `title_ko` 저장
+  - 프론트엔드 사이드바 및 상세 페이지 제목 `title_ko` 우선 표시
+- [x] 썸네일 파이프라인 통합
+  - `pitchfork_scrapers.py` `article_data`에 `thumbnail_url` 추가
+  - `database_loader.py` `save_article()`에 `thumbnail_url` 저장
+  - `ArticleDetail`에 썸네일 이미지 표시 (제목 상단)
+- [x] 원문 보기 링크 추가
+  - `ArticleDetail` 메타 정보 줄에 `source_url` 기반 외부 링크
+- [x] 번역 품질 개선 (Gemini 프롬프트)
+  - 마크다운 문법 출력 금지 (`**`, `*`, `#` 등)
+  - 본문 무관 내용 제거 지시 (더 보기, 광고, 뉴스레터 구독 유도 등)
+- [x] 프론트엔드 콘텐츠 클리닝
+  - `renderContent()` 함수: `더 보기` 라인 필터링 + `**bold**`/`*italic*` 마크다운 → HTML 변환
+- [x] Mesh Gradient 블롭 초기 위치 랜덤화
+  - 페이지 로드마다 3개 블롭 위치 랜덤 배치 (JS 초기화, CSS 고정값 제거)
+- [x] .gitignore 수정
+  - Python 템플릿의 `lib/` 무시 규칙으로 `frontend/lib/`가 누락되는 문제 해결 (`!frontend/lib/` 예외 추가)
+
+#### 🚧 이슈
+- [x] Vercel 배포 시 `sessionStorage is not defined` 오류
+  - 해결: `useState` 초기화 함수 내 `typeof sessionStorage === 'undefined'` 가드 추가
+- [x] Vercel 배포 시 `supabaseUrl is required` 오류
+  - 해결: `.gitignore`의 `lib/` 규칙으로 `frontend/lib/supabase.ts` 미포함 → 예외 규칙 추가
+
+#### 📋 다음 단계
+- [ ] Supabase `articles` 테이블 `title_ko`, `thumbnail_url` 컬럼 추가 (ALTER TABLE)
+- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
+- [ ] 썸네일 도메인 확인 후 `next/image` + `remotePatterns` 전환
+- [ ] Albums 페이지 실데이터 연결
+- [ ] 모바일 반응형 레이아웃 대응
