@@ -127,7 +127,7 @@ def main():
     translator = GeminiTranslator()
     loader = SupabaseLoader()
 
-    features = scraper.fetch_latest_reviews(limit = 5)
+    features = scraper.fetch_latest_reviews(limit = 10)
 
     # RSS 피드 가져오기
     if not features:
