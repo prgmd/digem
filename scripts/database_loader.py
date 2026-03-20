@@ -50,20 +50,59 @@ class SupabaseLoader:
             print(f'중복 체크 실패: {e}')
             return False
 
-    def filter_new_articles(self, articles: List[Dict]) -> List[Dict]:        
+    def filter_new_articles(self, articles: List[Dict]) -> List[Dict]:
         new_articles = []
         for article in articles:
             source_url = article.get('source_url')
             if not source_url:
                 continue
-            
+
             if self.article_exists(source_url):
                 print(f"{article.get('title', '')[:50]}...이/가 이미 존재합니다.")
             else:
                 print(f"{article.get('title', '')[:50]}...을/를 저장합니다.")
                 new_articles.append(article)
-        
+
         return new_articles
+
+    def save_album(self, album_data: Dict) -> bool:
+        try:
+            print('앨범 DB 저장 중...')
+            data = {
+                'title': album_data.get('title'),
+                'artist': album_data.get('artist'),
+                'release_date': album_data.get('release_date'),
+                'artwork_url': album_data.get('artwork_url'),
+                'album_type': album_data.get('album_type'),
+                'region': album_data.get('region'),
+                'source': album_data.get('source', 'melon'),
+            }
+            self.client.table('albums').insert(data).execute()
+            print('앨범 DB 저장 완료')
+            return True
+        except Exception as e:
+            print(f'앨범 DB 저장 실패: {e}')
+            return False
+
+    def album_exists(self, title: str, artist: str) -> bool:
+        try:
+            result = self.client.table('albums').select('id').eq('title', title).eq('artist', artist).execute()
+            return len(result.data) > 0
+        except Exception as e:
+            print(f'앨범 중복 체크 실패: {e}')
+            return False
+
+    def filter_new_albums(self, albums: List[Dict]) -> List[Dict]:
+        new_albums = []
+        for album in albums:
+            title = album.get('title', '')
+            artist = album.get('artist', '')
+            if self.album_exists(title, artist):
+                print(f"{title[:40]} - {artist[:20]} 이미 존재합니다.")
+            else:
+                print(f"{title[:40]} - {artist[:20]} 저장합니다.")
+                new_albums.append(album)
+        return new_albums
 
 
 def main():
