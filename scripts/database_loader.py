@@ -22,6 +22,7 @@ class SupabaseLoader:
             print('DB 저장 중...')
             data = {
                 'title': article_data.get('title'),
+                'title_ko': article_data.get('title_ko'),
                 'content_en': article_data.get('content_en'),
                 'content_ko': article_data.get('content_ko'),
                 'source': article_data.get('source'),

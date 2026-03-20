@@ -4,12 +4,24 @@ import { useState } from 'react'
 interface Article {
   id: number
   title: string
+  title_ko?: string
   author: string
   source: string
+  source_url?: string
   published_at: string
   category: string
   content_en: string
   content_ko: string
+}
+
+function renderContent(raw: string): string {
+  return raw
+    .split('\n')
+    .filter(line => !line.match(/더\s*보기/))
+    .join('\n')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br />')
 }
 
 interface ArticleDetailProps {
@@ -105,30 +117,44 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         marginBottom: '1rem',
         lineHeight: 1.3
       }}>
-        {article.title}
+        {article.title_ko || article.title}
       </h1>
 
       {/* 메타 */}
       <div style={{
         fontSize: '0.9rem',
         color: 'var(--meta-color)',
-        marginBottom: '3rem'
+        marginBottom: '3rem',
+        display: 'flex',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '0.25rem',
       }}>
         <span>{article.author}</span>
-        <span style={{ margin: '0 0.5rem' }}>·</span>
+        <span style={{ margin: '0 0.25rem' }}>·</span>
         <span>{article.source}</span>
-        <span style={{ margin: '0 0.5rem' }}>·</span>
+        <span style={{ margin: '0 0.25rem' }}>·</span>
         <span>{new Date(article.published_at).toLocaleDateString('ko-KR')}</span>
+        {article.source_url && (
+          <>
+            <span style={{ margin: '0 0.25rem' }}>·</span>
+            <a
+              href={article.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--meta-color)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+            >
+              원문 보기
+            </a>
+          </>
+        )}
       </div>
 
       {/* 본문 */}
-      <div style={{
-        fontSize: '1.1rem',
-        lineHeight: 1.8,
-        whiteSpace: 'pre-wrap'
-      }}>
-        {content}
-      </div>
+      <div
+        style={{ fontSize: '1.1rem', lineHeight: 1.8 }}
+        dangerouslySetInnerHTML={{ __html: renderContent(content) }}
+      />
     </main>
   )
 }

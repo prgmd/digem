@@ -3,10 +3,31 @@
 interface Article {
   id: number
   title: string
+  title_ko?: string
   author: string
   source: string
+  source_url?: string
   published_at: string
   category: string
+}
+
+function SourceBadge({ source }: { source: string }) {
+  const s = source.toLowerCase()
+  if (s === 'pitchfork') {
+    return (
+      <img
+        src="/files/pitchfork.svg"
+        alt="Pitchfork"
+        style={{ width: 18, height: 18, objectFit: 'contain', flexShrink: 0, opacity: 0.7, marginTop: 1, filter: 'invert(1)' }}
+      />
+    )
+  }
+  const abbr = s === 'rolling stone' ? 'RS' : source.slice(0, 2).toUpperCase()
+  return (
+    <span style={{ fontSize: '0.65rem', opacity: 0.6, flexShrink: 0, letterSpacing: '0.05em' }}>
+      {abbr}
+    </span>
+  )
 }
 
 interface SidebarProps {
@@ -77,6 +98,9 @@ export default function Sidebar({
               backgroundColor: selectedId === article.id ? 'var(--selected-bg)' : 'transparent',
               color: selectedId === article.id ? 'var(--text-color)' : 'inherit',
               transition: 'background-color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
             }}
             onMouseEnter={(e) => {
               if (selectedId !== article.id) e.currentTarget.style.backgroundColor = 'var(--hover-bg)'
@@ -85,7 +109,8 @@ export default function Sidebar({
               if (selectedId !== article.id) e.currentTarget.style.backgroundColor = 'transparent'
             }}
           >
-            • {article.title}
+            <SourceBadge source={article.source} />
+            <span>{article.title_ko || article.title}</span>
           </li>
         ))}
       </ul>
