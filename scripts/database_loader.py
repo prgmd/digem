@@ -77,12 +77,42 @@ class SupabaseLoader:
                 'region': album_data.get('region'),
                 'source': album_data.get('source', 'melon'),
             }
-            self.client.table('albums').insert(data).execute()
+            result = self.client.table('albums').insert(data).execute()
+            album_id = result.data[0]['id']
+
+            artist_name = album_data.get('artist', '')
+            if artist_name:
+                artist_id = self.get_or_create_artist(artist_name)
+                if artist_id:
+                    self._save_album_artist(album_id, artist_id)
+
             print('앨범 DB 저장 완료')
             return True
         except Exception as e:
             print(f'앨범 DB 저장 실패: {e}')
             return False
+
+    def get_or_create_artist(self, name: str) -> Optional[str]:
+        try:
+            result = self.client.table('artists').select('id').eq('name', name).execute()
+            if result.data:
+                return result.data[0]['id']
+            result = self.client.table('artists').insert({'name': name}).execute()
+            print(f'아티스트 생성: {name}')
+            return result.data[0]['id']
+        except Exception as e:
+            print(f'아티스트 get_or_create 실패: {e}')
+            return None
+
+    def _save_album_artist(self, album_id: str, artist_id: str) -> None:
+        try:
+            self.client.table('album_artists').insert({
+                'album_id': album_id,
+                'artist_id': artist_id,
+                'order': 1,
+            }).execute()
+        except Exception as e:
+            print(f'album_artists 저장 실패: {e}')
 
     def album_exists(self, title: str, artist: str) -> bool:
         try:

@@ -82,6 +82,7 @@ export default function ArticlesClient({ articles }: Props) {
         )}
         {showDetail && (
           <ArticleDetail
+            key={currentArticle?.id ?? 'empty'}
             article={currentArticle}
             onBack={isMobile ? () => setSelectedId(null) : undefined}
           />
