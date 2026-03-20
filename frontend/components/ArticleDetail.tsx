@@ -8,6 +8,7 @@ interface Article {
   author: string
   source: string
   source_url?: string
+  thumbnail_url?: string
   published_at: string
   category: string
   content_en: string
@@ -110,6 +111,21 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
           </button>
         </div>
       </div>
+
+      {/* 썸네일 */}
+      {article.thumbnail_url && (
+        <img
+          src={article.thumbnail_url}
+          alt={article.title_ko || article.title}
+          style={{
+            width: '100%',
+            maxHeight: '360px',
+            objectFit: 'cover',
+            marginBottom: '2rem',
+            borderRadius: '4px',
+          }}
+        />
+      )}
 
       {/* 제목 */}
       <h1 style={{
