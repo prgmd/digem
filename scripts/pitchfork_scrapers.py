@@ -177,6 +177,7 @@ def main():
             'source_url': feature['source_url'],
             'author': feature['author'],
             'published_at': feature['published_at'],
+            'thumbnail_url': feature.get('thumbnail_url'),
         }
 
         success = loader.save_article(article_data)

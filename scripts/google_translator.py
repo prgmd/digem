@@ -43,7 +43,17 @@ class GeminiTranslator:
         return response.text.strip()
     
     def _translate_content(self, content:str) -> str:
-        prompt = f'당신은 음악 평론 전문 번역가입니다. 다음 음악 칼럼 내용을 한국어로 번역해주세요. 아티스트명은 원문도 함께 표기 (ex: 테일러 스위프트(Taylor Swift)). 부연 설명 없이 번역된 본문만 출력. 자연스러운 한국어로 번역. 내용: {content}'
+        prompt = f'''당신은 음악 평론 전문 번역가입니다. 다음 음악 칼럼 내용을 한국어로 번역해주세요.
+
+규칙:
+1. 아티스트명은 원문도 함께 표기 (ex: 테일러 스위프트(Taylor Swift))
+2. 자연스러운 한국어로 번역
+3. 마크다운 문법 사용 금지 (**, *, #, - 등 절대 사용하지 말 것)
+4. 본문과 무관한 내용 제거 (예: "더 보기", 광고 문구, 출처 링크 안내, 뉴스레터 구독 유도 등)
+5. 부연 설명 없이 번역된 본문만 출력
+
+내용:
+{content}'''
         response = self.model.generate_content(prompt)
         return response.text.strip()
 

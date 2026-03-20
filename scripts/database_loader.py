@@ -29,6 +29,7 @@ class SupabaseLoader:
                 'source_url': article_data.get('source_url'),
                 'author': article_data.get('author'),
                 'published_at': article_data.get('published_at'),
+                'thumbnail_url': article_data.get('thumbnail_url'),
                 'translation_status': 'success',
                 'translated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
