@@ -59,7 +59,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   return (
     <main style={{
       flex: 1,
-      padding: '3rem 4rem',
+      padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
       overflowY: 'auto',
       height: '100%',
       filter: 'blur(0.3px)',
@@ -113,28 +113,13 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         </div>
       </div>
 
-      {/* 썸네일 */}
-      {article.thumbnail_url && (
-        <img
-          src={article.thumbnail_url}
-          alt={article.title_ko || article.title}
-          style={{
-            width: '100%',
-            maxHeight: '360px',
-            objectFit: 'cover',
-            marginBottom: '2rem',
-            borderRadius: '4px',
-          }}
-        />
-      )}
-
       {/* 제목 */}
       <h1 style={{
         fontSize: '2.5rem',
         marginBottom: '1rem',
         lineHeight: 1.3
       }}>
-        {article.title_ko || article.title}
+        {language === 'en' ? article.title : (article.title_ko || article.title)}
       </h1>
 
       {/* 메타 */}
@@ -166,6 +151,21 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
           </>
         )}
       </div>
+
+      {/* 썸네일 */}
+      {article.thumbnail_url && (
+        <img
+          src={article.thumbnail_url}
+          alt={article.title}
+          style={{
+            width: '100%',
+            maxHeight: '360px',
+            objectFit: 'cover',
+            marginBottom: '2rem',
+            borderRadius: '4px',
+          }}
+        />
+      )}
 
       {/* 본문 */}
       <div

@@ -162,3 +162,13 @@ body {
   height: 450px;
   background: #051a10;
 }
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  .category-header {
+    padding: 0 1rem !important;
+  }
+}
