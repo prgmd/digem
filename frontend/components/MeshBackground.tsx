@@ -17,18 +17,27 @@ export default function MeshBackground() {
     }
 
     const animate = () => {
-      currentX += (targetX - currentX) * 0.04
-      currentY += (targetY - currentY) * 0.04
+      currentX += (targetX - currentX) * 0.08
+      currentY += (targetY - currentY) * 0.08
 
       const cx = currentX - 0.5
       const cy = currentY - 0.5
 
-      if (blob1.current) blob1.current.style.transform = `translate(${cx * 140}px, ${cy * 120}px)`
-      if (blob2.current) blob2.current.style.transform = `translate(${-cx * 180}px, ${-cy * 160}px)`
-      if (blob3.current) blob3.current.style.transform = `translate(${cx * 90}px, ${-cy * 110}px)`
+      if (blob1.current) blob1.current.style.transform = `translate(${cx * 260}px, ${cy * 220}px)`
+      if (blob2.current) blob2.current.style.transform = `translate(${-cx * 320}px, ${-cy * 280}px)`
+      if (blob3.current) blob3.current.style.transform = `translate(${cx * 180}px, ${-cy * 200}px)`
 
       rafId = requestAnimationFrame(animate)
     }
+
+    // 초기 위치 랜덤
+    const rand = () => Math.random() * 80 - 10  // -10% ~ 70% 범위
+    ;[blob1, blob2, blob3].forEach(ref => {
+      if (ref.current) {
+        ref.current.style.left = `${rand()}%`
+        ref.current.style.top = `${rand()}%`
+      }
+    })
 
     window.addEventListener('mousemove', onMouseMove)
     rafId = requestAnimationFrame(animate)

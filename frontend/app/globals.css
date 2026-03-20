@@ -147,22 +147,16 @@ body {
   width: 700px;
   height: 700px;
   background: #0a3d2e;
-  top: -15%;
-  left: -10%;
 }
 
 .mesh-blob-2 {
   width: 550px;
   height: 550px;
   background: #1a5d42;
-  bottom: -10%;
-  right: -5%;
 }
 
 .mesh-blob-3 {
   width: 450px;
   height: 450px;
   background: #051a10;
-  top: 35%;
-  left: 45%;
 }
