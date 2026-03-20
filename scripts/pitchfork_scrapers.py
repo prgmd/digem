@@ -170,6 +170,7 @@ def main():
 
         article_data = {
             'title': feature['title'],
+            'title_ko': result['title_ko'],
             'content_en': full_content,
             'content_ko': result['content_ko'],
             'source': feature['source'],
