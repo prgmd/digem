@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Article {
   id: number
@@ -32,6 +32,15 @@ interface ArticleDetailProps {
 
 export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const [language, setLanguage] = useState<'ko' | 'en'>('ko')
+  const [ready, setReady] = useState(!article?.thumbnail_url)
+
+  useEffect(() => {
+    if (!article?.thumbnail_url) return
+    const img = new window.Image()
+    img.src = article.thumbnail_url
+    img.onload = () => setReady(true)
+    img.onerror = () => setReady(true)
+  }, [article?.thumbnail_url])
 
   if (!article) {
     return (
@@ -56,6 +65,21 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
   const content = language === 'ko' ? article.content_ko : article.content_en
 
+  if (!ready) {
+    return (
+      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', opacity: 0.4 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%',
+            border: '2px solid var(--meta-color)',
+            borderTopColor: 'var(--text-color)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main style={{
       flex: 1,
@@ -65,7 +89,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       filter: 'blur(0.3px)',
       animation: 'fadeIn 0.5s'
     }}>
-      <div style={{ maxWidth: '760px' }}>
+      <div style={{ maxWidth: '760px', margin: '0 auto' }}>
       {/* 모바일 뒤로가기 + 언어 토글 */}
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: onBack ? 'space-between' : 'flex-end', alignItems: 'center' }}>
         {onBack && (
@@ -169,7 +193,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontSize: '1.1rem', lineHeight: 1.8, maxWidth: '720px' }}
+        style={{ fontSize: '1.1rem', lineHeight: 1.8, maxWidth: '720px', textAlign: 'justify', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content) }}
       />
       </div>

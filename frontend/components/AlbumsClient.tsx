@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import CategoryHeader from '@/components/CategoryHeader'
 
 export interface Album {
@@ -163,8 +162,25 @@ export default function AlbumsClient({ albums }: Props) {
                 justifyContent: 'center',
                 marginBottom: '0.65rem',
                 overflow: 'hidden',
+                outline: album.is_featured ? '2px solid #2d7a4f' : 'none',
+                outlineOffset: '2px',
                 position: 'relative',
               }}>
+                {album.is_featured && (
+                  <span style={{
+                    position: 'absolute', top: 0, left: 0,
+                    fontFamily: 'bjorkfont, sans-serif',
+                    fontSize: '1rem',
+                    color: '#fff',
+                    background: '#2d7a4f',
+                    width: 24, height: 24,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 1,
+                    lineHeight: 1,
+                    paddingTop: '4px',
+                    paddingRight: '6px',
+                  }}>d</span>
+                )}
                 {album.artwork_url ? (
                   <img
                     src={album.artwork_url}
@@ -176,18 +192,14 @@ export default function AlbumsClient({ albums }: Props) {
                     {album.title[0]}
                   </span>
                 )}
-                {album.is_featured && (
-                  <div style={{
-                    position: 'absolute', top: 6, right: 6,
-                    width: 8, height: 8, borderRadius: '50%',
-                    background: '#2d7a4f',
-                  }} />
-                )}
               </div>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
                 {album.title}
               </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
+              <p
+                onClick={(e) => { e.stopPropagation(); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
+                style={{ fontSize: '0.8rem', color: 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer' }}
+              >
                 {album.artist}
               </p>
               <p style={{ fontSize: '0.75rem', color: 'var(--meta-color)', opacity: 0.65 }}>
