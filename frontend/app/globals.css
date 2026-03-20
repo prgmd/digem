@@ -139,8 +139,10 @@ body {
 .mesh-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(70px);
   opacity: 0.55;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .mesh-blob-1 {

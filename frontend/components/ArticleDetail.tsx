@@ -65,6 +65,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       filter: 'blur(0.3px)',
       animation: 'fadeIn 0.5s'
     }}>
+      <div style={{ maxWidth: '760px' }}>
       {/* 모바일 뒤로가기 + 언어 토글 */}
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: onBack ? 'space-between' : 'flex-end', alignItems: 'center' }}>
         {onBack && (
@@ -168,9 +169,10 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontSize: '1.1rem', lineHeight: 1.8 }}
+        style={{ fontSize: '1.1rem', lineHeight: 1.8, maxWidth: '720px' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content) }}
       />
+      </div>
     </main>
   )
 }
