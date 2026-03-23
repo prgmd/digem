@@ -214,3 +214,8 @@ pip install -r requirements.txt
   - 6열 기준 `maxWidth: 1200px` 중앙 정렬로 초광폭 화면 대응
 - [x] Albums 모바일 그리드 잘림 수정
   - grid item에 `minWidth: 0` 추가 — `whiteSpace: nowrap` 텍스트가 `1fr` 셀을 밀어내던 CSS Grid 기본값 문제 해결
+- [x] 썸네일 저작권 크레딧 파이프라인 추가
+  - `pitchfork_scrapers.py` — `fetch_full_content` 반환값을 dict로 변경, 첫 번째 `<figure>` → `<figcaption>` 텍스트를 `thumbnail_credit`으로 추출
+  - `database_loader.py` — `save_article`에 `thumbnail_credit` 저장 추가
+  - Supabase `articles` 테이블에 `thumbnail_credit TEXT` 컬럼 추가
+  - `ArticleDetail.tsx` — 썸네일 이미지 하단 왼쪽에 크레딧 텍스트 표시 (`0.8rem`, `var(--meta-color)`)

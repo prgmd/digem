@@ -89,14 +89,22 @@ class pitchforkScraper:
             print(f'날짜 파싱 오류: {e}')
             return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    # 전문 가져오기
-    def fetch_full_content(self, url: str) -> str:
+    # 전문 + 썸네일 크레딧 가져오기
+    def fetch_full_content(self, url: str) -> Dict:
         try:
             print('전체 내용을 가져옵니다...')
             response = self.session.get(url, timeout = 10)
             response.raise_for_status()
 
             soup = BeautifulSoup(response.text, 'html.parser')
+
+            # 썸네일 크레딧: 첫 번째 figure의 figcaption
+            thumbnail_credit = None
+            first_figure = soup.find('figure')
+            if first_figure:
+                figcaption = first_figure.find('figcaption')
+                if figcaption:
+                    thumbnail_credit = figcaption.get_text(separator=' ').strip()
 
             all_paragraphs = soup.find_all('p')
             content_paragraphs = []
@@ -112,14 +120,14 @@ class pitchforkScraper:
             content = '\n\n'.join(content_paragraphs)
 
             if content:
-                return content
+                return {'content': content, 'thumbnail_credit': thumbnail_credit}
             else:
                 print('본문을 찾지 못했습니다.')
-                return ''
-            
+                return {'content': '', 'thumbnail_credit': None}
+
         except Exception as e:
             print('페이지 가져오기 오류', e)
-            return ''
+            return {'content': '', 'thumbnail_credit': None}
 
 def main():
     print('Pitchfork 크롤링을 시작합니다...')
@@ -149,15 +157,19 @@ def main():
         return
 
     for i, feature in enumerate(new_features, 1):    
-        full_content = scraper.fetch_full_content(feature['source_url'])
+        fetched = scraper.fetch_full_content(feature['source_url'])
+        full_content = fetched['content']
+        thumbnail_credit = fetched['thumbnail_credit']
         if full_content:
             print(f"\n(전체 {len(full_content)}자)")
             print(f'{feature['title']}')
             print(f"{full_content[:200]}...\n")
+            if thumbnail_credit:
+                print(f"[썸네일 크레딧]: {thumbnail_credit}")
         else:
             print('본문 추출 실패. 스킵하겠습니다.')
-            continue        
-        
+            continue
+
         # 번역 요청
         result = translator.translate_article(feature['title'], full_content)
         if result['status'] == 'success':
@@ -178,6 +190,7 @@ def main():
             'author': feature['author'],
             'published_at': feature['published_at'],
             'thumbnail_url': feature.get('thumbnail_url'),
+            'thumbnail_credit': thumbnail_credit,
         }
 
         success = loader.save_article(article_data)

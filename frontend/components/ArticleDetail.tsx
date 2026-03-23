@@ -9,6 +9,7 @@ interface Article {
   source: string
   source_url?: string
   thumbnail_url?: string
+  thumbnail_credit?: string
   published_at: string
   category: string
   content_en: string
@@ -165,17 +166,24 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 썸네일 */}
       {article.thumbnail_url && (
-        <img
-          src={article.thumbnail_url}
-          alt={article.title}
-          style={{
-            width: '100%',
-            maxHeight: '360px',
-            objectFit: 'cover',
-            marginBottom: '2rem',
-            borderRadius: '4px',
-          }}
-        />
+        <div style={{ marginBottom: '2rem' }}>
+          <img
+            src={article.thumbnail_url}
+            alt={article.title}
+            style={{
+              width: '100%',
+              maxHeight: '360px',
+              objectFit: 'cover',
+              borderRadius: '4px',
+              display: 'block',
+            }}
+          />
+          {article.thumbnail_credit && (
+            <p style={{ fontSize: '0.8rem', color: 'var(--meta-color)', marginTop: '0.4rem', textAlign: 'left' }}>
+              {article.thumbnail_credit}
+            </p>
+          )}
+        </div>
       )}
 
       {/* 본문 */}

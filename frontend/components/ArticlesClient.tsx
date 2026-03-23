@@ -13,6 +13,7 @@ export interface Article {
   source: string
   source_url?: string
   thumbnail_url?: string
+  thumbnail_credit?: string
   published_at: string
   category: string
   content_en: string
