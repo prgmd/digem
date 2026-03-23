@@ -223,6 +223,9 @@ pip install -r requirements.txt
   - 햄버거 메뉴 맨 하단(구분선 아래)에서만 접근 가능
   - About / 저작권 / 폰트 세 섹션으로 구성
   - 햄버거 패널 항목 가로 중앙 정렬 적용
+  - bjorkfont 출처 수정 (FontZone 무료 배포 서체, 제작자 미상)
+- [x] 카카오톡 인앱 브라우저 로고 잘림 수정
+  - `html`에 `overflow-x: hidden` + `max-width: 100%` 추가 — 블롭 translate 시 body 폭이 순간 확장되던 문제 차단
 
 #### 📋 다음 단계
 - [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
