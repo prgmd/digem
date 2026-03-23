@@ -66,7 +66,8 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
             position: 'fixed',
             top: 0, right: 0,
             height: '100vh',
-            width: '220px',
+            width: 'fit-content',
+            minWidth: 0,
             backgroundColor: '#0a0a0a',
             borderLeft: '1px solid var(--border)',
             zIndex: 26,
@@ -74,7 +75,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
             flexDirection: 'column',
             justifyContent: 'center',
             gap: '2rem',
-            padding: '0 2.5rem',
+            padding: '0 2rem',
             animation: menuClosing
               ? 'menuSlideOutRight 0.3s cubic-bezier(0.4, 0, 1, 1) forwards'
               : 'menuSlideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1)',

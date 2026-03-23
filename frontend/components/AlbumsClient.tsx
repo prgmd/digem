@@ -52,7 +52,7 @@ interface Props {
 export default function AlbumsClient({ albums }: Props) {
   const router = useRouter()
   const [isExiting, setIsExiting] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [columns, setColumns] = useState(6)
   const [fadeIn] = useState(() => {
     if (typeof sessionStorage === 'undefined') return true
     const skip = sessionStorage.getItem('nofade')
@@ -69,11 +69,19 @@ export default function AlbumsClient({ albums }: Props) {
   const [navigating, setNavigating] = useState(false)
   const [hoveredArtist, setHoveredArtist] = useState<string | null>(null)
 
+  const isMobile = columns === 2
+
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+    const update = () => {
+      const w = window.innerWidth
+      if (w < 768) setColumns(2)
+      else if (w < 900) setColumns(3)
+      else if (w < 1200) setColumns(5)
+      else setColumns(6)
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
   }, [])
 
   const setFilter = <T,>(setter: (v: T) => void) => (v: T) => { setter(v); setPage(1) }
@@ -157,13 +165,16 @@ export default function AlbumsClient({ albums }: Props) {
       <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '1rem' : '2rem' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(180px, 1fr))',
+          gridTemplateColumns: `repeat(${columns}, 1fr)`,
           gap: isMobile ? '1rem' : '1.75rem',
+          maxWidth: columns === 6 ? '1200px' : undefined,
+          margin: columns === 6 ? '0 auto' : undefined,
         }}>
           {paginated.map((album, index) => (
             <div key={album.id} style={{
               opacity: 0,
               animation: `fadeIn 0.5s ease-in-out ${index * 30}ms forwards`,
+              minWidth: 0,
             }}>
               <div style={{
                 width: '100%',

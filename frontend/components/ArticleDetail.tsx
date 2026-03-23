@@ -81,27 +81,21 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   }
 
   return (
-    <main style={{
-      flex: 1,
-      padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
-      overflowY: 'auto',
-      height: '100%',
-      filter: 'blur(0.3px)',
-      animation: 'fadeIn 0.5s'
-    }}>
-      <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-      {/* 모바일 뒤로가기 + 언어 토글 */}
-      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: onBack ? 'space-between' : 'flex-end', alignItems: 'center' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* 고정 헤더: 뒤로가기 + 언어 토글 */}
+      <div style={{
+        display: 'flex',
+        justifyContent: onBack ? 'space-between' : 'flex-end',
+        alignItems: 'center',
+        padding: '0 1.5rem',
+        height: '44px',
+        borderBottom: '1px solid var(--border)',
+        flexShrink: 0,
+      }}>
         {onBack && (
           <button
             onClick={onBack}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--meta-color)',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-            }}
+            style={{ background: 'none', border: 'none', color: 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}
           >
             ← 목록
           </button>
@@ -109,34 +103,27 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         <div>
           <button
             onClick={() => setLanguage('en')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              marginRight: '1rem',
-              fontWeight: language === 'en' ? 'bold' : 'normal'
-            }}
+            style={{ background: 'none', border: 'none', color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginRight: '1rem', fontWeight: language === 'en' ? 'bold' : 'normal' }}
           >
             원문
           </button>
           <button
             onClick={() => setLanguage('ko')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              fontWeight: language === 'ko' ? 'bold' : 'normal'
-            }}
+            style={{ background: 'none', border: 'none', color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', fontWeight: language === 'ko' ? 'bold' : 'normal' }}
           >
             번역
           </button>
         </div>
       </div>
 
+    <main style={{
+      flex: 1,
+      padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
+      overflowY: 'auto',
+      filter: 'blur(0.3px)',
+      animation: 'fadeIn 0.5s'
+    }}>
+      <div style={{ maxWidth: '760px', margin: '0 auto' }}>
       {/* 제목 */}
       <h1 style={{
         fontSize: '2.5rem',
@@ -198,5 +185,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       />
       </div>
     </main>
+    </div>
   )
 }
