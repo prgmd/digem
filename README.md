@@ -219,3 +219,15 @@ pip install -r requirements.txt
   - `database_loader.py` — `save_article`에 `thumbnail_credit` 저장 추가
   - Supabase `articles` 테이블에 `thumbnail_credit TEXT` 컬럼 추가
   - `ArticleDetail.tsx` — 썸네일 이미지 하단 왼쪽에 크레딧 텍스트 표시 (`0.8rem`, `var(--meta-color)`)
+- [x] Info 페이지 신규 생성 (`/info`)
+  - 햄버거 메뉴 맨 하단(구분선 아래)에서만 접근 가능
+  - About / 저작권 / 폰트 세 섹션으로 구성
+  - 햄버거 패널 항목 가로 중앙 정렬 적용
+
+#### 📋 다음 단계
+- [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
+  - `@upstash/redis` 패키지 설치
+  - `lib/redis.ts` 생성, `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` 환경변수 추가
+  - `app/api/views/route.ts` — `views:total` + `views:YYYY-MM-DD` INCR
+  - `ViewTracker` 클라이언트 컴포넌트 → layout에 추가 (sessionStorage로 세션당 1회 카운트)
+  - Info 페이지에 오늘 조회수 / 누적 조회수 표시

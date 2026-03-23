@@ -4,13 +4,15 @@ import { useRouter } from 'next/navigation'
 
 interface CategoryHeaderProps {
   onLogoClick: () => void
-  currentCategory: 'articles' | 'albums'
+  currentCategory: 'articles' | 'albums' | 'info'
 }
 
 const CATEGORIES = [
   { label: 'Articles', path: '/articles', key: 'articles' },
   { label: 'Albums',   path: '/albums',   key: 'albums'   },
 ] as const
+
+const INFO_ITEM = { label: 'Info', path: '/info', key: 'info' } as const
 
 export default function CategoryHeader({ onLogoClick, currentCategory }: CategoryHeaderProps) {
   const router = useRouter()
@@ -74,6 +76,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
+            alignItems: 'center',
             gap: '2rem',
             padding: '0 2rem',
             animation: menuClosing
@@ -93,6 +96,17 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                 {cat.label}
               </span>
             ))}
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0' }} />
+            <span
+              onClick={INFO_ITEM.key !== currentCategory ? () => navigateTo(INFO_ITEM.path) : undefined}
+              style={{
+                fontSize: '1.1rem',
+                color: INFO_ITEM.key === currentCategory ? 'var(--text-color)' : 'var(--meta-color)',
+                cursor: INFO_ITEM.key !== currentCategory ? 'pointer' : 'default',
+              }}
+            >
+              {INFO_ITEM.label}
+            </span>
           </nav>
         </>
       )}
