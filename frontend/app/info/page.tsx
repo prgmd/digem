@@ -69,7 +69,7 @@ export default function InfoPage() {
 
           <Section title="폰트">
             <Row label="bjorkfont">
-              로고, 뱃지, 액센트 요소에 사용. FontZone에서 무료 배포되는 서체로, 제작자 정보는 별도로 확인되지 않습니다.
+              로고, 뱃지, 액센트 요소에 사용. FontZone에서 제공하는 Bjork의 [POST] 앨범 폰트를 이용했습니다.
             </Row>
             <Row label="Noto Serif KR">
               본문, UI 텍스트 전반에 사용. Google Fonts에서 제공하는 오픈소스 서체입니다.
