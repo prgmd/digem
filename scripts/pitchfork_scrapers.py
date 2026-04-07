@@ -8,7 +8,8 @@ from database_loader import SupabaseLoader
 import time
 
 class pitchforkScraper:
-    RSS_URL = "https://pitchfork.com/feed/feed-features/rss"
+    FEATURE_URL = "https://pitchfork.com/feed/feed-features/rss"
+    COLUMN_URL = "https://pitchfork.com/feed/feed-the-pitch/rss"
 
     ALLOWED_CATEGORIES = [
         'Features / Interview',
@@ -23,31 +24,39 @@ class pitchforkScraper:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
-    
-    # 최근 기사 불러오기
-    def fetch_latest_reviews(self, limit: int = 10) -> List[Dict]:
+
+    def fetch_features(self, limit: int = 10) -> List[Dict]:
+        print('Features 피드 수집 중...')
+        return self._fetch_feed(self.FEATURE_URL, limit, filter_categories=True)
+
+    def fetch_columns(self, limit: int = 10) -> List[Dict]:
+        print('The Pitch 칼럼 피드 수집 중...')
+        return self._fetch_feed(self.COLUMN_URL, limit, filter_categories=False)
+
+    def _fetch_feed(self, url: str, limit: int, filter_categories: bool) -> List[Dict]:
         try:
-            feed = feedparser.parse(self.RSS_URL)
+            feed = feedparser.parse(url)
             print(f'{len(feed.entries)}개 항목 발견')
 
-            features = []
+            results = []
             for entry in feed.entries[:limit]:
-                feature_data = self._parse_entry(entry)
-                if feature_data:
-                    category = feature_data.get('category', '').lower()
+                item = self._parse_entry(entry)
+                if not item:
+                    continue
+                if filter_categories:
+                    category = item.get('category', '').lower()
                     if category and category not in [c.lower() for c in self.ALLOWED_CATEGORIES]:
-                        print(f"제외됨 ({category}): {feature_data['title'][:50]}...")
+                        print(f"제외됨 ({category}): {item['title'][:50]}...")
                         continue
+                results.append(item)
 
-                    features.append(feature_data)
-            
-            print(f'{len(features)}개 수집 완료')
-            return features
+            print(f'{len(results)}개 수집 완료')
+            return results
 
         except Exception as e:
             print(f'RSS 파싱 오류: {e}')
             return []
-    
+
     # 항목 파싱
     def _parse_entry(self, entry) -> Dict:
         try:
@@ -67,7 +76,7 @@ class pitchforkScraper:
             else:
                 data['thumbnail_url'] = None
 
-            # 카테고리 추출 (신규)
+            # 카테고리 추출
             if 'tags' in entry and entry['tags']:
                 data['category'] = entry['tags'][0].get('term', '')
             else:
@@ -88,7 +97,7 @@ class pitchforkScraper:
         except Exception as e:
             print(f'날짜 파싱 오류: {e}')
             return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
+
     # 전문 + 썸네일 크레딧 가져오기
     def fetch_full_content(self, url: str) -> Dict:
         try:
@@ -135,34 +144,33 @@ def main():
     translator = GeminiTranslator()
     loader = SupabaseLoader()
 
-    features = scraper.fetch_latest_reviews(limit = 3)
+    features = scraper.fetch_features(limit=3)
+    columns = scraper.fetch_columns(limit=3)
 
-    # RSS 피드 가져오기
-    if not features:
-        print('컬럼이 없습니다.')
+    all_articles = features + columns
+
+    if not all_articles:
+        print('수집된 항목이 없습니다.')
         return
 
-    print(f'\n📋 RSS에서 {len(features)}개 칼럼 발견')
+    print(f'\nRSS에서 총 {len(all_articles)}개 항목 발견 (features: {len(features)}, columns: {len(columns)})')
 
-    # 중복 제거
     print('\n' + '=' * 60)
-    print('🔍 중복 체크 중...')
+    print('중복 체크 중...')
     print('=' * 60)
-    new_features = loader.filter_new_articles(features)
+    new_articles = loader.filter_new_articles(all_articles)
 
-    # 중복 제거
-    new_features = loader.filter_new_articles(features)
-    if not new_features:
-        print('이미 모든 칼럼이 DB에 저장되어 있습니다. 수고!')
+    if not new_articles:
+        print('이미 모든 항목이 DB에 저장되어 있습니다. 수고!')
         return
 
-    for i, feature in enumerate(new_features, 1):    
+    for i, feature in enumerate(new_articles, 1):
         fetched = scraper.fetch_full_content(feature['source_url'])
         full_content = fetched['content']
         thumbnail_credit = fetched['thumbnail_credit']
         if full_content:
             print(f"\n(전체 {len(full_content)}자)")
-            print(f'{feature['title']}')
+            print(f'{feature["title"]}')
             print(f"{full_content[:200]}...\n")
             if thumbnail_credit:
                 print(f"[썸네일 크레딧]: {thumbnail_credit}")
@@ -198,7 +206,7 @@ def main():
             print('DB 저장 실패.')
 
         # Rate Limit 방지용 코드
-        if i < len(new_features):
+        if i < len(new_articles):
             time.sleep(10)
 
 # 호출마다 자동 실행되는 걸 방지함 (직접 실행할 때만 코드 돌리도록)

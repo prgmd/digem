@@ -197,6 +197,27 @@ pip install -r requirements.txt
 
 ---
 
+### **2026-04-07 (Day 6)**
+#### ✅ 완료
+- [x] Python 3.13 호환성 수정 (requirements.txt)
+  - `pydantic==2.5.3` → `2.10.6` (Python 3.13 pre-built wheel 없어 Rust 컴파일 시도 → 실패)
+  - `lxml==5.1.0` → `5.3.0` (동일 원인)
+- [x] `melon_scraper.py` 실행 — 국내/해외 정규·EP 7개 신규 저장
+- [x] `pitchfork_scrapers.py` The Pitch 칼럼 피드 추가
+  - `COLUMN_URL` 추가 (`feed-the-pitch/rss`), 기존 `RSS_URL` → `FEATURE_URL` rename
+  - `fetch_latest_reviews` 분리: `fetch_features()` / `fetch_columns()` / `_fetch_feed()` (private)
+    - The Pitch 피드는 칼럼 전용이므로 `filter_categories=False` 캡슐화
+  - 중복 `filter_new_articles` 이중 호출 버그 수정
+- [x] `pitchfork_scrapers.py` 실행 — features 2개 + columns 3개 수집, 신규 3개 번역 후 저장
+
+#### 📋 다음 단계
+- [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
+- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
+- [ ] 아티스트 페이지 라우팅 UUID 기반으로 전환
+- [ ] Rolling Stone 스크래퍼 추가
+
+---
+
 ### **2026-03-23 (Day 5)**
 #### ✅ 완료
 - [x] 홈 페이지 세로 레이아웃 개선
