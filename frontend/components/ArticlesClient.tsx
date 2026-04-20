@@ -20,7 +20,7 @@ export interface Article {
   content_ko: string
 }
 
-const SOURCES = ['Pitchfork', 'Rolling Stone']
+const SOURCES = ['Pitchfork', 'Stereogum', 'Consequence', 'Bandcamp']
 
 interface Props {
   articles: Article[]
