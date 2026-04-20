@@ -11,13 +11,19 @@ interface Article {
   category: string
 }
 
+const SVG_SOURCES: Record<string, string> = {
+  pitchfork: '/files/pitchfork.svg',
+  stereogum: '/files/stereogum.svg',
+  consequence: '/files/consequence.svg',
+}
+
 function SourceBadge({ source }: { source: string }) {
   const s = source.toLowerCase()
-  if (s === 'pitchfork') {
+  if (SVG_SOURCES[s]) {
     return (
       <img
-        src="/files/pitchfork.svg"
-        alt="Pitchfork"
+        src={SVG_SOURCES[s]}
+        alt={source}
         style={{ width: 18, height: 18, objectFit: 'contain', flexShrink: 0, opacity: 0.7, marginTop: 1, filter: 'invert(1)' }}
       />
     )

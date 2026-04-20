@@ -199,9 +199,27 @@ pip install -r requirements.txt
 
 ### **2026-04-20 (Day 7)**
 #### ✅ 완료
+- [x] STRUCTURE.md 작성
+  - 기술 스택, 디렉토리 구조, 데이터 파이프라인, DB 스키마, 환경변수 정리
+- [x] Supabase RLS 적용
+  - `articles`, `albums`, `artists`, `album_artists` 테이블 RLS 활성화
+  - 퍼블릭 SELECT 전용 정책 추가 (anon 키 노출 대응)
 - [x] iOS WebKit 메인 로고 잘림 수정
   - iPhone Chrome(WebKit)에서 `heroSlideInRight` 애니메이션이 순간적으로 레이아웃 너비를 확장, 중앙 정렬된 `digem` 로고 오른쪽이 잘리는 현상
   - `app/page.tsx` 최상단 div에 `width: '100%'`, `overflowX: 'hidden'` 추가
+- [x] Stereogum 스크래퍼 추가 (`scripts/stereogum_scraper.py`)
+  - RSS 피드 파싱 (Columns, Reviews, Lists 카테고리 필터)
+  - BeautifulSoup 전문 크롤링 + 썸네일 크레딧 추출
+  - Gemini 번역 → Supabase 저장 파이프라인 연결
+- [x] Consequence 스크래퍼 추가 (`scripts/consequence_scraper.py`)
+  - Features(`?feed=rss2`), Editorials 두 피드 수집
+  - `/feed/` 경로 차단 우회: `?feed=rss2` 파라미터 사용
+- [x] Supabase service_role 키 오류 수정
+  - `scripts/.env`의 anon/service_role 키 혼용 문제 확인 및 수정
+  - JWT 디코딩으로 키 role 검증
+- [x] 출처 아이콘 SVG 확장
+  - `Sidebar.tsx` `SourceBadge` 리팩토링 — SVG 출처 맵(`SVG_SOURCES`) 도입
+  - Stereogum, Consequence SVG 로고 추가 (`public/files/`)
 
 #### 📋 다음 단계
 - [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
