@@ -229,6 +229,26 @@ pip install -r requirements.txt
 
 ---
 
+### **2026-04-20 (Day 8)**
+#### ✅ 완료
+- [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
+  - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
+  - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
+  - `requirements.txt`에 `selenium>=4.20.0` 추가
+- [x] Consequence 썸네일 크레딧 RSS 직접 수집
+  - `media:copyright` 필드를 RSS 파싱 시 바로 추출 (HTML 스크래핑 불필요)
+  - HTML figcaption 폴백 유지
+- [x] 출처 아이콘 SVG 확장 (`Sidebar.tsx`)
+  - `SVG_SOURCES` 맵 도입 — Stereogum, Consequence SVG 로고 추가
+
+#### 📋 다음 단계
+- [ ] 스크래퍼 공통 로직 리팩토링 (`base_scraper.py`)
+- [ ] 프론트엔드 출처 필터 탭 확장 (Stereogum, Consequence, Bandcamp)
+- [ ] Upstash Redis 조회수 카운터 연동
+- [ ] GitHub Actions 자동화
+
+---
+
 ### **2026-04-07 (Day 6)**
 #### ✅ 완료
 - [x] Python 3.13 호환성 수정 (requirements.txt)

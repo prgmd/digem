@@ -55,12 +55,14 @@ class ConsequenceScraper:
                 'source': 'consequence',
             }
 
-            # 썸네일: media:content
+            # 썸네일 + 크레딧: media:content
             media = entry.get('media_content', [])
             if media:
                 data['thumbnail_url'] = media[0].get('url', '')
+                data['thumbnail_credit'] = media[0].get('media_copyright', None)
             else:
                 data['thumbnail_url'] = None
+                data['thumbnail_credit'] = None
 
             # 카테고리
             tags = [t.get('term', '').strip() for t in entry.get('tags', [])]
@@ -151,7 +153,8 @@ def main():
     for i, article in enumerate(new_articles, 1):
         fetched = scraper.fetch_full_content(article['source_url'])
         full_content = fetched['content']
-        thumbnail_credit = fetched['thumbnail_credit']
+        # RSS media:copyright 우선, 없으면 HTML figcaption
+        thumbnail_credit = article.get('thumbnail_credit') or fetched['thumbnail_credit']
 
         if not full_content:
             print('본문 추출 실패. 스킵하겠습니다.')
