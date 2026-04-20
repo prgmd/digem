@@ -179,12 +179,11 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
                 display: 'inline-block',
                 marginTop: '1rem',
                 padding: '0.4rem 1rem',
-                border: '1px solid var(--meta-color)',
                 borderRadius: '2px',
-                color: 'var(--text-color)',
+                background: 'var(--meta-color)',
+                color: '#000',
                 fontSize: '0.85rem',
                 textDecoration: 'none',
-                opacity: 0.7,
               }}
             >
               원문 보기 →

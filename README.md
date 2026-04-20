@@ -231,6 +231,13 @@ pip install -r requirements.txt
 
 ### **2026-04-20 (Day 8)**
 #### ✅ 완료
+- [x] 프론트엔드 출처 필터 탭 확장
+  - `ArticlesClient.tsx` SOURCES Rolling Stone 제거 → Stereogum, Consequence, Bandcamp 추가
+- [x] 출처 아이콘 Bandcamp SVG 추가 및 Stereogum 색반전 제외
+  - `Sidebar.tsx` `INVERT_SOURCES` Set 도입으로 출처별 invert 개별 제어
+- [x] `ArticleDetail` UI 개선
+  - 이미지·본문 중앙 정렬 불일치 수정 (본문 `maxWidth: 720px` 제거)
+  - 원문 보기 메타 텍스트에서 분리 → 썸네일 하단 단독 버튼으로 변경 (베이지 배경 + 검정 글씨)
 - [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
   - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
   - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
