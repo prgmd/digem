@@ -149,19 +149,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         <span>{article.source}</span>
         <span style={{ margin: '0 0.25rem' }}>·</span>
         <span>{new Date(article.published_at).toLocaleDateString('ko-KR')}</span>
-        {article.source_url && (
-          <>
-            <span style={{ margin: '0 0.25rem' }}>·</span>
-            <a
-              href={article.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'var(--meta-color)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
-            >
-              원문 보기
-            </a>
-          </>
-        )}
       </div>
 
       {/* 썸네일 */}
@@ -183,12 +170,32 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
               {article.thumbnail_credit}
             </p>
           )}
+          {article.source_url && (
+            <a
+              href={article.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                marginTop: '1rem',
+                padding: '0.4rem 1rem',
+                border: '1px solid var(--meta-color)',
+                borderRadius: '2px',
+                color: 'var(--text-color)',
+                fontSize: '0.85rem',
+                textDecoration: 'none',
+                opacity: 0.7,
+              }}
+            >
+              원문 보기 →
+            </a>
+          )}
         </div>
       )}
 
       {/* 본문 */}
       <div
-        style={{ fontSize: '1.1rem', lineHeight: 1.8, maxWidth: '720px', textAlign: 'justify', wordBreak: 'keep-all' }}
+        style={{ fontSize: '1.1rem', lineHeight: 1.8, textAlign: 'justify', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content) }}
       />
       </div>
