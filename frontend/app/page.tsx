@@ -7,6 +7,8 @@ export default function Home() {
       flexDirection: 'column',
       alignItems: 'center',
       height: '100vh',
+      width: '100%',
+      overflowX: 'hidden',
     }}>
       {/* 상단 절반: 로고 + 태그라인 */}
       <div style={{

@@ -197,6 +197,20 @@ pip install -r requirements.txt
 
 ---
 
+### **2026-04-20 (Day 7)**
+#### ✅ 완료
+- [x] iOS WebKit 메인 로고 잘림 수정
+  - iPhone Chrome(WebKit)에서 `heroSlideInRight` 애니메이션이 순간적으로 레이아웃 너비를 확장, 중앙 정렬된 `digem` 로고 오른쪽이 잘리는 현상
+  - `app/page.tsx` 최상단 div에 `width: '100%'`, `overflowX: 'hidden'` 추가
+
+#### 📋 다음 단계
+- [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
+- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
+- [ ] 아티스트 페이지 라우팅 UUID 기반으로 전환
+- [ ] Rolling Stone 스크래퍼 추가
+
+---
+
 ### **2026-04-07 (Day 6)**
 #### ✅ 완료
 - [x] Python 3.13 호환성 수정 (requirements.txt)
