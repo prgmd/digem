@@ -406,6 +406,25 @@ python -m scripts.melon_scraper
 
 ---
 
+### **2026-04-20 (Day 8)**
+#### ✅ 완료
+- [x] 프론트엔드 출처 필터 탭 확장
+  - `ArticlesClient.tsx` SOURCES Rolling Stone 제거 → Stereogum, Consequence, Bandcamp 추가
+- [x] 출처 아이콘 Bandcamp SVG 추가 및 Stereogum 색반전 제외
+  - `Sidebar.tsx` `INVERT_SOURCES` Set 도입으로 출처별 invert 개별 제어
+- [x] `ArticleDetail` UI 개선
+  - 이미지·본문 중앙 정렬 불일치 수정 (본문 `maxWidth: 720px` 제거)
+  - 원문 보기 메타 텍스트에서 분리 → 썸네일 하단 단독 버튼으로 변경 (베이지 배경 + 검정 글씨)
+- [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
+  - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
+  - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
+  - `requirements.txt`에 `selenium>=4.20.0` 추가
+- [x] Consequence 썸네일 크레딧 RSS 직접 수집
+  - `media:copyright` 필드를 RSS 파싱 시 바로 추출 (HTML 스크래핑 불필요)
+  - HTML figcaption 폴백 유지
+
+---
+
 ### **2026-04-23 (Day 9)**
 #### ✅ 완료
 - [x] `pitchforkScraper` → `PitchforkScraper` 클래스명 PEP 8 수정
@@ -417,7 +436,6 @@ python -m scripts.melon_scraper
 - [x] `README.md` 개발 일지 정리
   - 날짜 순서 수정 (Day 5→6→7→8 순으로 재배치)
   - 일별 "다음 단계" 섹션 제거 → 상단 "미구현 / 예정 기능" 섹션에서 단일 관리
-  - Day 8 완료된 항목이 다음 단계에 중복 기재되던 문제 수정
 - [x] 칼럼 스크래퍼 `scripts/column/` 패키지로 분리
   - `scripts/__init__.py`, `scripts/column/__init__.py` 추가 (패키지화)
   - `pitchfork_scrapers.py`, `stereogum_scraper.py`, `consequence_scraper.py`, `bandcamp_scraper.py` 이동
@@ -445,22 +463,12 @@ python -m scripts.melon_scraper
 - [x] Gemini 번역 재시도 로직 제거
   - Exponential Backoff (최대 3회) 제거 → 단건 시도로 단순화
   - 근거: 2차·3차 시도에서 성공한 사례 없음. 실패 시 위 번역 실패 처리로 대응
-
----
-
-### **2026-04-20 (Day 8)**
-#### ✅ 완료
-- [x] 프론트엔드 출처 필터 탭 확장
-  - `ArticlesClient.tsx` SOURCES Rolling Stone 제거 → Stereogum, Consequence, Bandcamp 추가
-- [x] 출처 아이콘 Bandcamp SVG 추가 및 Stereogum 색반전 제외
-  - `Sidebar.tsx` `INVERT_SOURCES` Set 도입으로 출처별 invert 개별 제어
-- [x] `ArticleDetail` UI 개선
-  - 이미지·본문 중앙 정렬 불일치 수정 (본문 `maxWidth: 720px` 제거)
-  - 원문 보기 메타 텍스트에서 분리 → 썸네일 하단 단독 버튼으로 변경 (베이지 배경 + 검정 글씨)
-- [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
-  - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
-  - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
-  - `requirements.txt`에 `selenium>=4.20.0` 추가
-- [x] Consequence 썸네일 크레딧 RSS 직접 수집
-  - `media:copyright` 필드를 RSS 파싱 시 바로 추출 (HTML 스크래핑 불필요)
-  - HTML figcaption 폴백 유지
+- [x] Articles 페이지 출처 필터 드롭다운 전환 + Bandcamp 추가
+  - 탭 버튼 방식 → `<select>` 드롭다운으로 교체 (All + 4개 출처)
+  - `ArticlesClient.tsx` SOURCES에 `bandcamp` 추가
+- [x] Articles 페이지 서버사이드 페이지네이션 추가
+  - 전체 로딩 → 페이지당 20개 (`PAGE_SIZE = 20`)
+  - `articles/page.tsx` — Supabase `.range()` + `count: 'exact'`로 서버사이드 슬라이싱
+  - URL 파라미터 기반 상태 관리 (`?source=...&page=...`)
+  - `ArticlesClient.tsx` — `router.push` + `URLSearchParams`로 필터/페이지 이동
+  - `Sidebar.tsx` — 하단 `← N/M →` 페이지네이션 컨트롤 추가

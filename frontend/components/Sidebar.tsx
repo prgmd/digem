@@ -31,10 +31,9 @@ function SourceBadge({ source }: { source: string }) {
       />
     )
   }
-  const abbr = s === 'rolling stone' ? 'RS' : source.slice(0, 2).toUpperCase()
   return (
     <span style={{ fontSize: '0.65rem', opacity: 0.6, flexShrink: 0, letterSpacing: '0.05em' }}>
-      {abbr}
+      {source.slice(0, 2).toUpperCase()}
     </span>
   )
 }
@@ -46,6 +45,9 @@ interface SidebarProps {
   sources: string[]
   selectedSource: string | null
   onSourceSelect: (source: string | null) => void
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
   fullWidth?: boolean
 }
 
@@ -56,10 +58,11 @@ export default function Sidebar({
   sources,
   selectedSource,
   onSourceSelect,
+  currentPage,
+  totalPages,
+  onPageChange,
   fullWidth,
 }: SidebarProps) {
-  const allSources = [null, ...sources]
-
   return (
     <aside style={{
       width: fullWidth ? '100%' : '480px',
@@ -68,33 +71,37 @@ export default function Sidebar({
       padding: fullWidth ? '1rem' : '2rem',
       overflowY: 'auto',
       flexShrink: 0,
+      display: 'flex',
+      flexDirection: 'column',
     }}>
-      {/* 출처 탭 */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
-        {allSources.map(src => (
-          <button
-            key={src ?? 'all'}
-            onClick={() => onSourceSelect(src)}
-            style={{
-              background: selectedSource === src ? 'var(--selected-bg)' : 'none',
-              border: '1px solid var(--border)',
-              color: selectedSource === src ? 'var(--text-color)' : 'var(--meta-color)',
-              fontSize: '0.85rem',
-              padding: '0.35rem 0.85rem',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              transition: 'background-color 0.15s, color 0.15s',
-            }}
-          >
-            {src ?? 'All'}
-          </button>
+      {/* 출처 드롭다운 */}
+      <select
+        value={selectedSource ?? ''}
+        onChange={(e) => onSourceSelect(e.target.value || null)}
+        style={{
+          background: 'transparent',
+          border: '1px solid var(--border)',
+          color: 'var(--text-color)',
+          fontSize: '0.85rem',
+          padding: '0.35rem 0.6rem',
+          cursor: 'pointer',
+          marginBottom: '2rem',
+          appearance: 'none',
+          width: '100%',
+        }}
+      >
+        <option value="">All</option>
+        {sources.map(src => (
+          <option key={src} value={src} style={{ background: '#000' }}>
+            {src.charAt(0).toUpperCase() + src.slice(1)}
+          </option>
         ))}
-      </div>
+      </select>
 
-      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '1.5rem 0' }} />
+      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0 0 1.5rem' }} />
 
       {/* 칼럼 목록 */}
-      <ul style={{ listStyle: 'none' }}>
+      <ul style={{ listStyle: 'none', flex: 1 }}>
         {articles.map(article => (
           <li
             key={article.id}
@@ -123,6 +130,46 @@ export default function Sidebar({
           </li>
         ))}
       </ul>
+
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <>
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '1rem 0' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+              style={{
+                background: 'none',
+                border: '1px solid var(--border)',
+                color: currentPage <= 1 ? 'var(--meta-color)' : 'var(--text-color)',
+                padding: '0.3rem 0.7rem',
+                cursor: currentPage <= 1 ? 'default' : 'pointer',
+                fontSize: '0.85rem',
+              }}
+            >
+              ←
+            </button>
+            <span style={{ fontSize: '0.8rem', color: 'var(--meta-color)' }}>
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              style={{
+                background: 'none',
+                border: '1px solid var(--border)',
+                color: currentPage >= totalPages ? 'var(--meta-color)' : 'var(--text-color)',
+                padding: '0.3rem 0.7rem',
+                cursor: currentPage >= totalPages ? 'default' : 'pointer',
+                fontSize: '0.85rem',
+              }}
+            >
+              →
+            </button>
+          </div>
+        </>
+      )}
     </aside>
   )
 }

@@ -20,16 +20,18 @@ export interface Article {
   content_ko: string
 }
 
-const SOURCES = ['Pitchfork', 'Stereogum', 'Consequence', 'Bandcamp']
+const SOURCES = ['pitchfork', 'stereogum', 'consequence', 'bandcamp']
 
 interface Props {
   articles: Article[]
+  currentPage: number
+  totalPages: number
+  selectedSource: string | null
 }
 
-export default function ArticlesClient({ articles }: Props) {
+export default function ArticlesClient({ articles, currentPage, totalPages, selectedSource }: Props) {
   const router = useRouter()
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [selectedSource, setSelectedSource] = useState<string | null>(null)
   const [isExiting, setIsExiting] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [fadeIn] = useState(() => {
@@ -51,9 +53,13 @@ export default function ArticlesClient({ articles }: Props) {
     setTimeout(() => router.push('/'), 350)
   }
 
-  const filteredArticles = selectedSource
-    ? articles.filter(a => a.source.toLowerCase() === selectedSource.toLowerCase())
-    : articles
+  const navigate = (source: string | null, page: number) => {
+    const params = new URLSearchParams()
+    if (source) params.set('source', source)
+    if (page > 1) params.set('page', String(page))
+    const qs = params.toString()
+    router.push(`/articles${qs ? `?${qs}` : ''}`)
+  }
 
   const currentArticle = articles.find(a => a.id === selectedId) || null
 
@@ -72,12 +78,15 @@ export default function ArticlesClient({ articles }: Props) {
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {showSidebar && (
           <Sidebar
-            articles={filteredArticles}
+            articles={articles}
             selectedId={selectedId}
             onSelect={setSelectedId}
             sources={SOURCES}
             selectedSource={selectedSource}
-            onSourceSelect={setSelectedSource}
+            onSourceSelect={(src) => navigate(src, 1)}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(p: number) => navigate(selectedSource, p)}
             fullWidth={isMobile}
           />
         )}
