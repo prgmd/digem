@@ -5,6 +5,7 @@ export default async function ArticlesPage() {
   const { data, error } = await supabase
     .from('articles')
     .select('*')
+    .eq('translation_status', 'success')
     .order('published_at', { ascending: false })
 
   const articles: Article[] = error || !data ? [] : data

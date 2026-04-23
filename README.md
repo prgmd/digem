@@ -83,8 +83,8 @@ RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Ge
 | `column/consequence_scraper.py` | Consequence | requests + BeautifulSoup | Features, Editorials |
 | `column/bandcamp_scraper.py` | Bandcamp Daily | Selenium Chrome headless | Features, Lists, Scene Report |
 
-- Gemini 재시도: Exponential Backoff (5s → 10s → 20s, 최대 3회)
 - Rate Limit 방지: 기사 사이 10초 대기
+- 번역 실패 시: `translation_status = 'failed'`로 DB 저장 (재수집 방지, 프론트엔드 노출 제외)
 
 ### 앨범 수집 (`melon_scraper.py`)
 
@@ -437,6 +437,14 @@ python -m scripts.melon_scraper
 - [x] `scripts/main.py` 신규 작성
   - 칼럼 4종 + 멜론 앨범 전체 파이프라인을 단일 진입점에서 실행
   - 실행: `python -m scripts.main` (정기 자동화 대비)
+- [x] 번역 실패 처리 개선
+  - 기존: 번역 실패 시 skip → 다음 수집 때 재시도 → 무한 실패 반복
+  - 변경: 실패 시 `translation_status = 'failed'`로 DB 저장 → 재수집 차단
+  - `database_loader.py` — `translation_status`를 하드코딩 대신 `article_data`에서 수신
+  - `app/articles/page.tsx` — Supabase 쿼리에 `.eq('translation_status', 'success')` 필터 추가
+- [x] Gemini 번역 재시도 로직 제거
+  - Exponential Backoff (최대 3회) 제거 → 단건 시도로 단순화
+  - 근거: 2차·3차 시도에서 성공한 사례 없음. 실패 시 위 번역 실패 처리로 대응
 
 ---
 

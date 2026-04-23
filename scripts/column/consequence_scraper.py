@@ -10,10 +10,9 @@ class ConsequenceScraper(BaseScraper):
     EDITORIALS_URL = "https://consequence.net/category/music/music-editorials/?feed=rss2"
 
     def fetch_articles(self, limit: int = 10) -> List[Dict]:
-        features = self._fetch_feed(self.FEATURES_URL, limit, 'Consequence Features')
         editorials = self._fetch_feed(self.EDITORIALS_URL, limit, 'Consequence Editorials')
-        print(f'Features: {len(features)}개, Editorials: {len(editorials)}개')
-        return features + editorials
+        print(f'Editorials: {len(editorials)}개')
+        return editorials
 
     def _fetch_feed(self, url: str, limit: int, label: str) -> List[Dict]:
         print(f'{label} 피드 수집 중...')

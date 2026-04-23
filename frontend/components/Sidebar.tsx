@@ -18,7 +18,7 @@ const SVG_SOURCES: Record<string, string> = {
   bandcamp: '/files/bandcamp.svg',
 }
 
-const INVERT_SOURCES = new Set(['pitchfork', 'consequence', 'bandcamp'])
+const INVERT_SOURCES = new Set(['pitchfork', 'bandcamp'])
 
 function SourceBadge({ source }: { source: string }) {
   const s = source.toLowerCase()

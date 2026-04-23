@@ -101,26 +101,37 @@ class BaseScraper(ABC):
 
             result = translator.translate_article(article['title'], full_content)
             if result['status'] != 'success':
-                print('번역 실패. 스킵하겠습니다.')
-                continue
-
-            print('번역 완료')
-            print(f" [번역된 제목]: {result['title_ko']}")
-
-            success = loader.save_article({
-                'title': article['title'],
-                'title_ko': result['title_ko'],
-                'content_en': full_content,
-                'content_ko': result['content_ko'],
-                'source': article['source'],
-                'source_url': article['source_url'],
-                'author': article['author'],
-                'published_at': article['published_at'],
-                'thumbnail_url': article.get('thumbnail_url'),
-                'thumbnail_credit': thumbnail_credit,
-            })
-            if not success:
-                print('DB 저장 실패.')
+                print('번역 실패. 영문 상태로 DB에 저장합니다.')
+                loader.save_article({
+                    'title': article['title'],
+                    'title_ko': None,
+                    'content_en': full_content,
+                    'content_ko': None,
+                    'source': article['source'],
+                    'source_url': article['source_url'],
+                    'author': article['author'],
+                    'published_at': article['published_at'],
+                    'thumbnail_url': article.get('thumbnail_url'),
+                    'thumbnail_credit': thumbnail_credit,
+                    'translation_status': 'failed',
+                })
+            else:
+                print('번역 완료')
+                print(f" [번역된 제목]: {result['title_ko']}")
+                success = loader.save_article({
+                    'title': article['title'],
+                    'title_ko': result['title_ko'],
+                    'content_en': full_content,
+                    'content_ko': result['content_ko'],
+                    'source': article['source'],
+                    'source_url': article['source_url'],
+                    'author': article['author'],
+                    'published_at': article['published_at'],
+                    'thumbnail_url': article.get('thumbnail_url'),
+                    'thumbnail_credit': thumbnail_credit,
+                })
+                if not success:
+                    print('DB 저장 실패.')
 
             if i < len(new_articles):
                 time.sleep(10)

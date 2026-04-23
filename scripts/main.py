@@ -12,7 +12,7 @@ COLUMN_SCRAPERS = [
 ]
 
 if __name__ == "__main__":
-    for scraper in COLUMN_SCRAPERS:
-        scraper.run(limit=5)
+    # for scraper in COLUMN_SCRAPERS:
+    #     scraper.run(limit=5)
 
     MelonScraper().run()

@@ -31,8 +31,8 @@ class SupabaseLoader:
                 'published_at': article_data.get('published_at'),
                 'thumbnail_url': article_data.get('thumbnail_url'),
                 'thumbnail_credit': article_data.get('thumbnail_credit'),
-                'translation_status': 'success',
-                'translated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                'translation_status': article_data.get('translation_status', 'success'),
+                'translated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S') if article_data.get('translation_status', 'success') == 'success' else None
             }
             result = self.client.table('articles').insert(data).execute()
             
