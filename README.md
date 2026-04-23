@@ -3,7 +3,153 @@
 
 ---
 
+## 기술 스택
+
+| 레이어 | 기술 |
+|---|---|
+| 프론트엔드 | Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS 4 |
+| 백엔드 DB | Supabase (PostgreSQL) |
+| 캐시/카운터 | Upstash Redis |
+| 번역 AI | Google Gemini 2.5 Flash (`google-generativeai`) |
+| 데이터 수집 (정기) | Python 3.13, requests, BeautifulSoup4, feedparser |
+| 데이터 수집 (일회성) | Selenium (Chrome headless) |
+| 배포 | Vercel (프론트엔드) |
+
+---
+
+## 디렉토리 구조
+
+```
+digem/
+├── frontend/                    # Next.js 앱
+│   ├── app/
+│   │   ├── page.tsx             # 홈 (애니메이션 진입)
+│   │   ├── layout.tsx           # 루트 레이아웃 (MeshBackground 전역 적용)
+│   │   ├── globals.css          # 디자인 토큰 (CSS 커스텀 프로퍼티)
+│   │   ├── articles/page.tsx    # 칼럼 목록 (Server Component)
+│   │   ├── albums/page.tsx      # 앨범 목록 (Server Component)
+│   │   ├── artists/[name]/      # 아티스트 상세 (동적 라우트)
+│   │   └── info/page.tsx        # 서비스 소개 페이지
+│   ├── components/
+│   │   ├── ArticlesClient.tsx   # 칼럼 목록 인터랙션 (use client)
+│   │   ├── ArticleDetail.tsx    # 칼럼 본문 + 번역 전환
+│   │   ├── AlbumsClient.tsx     # 앨범 그리드 + 필터 (use client)
+│   │   ├── ArtistClient.tsx     # 아티스트 앨범 목록 (use client)
+│   │   ├── CategoryHeader.tsx   # 공통 헤더 (로고 + 햄버거 메뉴)
+│   │   ├── Sidebar.tsx          # 칼럼 목록 사이드바
+│   │   └── MeshBackground.tsx   # 마우스 추적 메시 그래디언트 배경
+│   ├── lib/
+│   │   └── supabase.ts          # Supabase 클라이언트 초기화
+│   ├── public/
+│   │   ├── files/               # SVG 로고 (pitchfork, stereogum, consequence, bandcamp)
+│   │   └── fonts/bjorkfont.ttf
+│   ├── next.config.ts
+│   └── package.json
+│
+├── scripts/                     # Python 데이터 파이프라인
+│   ├── column/                  # 칼럼 스크래퍼
+│   │   ├── base_scraper.py      # 공통 추상 기반 클래스 (parse_date, extract_content, run)
+│   │   ├── pitchfork_scrapers.py
+│   │   ├── stereogum_scraper.py
+│   │   ├── consequence_scraper.py
+│   │   └── bandcamp_scraper.py  # Selenium (Cloudflare 봇차단 우회)
+│   ├── melon_scraper.py         # 멜론 신보 앨범 수집
+│   ├── google_translator.py     # Gemini API 번역 (제목 + 본문)
+│   └── database_loader.py       # Supabase INSERT / 중복 체크
+│
+├── tools/                       # 일회성 유틸리티
+│   └── melon_seed.py            # Selenium 기반 멜론 대량 시딩
+│
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 데이터 파이프라인
+
+### 칼럼 수집
+
+모든 칼럼 스크래퍼는 동일한 흐름으로 동작합니다:
+
+```
+RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Gemini 번역 → Supabase 저장
+```
+
+| 스크래퍼 | 출처 | 크롤링 방식 | 수집 카테고리 |
+|---|---|---|---|
+| `column/pitchfork_scrapers.py` | Pitchfork | requests + BeautifulSoup | Features, The Pitch 칼럼 |
+| `column/stereogum_scraper.py` | Stereogum | requests + BeautifulSoup | Columns, Reviews, Lists |
+| `column/consequence_scraper.py` | Consequence | requests + BeautifulSoup | Features, Editorials |
+| `column/bandcamp_scraper.py` | Bandcamp Daily | Selenium Chrome headless | Features, Lists, Scene Report |
+
+- Gemini 재시도: Exponential Backoff (5s → 10s → 20s, 최대 3회)
+- Rate Limit 방지: 기사 사이 10초 대기
+
+### 앨범 수집 (`melon_scraper.py`)
+
+```
+멜론 신보 API (국내/해외, 정규/EP)
+    → BeautifulSoup 파싱
+    → SupabaseLoader.save_album() → albums + artists + album_artists 테이블
+```
+
+- 멜론 API 페이지네이션 미지원 → 대량 시딩 시 `tools/melon_seed.py` (Selenium hash URL 방식) 사용
+
+---
+
+## DB 스키마 (Supabase)
+
+| 테이블 | 주요 컬럼 |
+|---|---|
+| `articles` | id, title, title_ko, content_en, content_ko, source, source_url, author, published_at, thumbnail_url, thumbnail_credit, translation_status, translated_at |
+| `albums` | id, title, artist, release_date, artwork_url, album_type, region, source, is_featured |
+| `artists` | id, name |
+| `album_artists` | album_id, artist_id, order |
+
+- 중복 방지: articles는 `source_url` 기준, albums는 `title + artist` 기준
+- RLS 활성화: 퍼블릭 SELECT 전용 정책 (anon 키 노출 대응)
+
+---
+
+## 프론트엔드 아키텍처
+
+- **Server Component / Client Component 분리**: 데이터 fetch는 `page.tsx`(서버), 인터랙션은 `*Client.tsx`(클라이언트)
+- **디자인 토큰**: `globals.css` CSS 커스텀 프로퍼티 4색 팔레트 (`#E8D5A0`, `#000`, `#0a3d2e`, `#8a7a5a`)
+- **MeshBackground**: `requestAnimationFrame` + lerp(0.04) 마우스 추적 그래디언트, 전역 레이아웃에 적용
+- **페이지 전환**: CSS keyframe 애니메이션, `sessionStorage` 플래그로 카테고리 간 이동 시 fade 스킵
+- **ArticleDetail**: 번역/원문 전환, sticky 헤더, 썸네일 + 크레딧 표시
+
+---
+
+## 환경변수
+
+| 변수 | 용도 |
+|---|---|
+| `SUPABASE_URL` | Python 스크립트용 Supabase URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Python 스크립트용 서비스 롤 키 |
+| `NEXT_PUBLIC_SUPABASE_URL` | 프론트엔드 Supabase URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 프론트엔드 익명 키 |
+| `GEMINI_API_KEY` | Google Gemini 번역 API 키 |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis URL (미구현) |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis 토큰 (미구현) |
+
+---
+
+## 미구현 / 예정 기능
+
+- [ ] Upstash Redis 조회수 카운터 프론트엔드 연동
+- [ ] Rolling Stone 스크래퍼 추가
+- [ ] 아티스트 페이지 UUID 기반 라우팅 전환
+- [ ] `next/image` + `remotePatterns` 썸네일 전환
+- [ ] 기존 레코드 `title_ko` 마이그레이션 스크립트
+- [x] 스크래퍼 공통 로직 리팩토링 (`base_scraper.py`)
+- [ ] GitHub Actions 자동화
+
+---
+
 ## 실행 (가상환경 설정)
+
 ```
 git clone https://github.com/prgmd/digem.git
 python -m venv venv
@@ -11,16 +157,24 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
+### 스크래퍼 실행 (`digem/` 루트에서)
+
+```bash
+# 전체 실행 (칼럼 4종 + 멜론 앨범)
+python -m scripts.main
+
+# 개별 실행
+python -m scripts.column.pitchfork_scrapers
+python -m scripts.column.stereogum_scraper
+python -m scripts.column.consequence_scraper
+python -m scripts.column.bandcamp_scraper
+python -m scripts.melon_scraper
+```
+
 ---
 
-## 📌 프로젝트 개요
-
-**목적:**
-- 음악 웹진(Pitchfork 등) 칼럼 자동 수집
-- Gemini API를 통한 자동 번역
-- 앨범 정보 및 차트 데이터 아카이빙
-
 ## 📅 개발 진행 상황
+
 ### **2026-02-28 (Day 1)**
 #### ✅ 완료
 - [x] Supabase 프로젝트 생성 및 DB 스키마 설계
@@ -36,6 +190,8 @@ pip install -r requirements.txt
   - 전문 크롤링 (BeautifulSoup)
   - figcaption 필터링 (사진 캡션 제외)
   - 저작권 문구 이후 컨텐츠 제외
+
+---
 
 ### **2026-03-04 (Day 2)**
 #### ✅ 완료
@@ -61,12 +217,7 @@ pip install -r requirements.txt
 - [x] 간헐적 Gemini API 타임아웃 (504 에러)
   - 해결 방안: 재시도 로직 강화 필요
 
-#### 📋 다음 단계
-- [ ] 재시도 로직 개선 (Exponential Backoff)
-- [ ] Cloudflare R2 백업 로직 구현
-- [ ] DLQ 패턴 구현 (Upstash Redis)
-- [ ] 다른 웹진 크롤러 추가 (Stereogum, Consequence)
-- [ ] GitHub Actions 워크플로우 작성
+---
 
 ### **2026-03-19 (Day 3)**
 #### ✅ 완료
@@ -100,10 +251,7 @@ pip install -r requirements.txt
 - [x] 카테고리 간 이동 시 메시 그래디언트 플래시 현상
   - 해결: `sessionStorage` 플래그로 카테고리→카테고리 이동 시 `pageFadeIn` 스킵
 
-#### 📋 다음 단계
-- [ ] 백엔드 API 연동 (articles, albums 실데이터 연결)
-- [ ] Albums 페이지 앨범 아트 이미지 처리
-- [ ] 모바일 반응형 레이아웃 대응
+---
 
 ### **2026-03-20 (Day 4)**
 #### ✅ 완료
@@ -142,15 +290,11 @@ pip install -r requirements.txt
 - [x] Vercel 배포 시 `supabaseUrl is required` 오류
   - 해결: `.gitignore`의 `lib/` 규칙으로 `frontend/lib/supabase.ts` 미포함 → 예외 규칙 추가
 
-#### 📋 다음 단계 (Day 4 이후)
-- [x] Supabase `articles` 테이블 `title_ko`, `thumbnail_url` 컬럼 추가
-- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
-- [ ] 썸네일 도메인 확인 후 `next/image` + `remotePatterns` 전환
-
 ---
 
 ### **2026-03-20 (Day 4 - 후반)**
 #### ✅ 완료
+- [x] Supabase `articles` 테이블 `title_ko`, `thumbnail_url` 컬럼 추가
 - [x] Albums 페이지 Supabase 연동 및 Server Component 전환
   - `app/albums/page.tsx` → Server Component, `components/AlbumsClient.tsx` 분리
   - 기본 필터 전부 `all`, 페이지당 30개 번호 페이지네이션
@@ -189,92 +333,6 @@ pip install -r requirements.txt
 - [ ] 멜론 API 페이지네이션 미지원 — `startIndex`, `pageIndex` 등 모든 파라미터 무시됨
   - `tools/melon_seed.py` Selenium으로 우회 (hash URL 방식)
 
-#### 📋 다음 단계
-- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
-- [ ] 썸네일 도메인 확인 후 `next/image` + `remotePatterns` 전환
-- [ ] 아티스트 페이지 라우팅 UUID 기반으로 전환
-- [ ] Rolling Stone 스크래퍼 추가
-
----
-
-### **2026-04-20 (Day 7)**
-#### ✅ 완료
-- [x] STRUCTURE.md 작성
-  - 기술 스택, 디렉토리 구조, 데이터 파이프라인, DB 스키마, 환경변수 정리
-- [x] Supabase RLS 적용
-  - `articles`, `albums`, `artists`, `album_artists` 테이블 RLS 활성화
-  - 퍼블릭 SELECT 전용 정책 추가 (anon 키 노출 대응)
-- [x] iOS WebKit 메인 로고 잘림 수정
-  - iPhone Chrome(WebKit)에서 `heroSlideInRight` 애니메이션이 순간적으로 레이아웃 너비를 확장, 중앙 정렬된 `digem` 로고 오른쪽이 잘리는 현상
-  - `app/page.tsx` 최상단 div에 `width: '100%'`, `overflowX: 'hidden'` 추가
-- [x] Stereogum 스크래퍼 추가 (`scripts/stereogum_scraper.py`)
-  - RSS 피드 파싱 (Columns, Reviews, Lists 카테고리 필터)
-  - BeautifulSoup 전문 크롤링 + 썸네일 크레딧 추출
-  - Gemini 번역 → Supabase 저장 파이프라인 연결
-- [x] Consequence 스크래퍼 추가 (`scripts/consequence_scraper.py`)
-  - Features(`?feed=rss2`), Editorials 두 피드 수집
-  - `/feed/` 경로 차단 우회: `?feed=rss2` 파라미터 사용
-- [x] Supabase service_role 키 오류 수정
-  - `scripts/.env`의 anon/service_role 키 혼용 문제 확인 및 수정
-  - JWT 디코딩으로 키 role 검증
-- [x] 출처 아이콘 SVG 확장
-  - `Sidebar.tsx` `SourceBadge` 리팩토링 — SVG 출처 맵(`SVG_SOURCES`) 도입
-  - Stereogum, Consequence SVG 로고 추가 (`public/files/`)
-
-#### 📋 다음 단계
-- [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
-- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
-- [ ] 아티스트 페이지 라우팅 UUID 기반으로 전환
-- [ ] Rolling Stone 스크래퍼 추가
-
----
-
-### **2026-04-20 (Day 8)**
-#### ✅ 완료
-- [x] 프론트엔드 출처 필터 탭 확장
-  - `ArticlesClient.tsx` SOURCES Rolling Stone 제거 → Stereogum, Consequence, Bandcamp 추가
-- [x] 출처 아이콘 Bandcamp SVG 추가 및 Stereogum 색반전 제외
-  - `Sidebar.tsx` `INVERT_SOURCES` Set 도입으로 출처별 invert 개별 제어
-- [x] `ArticleDetail` UI 개선
-  - 이미지·본문 중앙 정렬 불일치 수정 (본문 `maxWidth: 720px` 제거)
-  - 원문 보기 메타 텍스트에서 분리 → 썸네일 하단 단독 버튼으로 변경 (베이지 배경 + 검정 글씨)
-- [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
-  - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
-  - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
-  - `requirements.txt`에 `selenium>=4.20.0` 추가
-- [x] Consequence 썸네일 크레딧 RSS 직접 수집
-  - `media:copyright` 필드를 RSS 파싱 시 바로 추출 (HTML 스크래핑 불필요)
-  - HTML figcaption 폴백 유지
-- [x] 출처 아이콘 SVG 확장 (`Sidebar.tsx`)
-  - `SVG_SOURCES` 맵 도입 — Stereogum, Consequence SVG 로고 추가
-
-#### 📋 다음 단계
-- [ ] 스크래퍼 공통 로직 리팩토링 (`base_scraper.py`)
-- [ ] 프론트엔드 출처 필터 탭 확장 (Stereogum, Consequence, Bandcamp)
-- [ ] Upstash Redis 조회수 카운터 연동
-- [ ] GitHub Actions 자동화
-
----
-
-### **2026-04-07 (Day 6)**
-#### ✅ 완료
-- [x] Python 3.13 호환성 수정 (requirements.txt)
-  - `pydantic==2.5.3` → `2.10.6` (Python 3.13 pre-built wheel 없어 Rust 컴파일 시도 → 실패)
-  - `lxml==5.1.0` → `5.3.0` (동일 원인)
-- [x] `melon_scraper.py` 실행 — 국내/해외 정규·EP 7개 신규 저장
-- [x] `pitchfork_scrapers.py` The Pitch 칼럼 피드 추가
-  - `COLUMN_URL` 추가 (`feed-the-pitch/rss`), 기존 `RSS_URL` → `FEATURE_URL` rename
-  - `fetch_latest_reviews` 분리: `fetch_features()` / `fetch_columns()` / `_fetch_feed()` (private)
-    - The Pitch 피드는 칼럼 전용이므로 `filter_categories=False` 캡슐화
-  - 중복 `filter_new_articles` 이중 호출 버그 수정
-- [x] `pitchfork_scrapers.py` 실행 — features 2개 + columns 3개 수집, 신규 3개 번역 후 저장
-
-#### 📋 다음 단계
-- [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
-- [ ] 기존 레코드 `title_ko` 일회성 마이그레이션 스크립트 작성
-- [ ] 아티스트 페이지 라우팅 UUID 기반으로 전환
-- [ ] Rolling Stone 스크래퍼 추가
-
 ---
 
 ### **2026-03-23 (Day 5)**
@@ -307,10 +365,94 @@ pip install -r requirements.txt
 - [x] 카카오톡 인앱 브라우저 로고 잘림 수정
   - `html`에 `overflow-x: hidden` + `max-width: 100%` 추가 — 블롭 translate 시 body 폭이 순간 확장되던 문제 차단
 
-#### 📋 다음 단계
-- [ ] Upstash Redis 프론트엔드 연동 및 조회수 기능 구현
-  - `@upstash/redis` 패키지 설치
-  - `lib/redis.ts` 생성, `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` 환경변수 추가
-  - `app/api/views/route.ts` — `views:total` + `views:YYYY-MM-DD` INCR
-  - `ViewTracker` 클라이언트 컴포넌트 → layout에 추가 (sessionStorage로 세션당 1회 카운트)
-  - Info 페이지에 오늘 조회수 / 누적 조회수 표시
+---
+
+### **2026-04-07 (Day 6)**
+#### ✅ 완료
+- [x] Python 3.13 호환성 수정 (requirements.txt)
+  - `pydantic==2.5.3` → `2.10.6` (Python 3.13 pre-built wheel 없어 Rust 컴파일 시도 → 실패)
+  - `lxml==5.1.0` → `5.3.0` (동일 원인)
+- [x] `melon_scraper.py` 실행 — 국내/해외 정규·EP 7개 신규 저장
+- [x] `pitchfork_scrapers.py` The Pitch 칼럼 피드 추가
+  - `COLUMN_URL` 추가 (`feed-the-pitch/rss`), 기존 `RSS_URL` → `FEATURE_URL` rename
+  - `fetch_latest_reviews` 분리: `fetch_features()` / `fetch_columns()` / `_fetch_feed()` (private)
+    - The Pitch 피드는 칼럼 전용이므로 `filter_categories=False` 캡슐화
+  - 중복 `filter_new_articles` 이중 호출 버그 수정
+- [x] `pitchfork_scrapers.py` 실행 — features 2개 + columns 3개 수집, 신규 3개 번역 후 저장
+
+---
+
+### **2026-04-20 (Day 7)**
+#### ✅ 완료
+- [x] Supabase RLS 적용
+  - `articles`, `albums`, `artists`, `album_artists` 테이블 RLS 활성화
+  - 퍼블릭 SELECT 전용 정책 추가 (anon 키 노출 대응)
+- [x] iOS WebKit 메인 로고 잘림 수정
+  - iPhone Chrome(WebKit)에서 `heroSlideInRight` 애니메이션이 순간적으로 레이아웃 너비를 확장, 중앙 정렬된 `digem` 로고 오른쪽이 잘리는 현상
+  - `app/page.tsx` 최상단 div에 `width: '100%'`, `overflowX: 'hidden'` 추가
+- [x] Stereogum 스크래퍼 추가 (`scripts/stereogum_scraper.py`)
+  - RSS 피드 파싱 (Columns, Reviews, Lists 카테고리 필터)
+  - BeautifulSoup 전문 크롤링 + 썸네일 크레딧 추출
+  - Gemini 번역 → Supabase 저장 파이프라인 연결
+- [x] Consequence 스크래퍼 추가 (`scripts/consequence_scraper.py`)
+  - Features(`?feed=rss2`), Editorials 두 피드 수집
+  - `/feed/` 경로 차단 우회: `?feed=rss2` 파라미터 사용
+- [x] Supabase service_role 키 오류 수정
+  - `scripts/.env`의 anon/service_role 키 혼용 문제 확인 및 수정
+  - JWT 디코딩으로 키 role 검증
+- [x] 출처 아이콘 SVG 확장
+  - `Sidebar.tsx` `SourceBadge` 리팩토링 — SVG 출처 맵(`SVG_SOURCES`) 도입
+  - Stereogum, Consequence SVG 로고 추가 (`public/files/`)
+
+---
+
+### **2026-04-23 (Day 9)**
+#### ✅ 완료
+- [x] `pitchforkScraper` → `PitchforkScraper` 클래스명 PEP 8 수정
+- [x] Pitchfork 저작권 체크 개선
+  - `'© 2026 Condé Nast' in text or '© 2025 Condé Nast'` → `'Condé Nast' in text` (연도 하드코딩 제거)
+- [x] `STRUCTURE.md` 삭제 → 내용을 `README.md` 상단에 통합
+  - 기술 스택, 디렉토리 구조, 데이터 파이프라인, DB 스키마, 환경변수 섹션 추가
+  - 디렉토리 구조에 Day 7/8에 추가된 스크래퍼 파일 반영
+- [x] `README.md` 개발 일지 정리
+  - 날짜 순서 수정 (Day 5→6→7→8 순으로 재배치)
+  - 일별 "다음 단계" 섹션 제거 → 상단 "미구현 / 예정 기능" 섹션에서 단일 관리
+  - Day 8 완료된 항목이 다음 단계에 중복 기재되던 문제 수정
+- [x] 칼럼 스크래퍼 `scripts/column/` 패키지로 분리
+  - `scripts/__init__.py`, `scripts/column/__init__.py` 추가 (패키지화)
+  - `pitchfork_scrapers.py`, `stereogum_scraper.py`, `consequence_scraper.py`, `bandcamp_scraper.py` 이동
+  - 상대 import 방식으로 전환 (`from .base_scraper import BaseScraper` 등)
+- [x] `scripts/column/base_scraper.py` 신규 작성
+  - 4개 스크래퍼에 중복되던 공통 로직 추상 기반 클래스로 통합
+  - `_parse_date()` — 동일 구현이 4개 파일에 복사되던 것
+  - `_extract_content()` — figure 크레딧 + 단락 파싱 공통 헬퍼 (container selector, stop condition 파라미터)
+  - `run()` — 수집 → 중복체크 → 크롤링 → 번역 → 저장 → sleep 전체 파이프라인
+  - `article_data` dict 구성 — 4곳에서 반복되던 것 일원화
+- [x] `BandcampDailyScraper` 구조 개선
+  - `__del__` 제거 → `run()` override + `finally` 블록으로 드라이버 정리 보장
+  - `__init__`에서 즉시 초기화하던 Selenium 드라이버 → `_get_driver()` 지연 초기화로 전환
+- [x] `melon_scraper.py` 개선
+  - 모듈 수준 `main()` → 클래스 메서드 `run()`으로 전환
+  - import를 상대경로(`from .database_loader import SupabaseLoader`)로 수정
+- [x] `scripts/main.py` 신규 작성
+  - 칼럼 4종 + 멜론 앨범 전체 파이프라인을 단일 진입점에서 실행
+  - 실행: `python -m scripts.main` (정기 자동화 대비)
+
+---
+
+### **2026-04-20 (Day 8)**
+#### ✅ 완료
+- [x] 프론트엔드 출처 필터 탭 확장
+  - `ArticlesClient.tsx` SOURCES Rolling Stone 제거 → Stereogum, Consequence, Bandcamp 추가
+- [x] 출처 아이콘 Bandcamp SVG 추가 및 Stereogum 색반전 제외
+  - `Sidebar.tsx` `INVERT_SOURCES` Set 도입으로 출처별 invert 개별 제어
+- [x] `ArticleDetail` UI 개선
+  - 이미지·본문 중앙 정렬 불일치 수정 (본문 `maxWidth: 720px` 제거)
+  - 원문 보기 메타 텍스트에서 분리 → 썸네일 하단 단독 버튼으로 변경 (베이지 배경 + 검정 글씨)
+- [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
+  - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
+  - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
+  - `requirements.txt`에 `selenium>=4.20.0` 추가
+- [x] Consequence 썸네일 크레딧 RSS 직접 수집
+  - `media:copyright` 필드를 RSS 파싱 시 바로 추출 (HTML 스크래핑 불필요)
+  - HTML figcaption 폴백 유지

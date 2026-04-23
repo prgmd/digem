@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from typing import List, Dict
-from database_loader import SupabaseLoader
+from .database_loader import SupabaseLoader
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
@@ -82,35 +82,30 @@ class MelonScraper:
         return albums
 
 
-def main():
-    print('멜론 앨범 스크래핑 시작...')
-    scraper = MelonScraper()
-    loader = SupabaseLoader()
+    def run(self):
+        print('멜론 앨범 스크래핑 시작...')
+        loader = SupabaseLoader()
 
-    all_albums = []
-    for region in REGIONS:
-        albums = scraper.fetch_albums(region['area_code'], region['name'])
-        all_albums.extend(albums)
+        all_albums = []
+        for region in REGIONS:
+            albums = self.fetch_albums(region['area_code'], region['name'])
+            all_albums.extend(albums)
 
-    if not all_albums:
-        print('수집된 앨범이 없습니다.')
-        return
+        if not all_albums:
+            print('수집된 앨범이 없습니다.')
+            return
 
-    print(f'\n총 {len(all_albums)}개 앨범 수집. 중복 체크 중...')
-    new_albums = loader.filter_new_albums(all_albums)
+        print(f'\n총 {len(all_albums)}개 앨범 수집. 중복 체크 중...')
+        new_albums = loader.filter_new_albums(all_albums)
 
-    if not new_albums:
-        print('모든 앨범이 이미 DB에 존재합니다.')
-        return
+        if not new_albums:
+            print('모든 앨범이 이미 DB에 존재합니다.')
+            return
 
-    print(f'\n{len(new_albums)}개 신규 앨범 저장 시작...')
-    success = 0
-    for album in new_albums:
-        if loader.save_album(album):
-            success += 1
-
-    print(f'\n완료: {success}/{len(new_albums)}개 저장')
+        print(f'\n{len(new_albums)}개 신규 앨범 저장 시작...')
+        success = sum(1 for album in new_albums if loader.save_album(album))
+        print(f'\n완료: {success}/{len(new_albums)}개 저장')
 
 
 if __name__ == '__main__':
-    main()
+    MelonScraper().run()
