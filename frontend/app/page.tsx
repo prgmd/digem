@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import HomeNav from '@/components/HomeNav'
 
 export default function Home() {
   return (
@@ -48,22 +48,7 @@ export default function Home() {
         justifyContent: 'center',
         paddingTop: '2rem',
       }}>
-        <nav className="hero-nav" style={{ display: 'flex', gap: '4rem', alignItems: 'center' }}>
-          <Link
-            href="/articles"
-            className="hero-nav-left"
-            style={{ fontSize: '1.5rem', color: 'var(--meta-color)', textDecoration: 'none' }}
-          >
-            Articles
-          </Link>
-          <Link
-            href="/albums"
-            className="hero-nav-right"
-            style={{ fontSize: '1.5rem', color: 'var(--meta-color)', textDecoration: 'none' }}
-          >
-            Albums
-          </Link>
-        </nav>
+        <HomeNav />
       </div>
     </div>
   )

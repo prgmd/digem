@@ -145,6 +145,9 @@ RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Ge
 - [ ] 기존 레코드 `title_ko` 마이그레이션 스크립트
 - [x] 스크래퍼 공통 로직 리팩토링 (`base_scraper.py`)
 - [ ] GitHub Actions 자동화
+- [ ] `articles` 목록 쿼리 컬럼 최적화 — `select('*')` → 목록에 필요한 컬럼만 명시 (`content_en`, `content_ko` 제외)
+- [ ] Supabase 인덱스 추가 — `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
+- [ ] `albums` 페이지네이션 도입 — 현재 전체 로딩 중
 
 ---
 
@@ -482,3 +485,10 @@ python -m scripts.melon_scraper
   - 멜론 목록이 최신순 정렬이므로 연속 3개 중복 = 이후 전부 기존 데이터로 간주
   - 기존 `filter_new_albums()` 일괄 호출 → `album_exists()` 인라인 루프로 대체 (공용 메서드 영향 없음)
   - 신규 앨범 발견 시 카운터 리셋
+- [x] 홈 페이지 네비게이션 로딩 피드백 추가
+  - `HomeNav` 클라이언트 컴포넌트 분리 — 클릭 즉시 스피너 표시, 반대 항목 fade out
+  - `app/articles/loading.tsx`, `app/albums/loading.tsx` 추가 — Server Component 데이터 fetch 중 자동 표시
+- [ ] DB 쿼리 최적화 검토
+  - `articles` 목록: `select('*')`로 `content_en`, `content_ko` 본문 전체 포함 중 → 컬럼 명시로 개선 예정
+  - `albums`: 페이지네이션 없이 전체 로딩 중
+  - 권장 인덱스: `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
