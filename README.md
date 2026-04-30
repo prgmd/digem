@@ -472,3 +472,13 @@ python -m scripts.melon_scraper
   - URL 파라미터 기반 상태 관리 (`?source=...&page=...`)
   - `ArticlesClient.tsx` — `router.push` + `URLSearchParams`로 필터/페이지 이동
   - `Sidebar.tsx` — 하단 `← N/M →` 페이지네이션 컨트롤 추가
+
+---
+
+### **2026-04-30 (Day 10)**
+#### ✅ 완료
+- [x] `melon_scraper.py` 조기 종료 로직 추가
+  - 중복 체크 시 3개 앨범 연속 DB 존재 확인 시 이후 항목 순회 중단
+  - 멜론 목록이 최신순 정렬이므로 연속 3개 중복 = 이후 전부 기존 데이터로 간주
+  - 기존 `filter_new_albums()` 일괄 호출 → `album_exists()` 인라인 루프로 대체 (공용 메서드 영향 없음)
+  - 신규 앨범 발견 시 카운터 리셋

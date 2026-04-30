@@ -16,7 +16,9 @@ class PitchforkScraper(BaseScraper):
         'Features / Cover Story',
         'Features / Longform',
         'Features / Rising',
-        'Features / 5-10-15-20'
+        'Features / 5-10-15-20',
+        'Features / Lists & Guides',
+        'Features'
     ]
 
     def fetch_articles(self, limit: int = 10) -> List[Dict]:

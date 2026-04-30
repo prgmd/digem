@@ -96,7 +96,20 @@ class MelonScraper:
             return
 
         print(f'\n총 {len(all_albums)}개 앨범 수집. 중복 체크 중...')
-        new_albums = loader.filter_new_albums(all_albums)
+        new_albums = []
+        consecutive_exists = 0
+
+        for album in all_albums:
+            title = album.get('title', '')
+            artist = album.get('artist', '')
+            if loader.album_exists(title, artist):
+                consecutive_exists += 1
+                if consecutive_exists >= 3:
+                    print(f'최신 앨범 3개 연속 중복 확인 — 이후 항목 생략')
+                    break
+            else:
+                consecutive_exists = 0
+                new_albums.append(album)
 
         if not new_albums:
             print('모든 앨범이 이미 DB에 존재합니다.')
