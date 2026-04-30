@@ -138,16 +138,97 @@ RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Ge
 
 ## 미구현 / 예정 기능
 
-- [ ] Upstash Redis 조회수 카운터 프론트엔드 연동
+- [x] 스크래퍼 공통 로직 리팩토링 (`base_scraper.py`)
 - [ ] Rolling Stone 스크래퍼 추가
+- [ ] GitHub Actions 자동화
 - [ ] 아티스트 페이지 UUID 기반 라우팅 전환
 - [ ] `next/image` + `remotePatterns` 썸네일 전환
 - [ ] 기존 레코드 `title_ko` 마이그레이션 스크립트
-- [x] 스크래퍼 공통 로직 리팩토링 (`base_scraper.py`)
-- [ ] GitHub Actions 자동화
+
+### DB / 성능 최적화
 - [ ] `articles` 목록 쿼리 컬럼 최적화 — `select('*')` → 목록에 필요한 컬럼만 명시 (`content_en`, `content_ko` 제외)
-- [ ] Supabase 인덱스 추가 — `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
+- [ ] Supabase 인덱스 추가
+  - `(translation_status, published_at DESC)` — articles 기본 목록
+  - `(translation_status, source, published_at DESC)` — source 필터 포함
+  - `albums(release_date DESC)` — albums 정렬
 - [ ] `albums` 페이지네이션 도입 — 현재 전체 로딩 중
+
+### Upstash Redis 연동
+- [ ] **조회수 카운터 + 인기 순위 (Sorted Set)**
+  - 칼럼/앨범 클릭 시 `INCR article:{id}:views` + `ZADD popular:articles {score} {id}`
+  - 목록에 "인기순" 정렬 탭 추가
+  - Redis Sorted Set 활용
+- [ ] **쿼리 캐싱 (Cache-Aside 패턴)**
+  - articles/albums 목록 응답을 Redis에 TTL 10분으로 캐시
+  - 캐시 히트 시 Supabase 쿼리 스킵
+- [ ] **Rate Limiting**
+  - Next.js Route Handler에서 IP 기준 요청 횟수 제한
+  - `INCR` + `EXPIRE` 조합
+- [ ] **스크래퍼 중복 체크 캐싱**
+  - 현재 매번 Supabase `album_exists()` 쿼리 → Redis SET(`SISMEMBER`)으로 선조회
+
+### 검색 기능
+→ 아래 별도 섹션 참고
+
+---
+
+## 검색 기능 구현 플랜
+
+### 검색 범위
+- 대상: `articles` (title, title_ko 우선 / content_ko 선택)
+- albums는 title·artist 문자열이 짧아 클라이언트 필터로 충분
+
+### 방식 비교
+
+| 방식 | 장점 | 단점 |
+|---|---|---|
+| Supabase `ilike` | 별도 설정 없음, 즉시 적용 | 인덱스 없으면 느림, 관련도 정렬 없음 |
+| Supabase FTS (`tsvector`) | DB 내장, 영어 관련도 정렬 가능 | 한국어 형태소 분석 미지원 |
+| `pg_trgm` (trigram) | 한국어 부분 일치 검색 가능, GIN 인덱스로 빠름 | Supabase에서 extension 활성화 필요 |
+| Algolia | 한/영 모두 최고 품질, 오타 허용 | 외부 서비스, 인덱스 동기화 필요 |
+
+**채택 방향**: `pg_trgm` + Supabase 쿼리 (외부 서비스 추가 없이 DB 레벨에서 해결)
+- 영어 본문은 `ilike`로도 충분, 한국어 title_ko 검색 품질이 핵심
+
+### 구현 단계
+
+#### 1단계 — DB 준비 (Supabase SQL Editor)
+```sql
+-- trigram extension 활성화
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- title_ko, title 컬럼에 GIN 인덱스
+CREATE INDEX idx_articles_title_ko_trgm ON articles USING GIN (title_ko gin_trgm_ops);
+CREATE INDEX idx_articles_title_trgm    ON articles USING GIN (title    gin_trgm_ops);
+```
+
+#### 2단계 — Next.js Route Handler (`app/api/search/route.ts`)
+```
+GET /api/search?q=검색어
+  → title_ko ILIKE %q% OR title ILIKE %q%
+  → id, title, title_ko, source, published_at, thumbnail_url 반환 (content 제외)
+  → (선택) Redis에 결과 캐시 TTL 5분
+```
+
+#### 3단계 — 검색 UI
+- `CategoryHeader`에 검색 아이콘(🔍) 버튼 추가
+- 클릭 시 검색 입력창 토글 (헤더 인라인 또는 오버레이)
+- 입력 디바운스 300ms 후 `/api/search` 호출
+- 결과를 드롭다운 또는 사이드패널로 표시
+- 항목 클릭 → 해당 칼럼 상세로 이동
+
+#### 4단계 — Redis 캐싱 연계 (선택)
+- 동일 검색어 결과를 Redis에 캐시
+- `search:{query}` 키, TTL 5분
+- 캐시 히트 시 DB 쿼리 없이 바로 반환
+
+### 파일 변경 목록
+| 파일 | 작업 |
+|---|---|
+| `app/api/search/route.ts` | 신규 — 검색 Route Handler |
+| `lib/redis.ts` | 신규 — Upstash Redis 클라이언트 (캐싱 연계 시) |
+| `components/CategoryHeader.tsx` | 수정 — 검색 아이콘 + 입력창 추가 |
+| Supabase SQL | `pg_trgm` extension + GIN 인덱스 |
 
 ---
 
