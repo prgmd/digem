@@ -24,7 +24,9 @@ export default async function ArticlesPage({
 
   const { data, error, count } = await query
 
-  const articles: Article[] = error || !data ? [] : data
+  if (error) throw error
+
+  const articles: Article[] = data ?? []
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   return (

@@ -1,5 +1,7 @@
+import { Suspense } from 'react'
 import { supabase } from '@/lib/supabase'
 import AlbumsClient, { Album } from '@/components/AlbumsClient'
+import Loading from './loading'
 
 export default async function AlbumsPage() {
   const { data, error } = await supabase
@@ -7,7 +9,13 @@ export default async function AlbumsPage() {
     .select('*')
     .order('release_date', { ascending: false })
 
-  const albums: Album[] = error || !data ? [] : data
+  if (error) throw error
 
-  return <AlbumsClient albums={albums} />
+  const albums: Album[] = data ?? []
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <AlbumsClient albums={albums} />
+    </Suspense>
+  )
 }

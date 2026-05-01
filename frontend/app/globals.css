@@ -181,3 +181,37 @@ body {
     padding: 0 1rem !important;
   }
 }
+
+/* 앨범 그리드 반응형 */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.75rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .album-grid { grid-template-columns: repeat(5, 1fr); max-width: unset; }
+}
+
+@media (max-width: 900px) {
+  .album-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+}
+
+@media (max-width: 768px) {
+  .album-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+}
+
+.album-filter-bar {
+  padding: 1.25rem 2rem;
+}
+
+.album-grid-wrapper {
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .album-filter-bar { padding: 1rem; }
+  .album-grid-wrapper { padding: 1rem; }
+}

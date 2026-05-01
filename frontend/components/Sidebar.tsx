@@ -102,6 +102,11 @@ export default function Sidebar({
 
       {/* 칼럼 목록 */}
       <ul style={{ listStyle: 'none', flex: 1 }}>
+        {articles.length === 0 && (
+          <li style={{ color: 'var(--meta-color)', fontSize: '0.85rem', padding: '1rem 0' }}>
+            해당하는 글이 없어요.
+          </li>
+        )}
         {articles.map(article => (
           <li
             key={article.id}

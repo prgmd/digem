@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Spinner from '@/components/Spinner'
 
 interface Article {
   id: number
@@ -69,13 +70,8 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   if (!ready) {
     return (
       <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', opacity: 0.4 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: '50%',
-            border: '2px solid var(--meta-color)',
-            borderTopColor: 'var(--text-color)',
-            animation: 'spin 0.8s linear infinite',
-          }} />
+        <div style={{ opacity: 0.4 }}>
+          <Spinner />
         </div>
       </main>
     )
