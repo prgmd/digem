@@ -131,7 +131,9 @@ export default function Sidebar({
             }}
           >
             <SourceBadge source={article.source} />
-            <span>{article.title_ko || article.title}</span>
+            <span style={{ fontFamily: 'BookkGothic, sans-serif', fontWeight: 400 }}>
+              {article.title_ko || article.title}
+            </span>
           </li>
         ))}
       </ul>

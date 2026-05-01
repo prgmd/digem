@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react'
 
 export const selectStyle: CSSProperties = {
+  fontFamily: 'BookkGothic, sans-serif',
+  fontWeight: 400,
   background: '#0a0a0a',
   border: '1px solid var(--border)',
   color: 'var(--text-color)',
@@ -11,6 +13,8 @@ export const selectStyle: CSSProperties = {
 }
 
 export const ghostButtonStyle: CSSProperties = {
+  fontFamily: 'BookkGothic, sans-serif',
+  fontWeight: 400,
   background: 'none',
   border: '1px solid var(--border)',
   color: 'var(--text-color)',
@@ -20,6 +24,8 @@ export const ghostButtonStyle: CSSProperties = {
 }
 
 export const tabStyle = (active: boolean): CSSProperties => ({
+  fontFamily: 'BookkGothic, sans-serif',
+  fontWeight: active ? 700 : 400,
   background: active ? 'var(--selected-bg)' : 'none',
   border: '1px solid var(--border)',
   color: active ? 'var(--text-color)' : 'var(--meta-color)',
@@ -31,6 +37,8 @@ export const tabStyle = (active: boolean): CSSProperties => ({
 })
 
 export const pageButtonStyle = (active: boolean): CSSProperties => ({
+  fontFamily: 'BookkGothic, sans-serif',
+  fontWeight: active ? 700 : 400,
   background: active ? 'var(--selected-bg)' : 'none',
   border: '1px solid var(--border)',
   color: active ? 'var(--text-color)' : 'var(--meta-color)',
