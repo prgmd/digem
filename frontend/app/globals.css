@@ -1,10 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap');
-
 @font-face {
   font-family: 'bjorkfont';
   src: url('/fonts/bjorkfont.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BookkMyungjo';
+  src: url('/fonts/BookkMyungjo_Light.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BookkMyungjo';
+  src: url('/fonts/BookkMyungjo_Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BookkGothic';
+  src: url('/fonts/BookkGothic_Light.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BookkGothic';
+  src: url('/fonts/BookkGothic_Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 * {
@@ -23,17 +54,17 @@ html {
   --foreground: #E8D5A0;
   --text-color: #E8D5A0;
   --meta-color: #8a7a5a;
-  --accent: #0a3d2e;
-  --accent-hover: #1a5d42;
+  --accent: #2a1800;
+  --accent-hover: #3d2500;
   --border: #1a1a1a;
   --hover-bg: #1a1a1a;
-  --selected-bg: #0a3d2e;
+  --selected-bg: #2a1800;
 }
 
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Noto Serif KR', serif;
+  font-family: 'BookkMyungjo', serif;
   overflow: hidden;
 }
 
@@ -157,19 +188,29 @@ body {
 .mesh-blob-1 {
   width: 700px;
   height: 700px;
-  background: #0a3d2e;
+  background: #3d2500;
 }
 
 .mesh-blob-2 {
   width: 550px;
   height: 550px;
-  background: #1a5d42;
+  background: #5c3800;
 }
 
 .mesh-blob-3 {
   width: 450px;
   height: 450px;
-  background: #051a10;
+  background: #1a0e00;
+}
+
+/* 앨범 카드 픽셀 hover 효과 */
+.album-artwork {
+  transition: none;
+  cursor: default;
+}
+.album-artwork:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--meta-color);
 }
 
 @media (max-width: 768px) {

@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
 const LINKS = [
-  { href: '/articles', label: 'Articles' },
-  { href: '/albums',   label: 'Albums'   },
+  { href: '/articles', label: 'ARTICLES' },
+  { href: '/albums',   label: 'ALBUMS'   },
 ]
 
 export default function HomeNav() {
@@ -13,7 +13,8 @@ export default function HomeNav() {
           key={href}
           href={href}
           style={{
-            fontSize: '1.5rem',
+            fontFamily: 'BookkMyungjo, serif',
+            fontSize: '1.1rem',
             color: 'var(--meta-color)',
             textDecoration: 'none',
           }}

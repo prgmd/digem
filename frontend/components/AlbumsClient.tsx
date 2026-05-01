@@ -120,7 +120,7 @@ export default function AlbumsClient({ albums }: Props) {
               animation: `fadeIn 0.5s ease-in-out ${index * 30}ms forwards`,
               minWidth: 0,
             }}>
-              <div style={{
+              <div className="album-artwork" style={{
                 width: '100%',
                 aspectRatio: '1 / 1',
                 background: 'var(--hover-bg)',
@@ -129,7 +129,7 @@ export default function AlbumsClient({ albums }: Props) {
                 justifyContent: 'center',
                 marginBottom: '0.65rem',
                 overflow: 'hidden',
-                outline: album.is_featured ? '2px solid #2d7a4f' : 'none',
+                outline: album.is_featured ? '2px solid var(--meta-color)' : 'none',
                 outlineOffset: '2px',
                 position: 'relative',
               }}>
@@ -138,8 +138,8 @@ export default function AlbumsClient({ albums }: Props) {
                     position: 'absolute', top: 0, left: 0,
                     fontFamily: 'bjorkfont, sans-serif',
                     fontSize: '1rem',
-                    color: '#fff',
-                    background: '#2d7a4f',
+                    color: 'var(--bg-color)',
+                    background: 'var(--meta-color)',
                     width: 24, height: 24,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     zIndex: 1,

@@ -28,9 +28,9 @@ export default function Home() {
         </span>
         <span
           className="hero-tagline"
-          style={{ fontFamily: "'Noto Serif KR', serif", fontSize: '0.95rem', color: '#E8D5A0', opacity: 0.6, letterSpacing: '0.1em' }}
+          style={{ fontFamily: 'BookkMyungjo, serif', fontSize: '0.9rem', color: '#E8D5A0', opacity: 0.55, letterSpacing: '0.08em' }}
         >
-          dig your uncut gems
+          dig your uncut gems.
         </span>
       </div>
 

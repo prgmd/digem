@@ -69,7 +69,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
   if (!ready) {
     return (
-      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', animation: 'pageFadeIn 0.25s ease both' }}>
         <div style={{ opacity: 0.4 }}>
           <Spinner />
         </div>
@@ -78,7 +78,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   }
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', animation: 'pageFadeIn 0.25s ease both' }}>
       {/* 고정 헤더: 뒤로가기 + 언어 토글 */}
       <div style={{
         display: 'flex',

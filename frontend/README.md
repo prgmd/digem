@@ -14,7 +14,7 @@
 | 언어 | TypeScript 5 (strict) |
 | 스타일 | CSS Variables + 인라인 스타일 + CSS 클래스 |
 | 백엔드 | Supabase (PostgreSQL) |
-| 폰트 | Noto Serif KR, bjorkfont (커스텀) |
+| 폰트 | BookkMyungjo / BookkGothic (교보문고), bjorkfont (커스텀) |
 
 ---
 
@@ -119,3 +119,22 @@ lib/
 - `components/Spinner.tsx` 신규 생성 — `ArticleDetail`, `AlbumsClient`에 중복된 스피너 HTML/스타일 통합
 - `lib/styles.ts` 신규 생성 — `selectStyle`, `tabStyle`, `ghostButtonStyle`, `pageButtonStyle` 공통 스타일 상수
 - error 페이지 버튼 스타일, 앨범 페이지네이션 버튼 스타일 → `lib/styles.ts` 참조로 교체
+
+**디자인 개선**
+- 사이트 전체 초록 계열 컬러 제거 — amber 계열(`#2a1800`, `#3d2500`)로 통일
+- 메시 배경 blob 색상 green → amber(`#3d2500`, `#5c3800`, `#1a0e00`)로 교체
+- 앨범 카드 hover 시 픽셀 그림자 효과 추가 — `translate(-2px,-2px)` + `box-shadow: 4px 4px 0 var(--meta-color)`
+- featured 앨범 뱃지/아웃라인 색상 hardcode green → `var(--meta-color)` 교체
+- 홈 tagline(`dig ur uncut gems.`) — BookkMyungjo 적용
+- 홈 네비게이션(Articles, Albums) — BookkMyungjo 적용
+- 디자인 시스템 테스트 페이지 추가 (`app/test/page.tsx`) — 1-bit phosphor green 가안
+
+**폰트 교체**
+- Noto Serif KR(Google Fonts) 제거 — 외부 네트워크 요청 의존성 제거
+- BookkMyungjo Light/Bold, BookkGothic Light/Bold 로컬 폰트로 등록 (`public/fonts/`)
+- `font-display: swap` 적용 — 폰트 로딩 중 텍스트 즉시 표시
+- `info/page.tsx` 폰트 크레딧 업데이트
+
+**Articles 글 전환 애니메이션**
+- `ArticleDetail.tsx` — 글 선택 시 `pageFadeIn 0.25s` 적용
+- `key={article.id}` 리마운트를 활용해 추가 상태 없이 구현
