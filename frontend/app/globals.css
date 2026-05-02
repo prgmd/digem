@@ -176,11 +176,20 @@ body {
   pointer-events: none;
 }
 
+.mesh-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #000 42%, transparent 42%);
+  background-size: 7px 7px;
+  pointer-events: none;
+}
+
 .mesh-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.55;
+  filter: blur(48px);
+  opacity: 0.85;
   will-change: transform;
   transform: translateZ(0);
 }
@@ -188,19 +197,19 @@ body {
 .mesh-blob-1 {
   width: 700px;
   height: 700px;
-  background: #3d2500;
+  background: #5c3800;
 }
 
 .mesh-blob-2 {
   width: 550px;
   height: 550px;
-  background: #5c3800;
+  background: #7a4d00;
 }
 
 .mesh-blob-3 {
   width: 450px;
   height: 450px;
-  background: #1a0e00;
+  background: #2a1800;
 }
 
 /* 앨범 카드 픽셀 hover 효과 */
