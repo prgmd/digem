@@ -174,14 +174,14 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
                   </span>
                 )}
               </div>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.4rem' }}>
                 {album.title}
               </p>
               <p
                 onClick={(e) => { e.stopPropagation(); setNavigating(true); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
                 onMouseEnter={() => setHoveredArtist(album.id)}
                 onMouseLeave={() => setHoveredArtist(null)}
-                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer', transition: 'color 0.15s' }}
+                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.35rem', cursor: 'pointer', transition: 'color 0.15s' }}
               >
                 {album.artist}
               </p>
