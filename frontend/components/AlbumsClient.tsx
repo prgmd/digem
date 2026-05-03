@@ -174,18 +174,18 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
                   </span>
                 )}
               </div>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 700, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
                 {album.title}
               </p>
               <p
                 onClick={(e) => { e.stopPropagation(); setNavigating(true); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
                 onMouseEnter={() => setHoveredArtist(album.id)}
                 onMouseLeave={() => setHoveredArtist(null)}
-                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer', transition: 'color 0.15s' }}
+                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer', transition: 'color 0.15s' }}
               >
                 {album.artist}
               </p>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: '0.75rem', color: 'var(--meta-color)' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.75rem', color: 'var(--meta-color)' }}>
                 {album.region}{album.album_type ? ` · ${album.album_type}` : ''}{album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
               </p>
             </div>

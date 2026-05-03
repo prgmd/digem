@@ -8,8 +8,24 @@
 
 @font-face {
   font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pretendard';
   src: url('/fonts/Pretendard-Regular.otf') format('opentype');
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-SemiBold.otf') format('opentype');
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
@@ -200,10 +216,6 @@ body {
 .album-artwork {
   transition: none;
   cursor: default;
-}
-.album-artwork:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--meta-color);
 }
 
 @media (max-width: 768px) {

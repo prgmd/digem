@@ -8,16 +8,16 @@ const PAGE_SIZE = 30
 export default async function AlbumsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const page      = Math.max(1, Number(searchParams.page ?? 1))
-  const region    = typeof searchParams.region === 'string' ? searchParams.region : 'all'
-  const albumType = typeof searchParams.type   === 'string' ? searchParams.type   : 'all'
-  const year      = typeof searchParams.year   === 'string' ? searchParams.year   : 'all'
-  const month     = typeof searchParams.month  === 'string' ? searchParams.month  : 'all'
-  const featured  = searchParams.featured === 'true'
+  const params    = await searchParams
+  const page      = Math.max(1, Number(params.page ?? 1))
+  const region    = params.region    ?? 'all'
+  const albumType = params.type      ?? 'all'
+  const year      = params.year      ?? 'all'
+  const month     = params.month     ?? 'all'
+  const featured  = params.featured === 'true'
 
-  // month-only (year = 'all') 인 경우 서버에서 월 필터 불가 → 클라이언트 처리
   const isMonthOnly = month !== 'all' && year === 'all'
 
   let query = supabase
@@ -40,7 +40,6 @@ export default async function AlbumsPage({
       .lte('release_date', `${year}-12-31`)
   }
 
-  // month-only는 전체 로드 후 클라이언트 필터, 그 외엔 서버 페이지네이션
   if (isMonthOnly) {
     query = query.limit(2000)
   } else {

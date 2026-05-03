@@ -107,6 +107,18 @@ lib/
 - `useAlbumFilters.ts`: 클라이언트 필터링 로직 제거, URL 상태 관리(read/write)만 담당
 - `AlbumsClient.tsx`: `totalCount`, `availableYears`, `monthFilter` props 추가, 페이지네이션을 서버 count 기준으로 계산
 
+**Albums 페이지 Next.js 15 호환성 수정**
+- `app/albums/page.tsx`: `searchParams`를 `Promise<...>` 타입으로 선언하고 `await` 처리 — Next.js 15에서 page props의 `searchParams`는 비동기 객체로 변경됨
+
+**폰트 weight 경량화**
+- articles `h1` 제목을 제외한 전 사이트 텍스트를 한 단계 얇게 조정
+- `400 → 300` (본문, 사이드바 목록, select, 버튼 비활성 상태 등)
+- `700 / bold → 600` (탭·버튼 활성 상태, 앨범 타이틀, 언어 토글, 홈 네비게이션)
+- `globals.css`에 Pretendard 300(Light)·600(SemiBold) `@font-face` 추가
+
+**앨범 카드 hover 효과 제거**
+- `globals.css`: `.album-artwork:hover` 픽셀 이동·그림자 효과 삭제
+
 ---
 
 ### 2026-05-01

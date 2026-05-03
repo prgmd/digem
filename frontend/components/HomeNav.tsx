@@ -14,7 +14,7 @@ export default function HomeNav() {
           href={href}
           style={{
             fontFamily: 'Pretendard, sans-serif',
-            fontWeight: 'bold',
+            fontWeight: 600,
             fontSize: '1.1rem',
             color: 'var(--meta-color)',
             textDecoration: 'none',

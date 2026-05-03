@@ -100,13 +100,13 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         <div>
           <button
             onClick={() => setLanguage('en')}
-            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'en' ? 700 : 400, background: 'none', border: 'none', color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginRight: '1rem' }}
+            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'en' ? 600 : 300, background: 'none', border: 'none', color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginRight: '1rem' }}
           >
             원문
           </button>
           <button
             onClick={() => setLanguage('ko')}
-            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'ko' ? 700 : 400, background: 'none', border: 'none', color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer' }}
+            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'ko' ? 600 : 300, background: 'none', border: 'none', color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer' }}
           >
             번역
           </button>
@@ -190,7 +190,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: '1.1rem', lineHeight: 1.8, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.8, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content) }}
       />
       </div>
