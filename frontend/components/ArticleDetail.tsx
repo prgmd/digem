@@ -190,7 +190,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.8, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.5, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content) }}
       />
       </div>
