@@ -173,6 +173,11 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
                     {album.title[0]}
                   </span>
                 )}
+                <div className="album-title-overlay">
+                  <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-color)', textAlign: 'center', lineHeight: 1.5, wordBreak: 'keep-all' }}>
+                    {album.title}
+                  </span>
+                </div>
               </div>
               <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.4rem' }}>
                 {album.title}

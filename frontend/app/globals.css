@@ -220,10 +220,26 @@ body {
   background: #2a1800;
 }
 
-/* 앨범 카드 픽셀 hover 효과 */
 .album-artwork {
   transition: none;
   cursor: default;
+}
+
+.album-title-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.album-artwork:hover .album-title-overlay {
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
