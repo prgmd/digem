@@ -28,7 +28,7 @@ export default function Home() {
         </span>
         <span
           className="hero-tagline"
-          style={{ fontFamily: 'BookkMyungjo, serif', fontSize: '0.9rem', color: '#E8D5A0', opacity: 0.55, letterSpacing: '0.08em' }}
+          style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '0.9rem', color: '#E8D5A0', opacity: 0.55, letterSpacing: '0.08em' }}
         >
           dig your uncut gems.
         </span>

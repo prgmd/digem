@@ -71,8 +71,8 @@ export default function InfoPage() {
             <Row label="bjorkfont">
               로고, 뱃지, 액센트 요소에 사용. FontZone에서 제공하는 Bjork의 [POST] 앨범 폰트를 이용했습니다.
             </Row>
-            <Row label="Bookk 명조 / Bookk 고딕">
-              본문, UI 텍스트 전반에 사용. 교보문고에서 제공하는 Bookk 서체입니다.
+            <Row label="Pretendard">
+              본문, UI 텍스트 전반에 사용. orioncactus에서 제공하는 Pretendard 서체입니다.
             </Row>
           </Section>
 

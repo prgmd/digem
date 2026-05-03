@@ -14,7 +14,7 @@
 | 언어 | TypeScript 5 (strict) |
 | 스타일 | CSS Variables + 인라인 스타일 + CSS 클래스 |
 | 백엔드 | Supabase (PostgreSQL) |
-| 폰트 | BookkMyungjo / BookkGothic (교보문고), bjorkfont (커스텀) |
+| 폰트 | Pretendard (orioncactus), bjorkfont (커스텀) |
 
 ---
 
@@ -87,6 +87,27 @@ lib/
 ---
 
 ## Changelog
+
+### 2026-05-03
+
+**폰트 교체: Bookk → Pretendard**
+- `globals.css`: BookkMyungjo/BookkGothic 4개 `@font-face` 제거 → Pretendard 등록 (실제 사용 weight인 400·700만 선언)
+- 전 사이트 `BookkGothic`/`BookkMyungjo` 인라인 스타일 참조 → `Pretendard`로 교체 (7개 파일)
+- body 기본 폰트 `BookkMyungjo, serif` → `Pretendard, sans-serif`
+- `layout.tsx`에 `<link rel="preload">` 추가 — bjorkfont, Pretendard-Regular, Pretendard-Bold를 HTML 파싱 즉시 fetch
+- `info/page.tsx` 폰트 크레딧 업데이트
+
+**Articles 본문 텍스트 정렬 변경**
+- `ArticleDetail.tsx`: `textAlign: 'justify'` → `textAlign: 'left'`
+
+**Albums 페이지 OOM 수정 — 서버사이드 필터링·페이지네이션 도입**
+- 기존: 전체 앨범을 limit 없이 fetch한 뒤 클라이언트에서 필터링 → 데이터 증가 시 Node.js 프로세스 OOM
+- `app/albums/page.tsx`: `region`, `type`, `featured`, `year`, `year+month` 필터를 Supabase 쿼리에 적용, `.range()`로 30개씩 서버 페이지네이션, `availableYears`는 별도 쿼리로 fetch
+- month-only 케이스(연도 미선택 + 월 선택)는 서버에서 월 단위 필터 불가 → `limit(2000)` 캡 적용 후 클라이언트 처리
+- `useAlbumFilters.ts`: 클라이언트 필터링 로직 제거, URL 상태 관리(read/write)만 담당
+- `AlbumsClient.tsx`: `totalCount`, `availableYears`, `monthFilter` props 추가, 페이지네이션을 서버 count 기준으로 계산
+
+---
 
 ### 2026-05-01
 

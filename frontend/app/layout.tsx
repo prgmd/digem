@@ -19,6 +19,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="preload" href="/fonts/bjorkfont.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/Pretendard-Regular.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/Pretendard-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+      </head>
       <body>
         <MeshBackground />
         {children}

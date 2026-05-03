@@ -13,7 +13,7 @@ export default function HomeNav() {
           key={href}
           href={href}
           style={{
-            fontFamily: 'BookkGothic, serif',
+            fontFamily: 'Pretendard, sans-serif',
             fontWeight: 'bold',
             fontSize: '1.1rem',
             color: 'var(--meta-color)',

@@ -17,8 +17,6 @@ export interface Album {
   is_featured: boolean
 }
 
-const PAGE_SIZE = 30
-
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   const y = date.getFullYear()
@@ -27,11 +25,16 @@ const formatDate = (dateString: string) => {
   return `${y}/${m}/${d}`
 }
 
+const PAGE_SIZE_CLIENT = 30
+
 interface Props {
   albums: Album[]
+  totalCount: number
+  availableYears: string[]
+  monthFilter: string
 }
 
-export default function AlbumsClient({ albums }: Props) {
+export default function AlbumsClient({ albums, totalCount, availableYears, monthFilter }: Props) {
   const router = useRouter()
   const [isExiting, setIsExiting] = useState(false)
   const [navigating, setNavigating] = useState(false)
@@ -43,7 +46,7 @@ export default function AlbumsClient({ albums }: Props) {
     return true
   })
 
-  const { filters, actions, filtered, availableYears } = useAlbumFilters(albums)
+  const { filters, actions } = useAlbumFilters()
   const { selectedRegion, selectedType, selectedYear, selectedMonth, featuredOnly, page } = filters
   const { setSelectedRegion, setSelectedType, setSelectedYear, setSelectedMonth, setFeaturedOnly, setPage } = actions
 
@@ -54,8 +57,19 @@ export default function AlbumsClient({ albums }: Props) {
 
   const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  // month-only 케이스: 서버가 월 필터 미적용 → 클라이언트에서 처리
+  const isMonthOnly = monthFilter !== 'all' && selectedYear === 'all'
+  const displayAlbums = isMonthOnly
+    ? albums.filter(a => (new Date(a.release_date).getMonth() + 1).toString() === monthFilter)
+    : albums
+
+  const totalPages = isMonthOnly
+    ? Math.ceil(displayAlbums.length / PAGE_SIZE_CLIENT)
+    : Math.ceil(totalCount / PAGE_SIZE_CLIENT)
+
+  const paginated = isMonthOnly
+    ? displayAlbums.slice((page - 1) * PAGE_SIZE_CLIENT, page * PAGE_SIZE_CLIENT)
+    : displayAlbums  // 서버가 이미 페이지네이션 적용
 
   return (
     <div style={{
@@ -160,18 +174,18 @@ export default function AlbumsClient({ albums }: Props) {
                   </span>
                 )}
               </div>
-              <p style={{ fontFamily: 'BookkGothic, sans-serif', fontWeight: 700, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 700, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem' }}>
                 {album.title}
               </p>
               <p
                 onClick={(e) => { e.stopPropagation(); setNavigating(true); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
                 onMouseEnter={() => setHoveredArtist(album.id)}
                 onMouseLeave={() => setHoveredArtist(null)}
-                style={{ fontFamily: 'BookkGothic, sans-serif', fontWeight: 400, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer', transition: 'color 0.15s' }}
+                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.2rem', cursor: 'pointer', transition: 'color 0.15s' }}
               >
                 {album.artist}
               </p>
-              <p style={{ fontFamily: 'BookkGothic, sans-serif', fontWeight: 400, fontSize: '0.75rem', color: 'var(--meta-color)' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: '0.75rem', color: 'var(--meta-color)' }}>
                 {album.region}{album.album_type ? ` · ${album.album_type}` : ''}{album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
               </p>
             </div>
