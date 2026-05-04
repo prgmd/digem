@@ -92,7 +92,9 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         {onBack && (
           <button
             onClick={onBack}
-            style={{ background: 'none', border: 'none', color: 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}
+            style={{ background: 'none', border: 'none', color: 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', padding: 0, transition: 'color 0.2s' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
           >
             ← 목록
           </button>
@@ -100,13 +102,13 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         <div>
           <button
             onClick={() => setLanguage('en')}
-            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'en' ? 600 : 300, background: 'none', border: 'none', color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginRight: '1rem' }}
+            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'en' ? 600 : 300, background: 'none', border: 'none', color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginRight: '1rem', transition: 'color 0.2s' }}
           >
             원문
           </button>
           <button
             onClick={() => setLanguage('ko')}
-            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'ko' ? 600 : 300, background: 'none', border: 'none', color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer' }}
+            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'ko' ? 600 : 300, background: 'none', border: 'none', color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', transition: 'color 0.2s' }}
           >
             번역
           </button>
@@ -123,7 +125,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       <div style={{ maxWidth: '760px', margin: '0 auto' }}>
       {/* 제목 */}
       <h1 style={{
-        fontSize: '2.5rem',
+        fontSize: '3rem',
         marginBottom: '1rem',
         lineHeight: 1.3
       }}>
@@ -171,6 +173,8 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
               href={article.source_url}
               target="_blank"
               rel="noopener noreferrer"
+              onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
               style={{
                 display: 'inline-block',
                 marginTop: '1rem',
@@ -180,6 +184,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
                 color: '#000',
                 fontSize: '0.85rem',
                 textDecoration: 'none',
+                transition: 'opacity 0.2s',
               }}
             >
               원문 보기 →
@@ -190,7 +195,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.5, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.3rem', lineHeight: 1.5, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content) }}
       />
       </div>

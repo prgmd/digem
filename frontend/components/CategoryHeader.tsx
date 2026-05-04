@@ -18,6 +18,8 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
+  const [logoHover, setLogoHover] = useState(false)
+  const [burgerHover, setBurgerHover] = useState(false)
 
   const closeMenu = () => {
     setMenuClosing(true)
@@ -42,7 +44,12 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
         flexShrink: 0,
       }}>
         {/* 로고 */}
-        <div onClick={onLogoClick} style={{ cursor: 'pointer', padding: '0.5rem 1.5rem 0.5rem 0', margin: '-0.5rem 0' }}>
+        <div
+          onClick={onLogoClick}
+          onMouseEnter={() => setLogoHover(true)}
+          onMouseLeave={() => setLogoHover(false)}
+          style={{ cursor: 'pointer', padding: '0.5rem 1.5rem 0.5rem 0', margin: '-0.5rem 0', opacity: logoHover ? 0.5 : 1, transition: 'opacity 0.2s' }}
+        >
           <span style={{ fontFamily: 'bjorkfont, sans-serif', fontSize: '2rem', color: 'var(--text-color)', lineHeight: 1 }}>
             d
           </span>
@@ -51,7 +58,9 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
         {/* 햄버거 */}
         <button
           onClick={() => menuOpen ? closeMenu() : setMenuOpen(true)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '5px', padding: '4px' }}
+          onMouseEnter={() => setBurgerHover(true)}
+          onMouseLeave={() => setBurgerHover(false)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '5px', padding: '4px', opacity: burgerHover ? 0.5 : 1, transition: 'opacity 0.2s' }}
           aria-label="메뉴"
         >
           <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
@@ -91,7 +100,10 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                   fontSize: '1.1rem',
                   color: cat.key === currentCategory ? 'var(--text-color)' : 'var(--meta-color)',
                   cursor: cat.key !== currentCategory ? 'pointer' : 'default',
+                  transition: 'color 0.2s',
                 }}
+                onMouseEnter={e => { if (cat.key !== currentCategory) (e.currentTarget as HTMLElement).style.color = 'var(--text-color)' }}
+                onMouseLeave={e => { if (cat.key !== currentCategory) (e.currentTarget as HTMLElement).style.color = 'var(--meta-color)' }}
               >
                 {cat.label}
               </span>
@@ -103,7 +115,10 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                 fontSize: '1.1rem',
                 color: INFO_ITEM.key === currentCategory ? 'var(--text-color)' : 'var(--meta-color)',
                 cursor: INFO_ITEM.key !== currentCategory ? 'pointer' : 'default',
+                transition: 'color 0.2s',
               }}
+              onMouseEnter={e => { if (INFO_ITEM.key !== currentCategory) (e.currentTarget as HTMLElement).style.color = 'var(--text-color)' }}
+              onMouseLeave={e => { if (INFO_ITEM.key !== currentCategory) (e.currentTarget as HTMLElement).style.color = 'var(--meta-color)' }}
             >
               {INFO_ITEM.label}
             </span>

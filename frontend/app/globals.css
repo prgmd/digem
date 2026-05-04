@@ -220,6 +220,12 @@ body {
   background: #2a1800;
 }
 
+.mesh-blob-4 {
+  width: 600px;
+  height: 600px;
+  background: #3d2000;
+}
+
 .album-artwork {
   transition: none;
   cursor: default;

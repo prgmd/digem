@@ -12,7 +12,7 @@ export default function Home() {
     }}>
       {/* 상단 절반: 로고 + 태그라인 */}
       <div style={{
-        flex: 1,
+        flex: 1.1,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -24,7 +24,7 @@ export default function Home() {
           className="hero-logo"
           style={{ fontFamily: 'bjorkfont, sans-serif', fontSize: '8rem', color: '#E8D5A0', lineHeight: 1 }}
         >
-          digem
+          digem.
         </span>
         <span
           className="hero-tagline"
@@ -42,7 +42,7 @@ export default function Home() {
 
       {/* 하단 절반: 네비게이션 */}
       <div style={{
-        flex: 1,
+        flex: 0.9,
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',

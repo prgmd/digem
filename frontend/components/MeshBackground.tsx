@@ -5,47 +5,48 @@ export default function MeshBackground() {
   const blob1 = useRef<HTMLDivElement>(null)
   const blob2 = useRef<HTMLDivElement>(null)
   const blob3 = useRef<HTMLDivElement>(null)
+  const blob4 = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let rafId: number
-    let targetX = 0.5, targetY = 0.5
-    let currentX = 0.5, currentY = 0.5
+    let startTime: number | null = null
 
-    const onMouseMove = (e: MouseEvent) => {
-      targetX = e.clientX / window.innerWidth
-      targetY = e.clientY / window.innerHeight
-    }
+    // 블롭마다 주파수·위상을 다르게 줘서 서로 독립적으로 떠다니는 것처럼 보이게 함
+    const configs = [
+      { xFreq: 0.18, yFreq: 0.23, xPhase: 0.0, yPhase: 1.2, xAmp: 220, yAmp: 180 },
+      { xFreq: 0.22, yFreq: 0.17, xPhase: 2.1, yPhase: 0.5, xAmp: 260, yAmp: 220 },
+      { xFreq: 0.15, yFreq: 0.20, xPhase: 4.3, yPhase: 3.1, xAmp: 180, yAmp: 200 },
+      { xFreq: 0.19, yFreq: 0.14, xPhase: 1.5, yPhase: 5.0, xAmp: 240, yAmp: 160 },
+    ]
 
-    const animate = () => {
-      currentX += (targetX - currentX) * 0.08
-      currentY += (targetY - currentY) * 0.08
+    const blobs = [blob1, blob2, blob3, blob4]
 
-      const cx = currentX - 0.5
-      const cy = currentY - 0.5
+    const rand = () => Math.random() * 80 - 10
+    blobs.forEach(ref => {
+      if (ref.current) {
+        ref.current.style.left = `${rand()}%`
+        ref.current.style.top  = `${rand()}%`
+      }
+    })
 
-      if (blob1.current) blob1.current.style.transform = `translate(${cx * 260}px, ${cy * 220}px)`
-      if (blob2.current) blob2.current.style.transform = `translate(${-cx * 320}px, ${-cy * 280}px)`
-      if (blob3.current) blob3.current.style.transform = `translate(${cx * 180}px, ${-cy * 200}px)`
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const t = (timestamp - startTime) / 1000
+
+      blobs.forEach((ref, i) => {
+        if (!ref.current) return
+        const { xFreq, yFreq, xPhase, yPhase, xAmp, yAmp } = configs[i]
+        const x = Math.sin(t * xFreq + xPhase) * xAmp
+        const y = Math.cos(t * yFreq + yPhase) * yAmp
+        ref.current.style.transform = `translate(${x}px, ${y}px)`
+      })
 
       rafId = requestAnimationFrame(animate)
     }
 
-    // 초기 위치 랜덤
-    const rand = () => Math.random() * 80 - 10  // -10% ~ 70% 범위
-    ;[blob1, blob2, blob3].forEach(ref => {
-      if (ref.current) {
-        ref.current.style.left = `${rand()}%`
-        ref.current.style.top = `${rand()}%`
-      }
-    })
-
-    window.addEventListener('mousemove', onMouseMove)
     rafId = requestAnimationFrame(animate)
 
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      cancelAnimationFrame(rafId)
-    }
+    return () => cancelAnimationFrame(rafId)
   }, [])
 
   return (
@@ -53,6 +54,7 @@ export default function MeshBackground() {
       <div className="mesh-blob mesh-blob-1" ref={blob1} />
       <div className="mesh-blob mesh-blob-2" ref={blob2} />
       <div className="mesh-blob mesh-blob-3" ref={blob3} />
+      <div className="mesh-blob mesh-blob-4" ref={blob4} />
     </div>
   )
 }

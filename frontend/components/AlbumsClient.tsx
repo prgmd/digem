@@ -121,7 +121,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       <div className="album-grid-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
         {paginated.length === 0 && (
           <p style={{
-            color: 'var(--meta-color)', fontSize: '0.85rem',
+            color: 'var(--meta-color)', fontSize: '1.05rem',
             textAlign: 'center', padding: '4rem 0',
           }}>
             필터에 맞는 앨범이 없어요.
@@ -174,23 +174,23 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
                   </span>
                 )}
                 <div className="album-title-overlay">
-                  <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-color)', textAlign: 'center', lineHeight: 1.5, wordBreak: 'keep-all' }}>
+                  <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1.05rem', color: 'var(--text-color)', textAlign: 'center', lineHeight: 1.5, wordBreak: 'keep-all' }}>
                     {album.title}
                   </span>
                 </div>
               </div>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.4rem' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1.2rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.4rem' }}>
                 {album.title}
               </p>
               <p
                 onClick={(e) => { e.stopPropagation(); setNavigating(true); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
                 onMouseEnter={() => setHoveredArtist(album.id)}
                 onMouseLeave={() => setHoveredArtist(null)}
-                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.8rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.35rem', cursor: 'pointer', transition: 'color 0.15s' }}
+                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.0rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.35rem', cursor: 'pointer', transition: 'color 0.15s' }}
               >
                 {album.artist}
               </p>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.75rem', color: 'var(--meta-color)' }}>
+              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.95rem', color: 'var(--meta-color)' }}>
                 {album.region}{album.album_type ? ` · ${album.album_type}` : ''}{album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
               </p>
             </div>

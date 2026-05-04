@@ -82,7 +82,8 @@ export default function Sidebar({
           background: 'transparent',
           border: '1px solid var(--border)',
           color: 'var(--text-color)',
-          fontSize: '0.85rem',
+          fontFamily: 'Pretendard, sans-serif',
+          fontSize: '1.05rem',
           padding: '0.35rem 0.6rem',
           cursor: 'pointer',
           marginBottom: '2rem',
@@ -103,7 +104,7 @@ export default function Sidebar({
       {/* 칼럼 목록 */}
       <ul style={{ listStyle: 'none', flex: 1 }}>
         {articles.length === 0 && (
-          <li style={{ color: 'var(--meta-color)', fontSize: '0.85rem', padding: '1rem 0' }}>
+          <li style={{ color: 'var(--meta-color)', fontSize: '1.05rem', padding: '1rem 0' }}>
             해당하는 글이 없어요.
           </li>
         )}
@@ -131,7 +132,7 @@ export default function Sidebar({
             }}
           >
             <SourceBadge source={article.source} />
-            <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300 }}>
+            <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.2rem' }}>
               {article.title_ko || article.title}
             </span>
           </li>
@@ -150,14 +151,15 @@ export default function Sidebar({
                 background: 'none',
                 border: '1px solid var(--border)',
                 color: currentPage <= 1 ? 'var(--meta-color)' : 'var(--text-color)',
+                fontFamily: 'Pretendard, sans-serif',
                 padding: '0.3rem 0.7rem',
                 cursor: currentPage <= 1 ? 'default' : 'pointer',
-                fontSize: '0.85rem',
+                fontSize: '1.05rem',
               }}
             >
               ←
             </button>
-            <span style={{ fontSize: '0.8rem', color: 'var(--meta-color)' }}>
+            <span style={{ fontSize: '1.0rem', color: 'var(--meta-color)', fontFamily: 'Pretendard, sans-serif' }}>
               {currentPage} / {totalPages}
             </span>
             <button
@@ -167,9 +169,10 @@ export default function Sidebar({
                 background: 'none',
                 border: '1px solid var(--border)',
                 color: currentPage >= totalPages ? 'var(--meta-color)' : 'var(--text-color)',
+                fontFamily: 'Pretendard, sans-serif',
                 padding: '0.3rem 0.7rem',
                 cursor: currentPage >= totalPages ? 'default' : 'pointer',
-                fontSize: '0.85rem',
+                fontSize: '1.05rem',
               }}
             >
               →

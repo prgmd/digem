@@ -593,6 +593,14 @@ python -m scripts.melon_scraper
     - 멜론 해시 URL에 Selenium이 필요한 이유 (hash 기반 라우팅)
     - 3연속 중복 조기 종료 이유 (최신순 정렬 기준으로 이미 따라잡은 것으로 판단)
 - [x] `google_translator.py` 장문 본문 분할 번역 기능 추가
+- [x] 프론트엔드 UI 개선
+  - 메인 페이지 blob 마우스 추적 → 자체 부유 애니메이션 전환 (sin/cos RAF)
+  - blob 4개로 확장
+  - 메인 페이지 콘텐츠 세로 위치 조정 (flex 1.1 / 0.9)
+  - articles 본문 제목(2.5→3rem), 본문(1.1→1.3rem), 목록·필터 전반 폰트 크기 +0.2rem
+  - albums 카드·필터 전반 폰트 크기 +0.2rem
+  - 아티스트 페이지 아티스트명 볼드 처리
+  - CategoryHeader 로고·햄버거·메뉴 항목, ArticleDetail 버튼·링크, ArtistClient 뒤로/카드 hover 및 transition 전반 추가
   - 10,000자 초과 본문을 `\n\n` 경계 기준으로 청크 분할 후 순차 번역
   - `_split_content()` — 마지막 `\n\n` 위치에서 분할, `\n\n` 없으면 강제 분할
   - `_translate_content()` — 분기 처리 (10,000자 이하: 단건 / 초과: 분할)
