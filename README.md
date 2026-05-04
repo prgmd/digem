@@ -573,3 +573,27 @@ python -m scripts.melon_scraper
   - `articles` 목록: `select('*')`로 `content_en`, `content_ko` 본문 전체 포함 중 → 컬럼 명시로 개선 예정
   - `albums`: 페이지네이션 없이 전체 로딩 중
   - 권장 인덱스: `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
+
+---
+
+### **2026-05-04 (Day 11)**
+#### ✅ 완료
+- [x] Python 스크립트 전체 주석 정비
+  - 대상: `database_loader.py`, `google_translator.py`, `melon_scraper.py`, `base_scraper.py`, `pitchfork_scrapers.py`, `stereogum_scraper.py`, `consequence_scraper.py`, `bandcamp_scraper.py`, `main.py`, `tools/melon_seed.py`
+  - 모든 메서드에 docstring 추가 (무슨 함수인지 한 줄 요약)
+  - WHAT 주석(코드가 이미 설명하는 것) 제거, WHY 주석(설계 의도·비자명한 동작)으로 대체
+  - 주요 WHY 주석 예시:
+    - `service_role` 키를 사용하는 이유 (RLS 우회)
+    - `list-inside` → `list-outside` 교체 이유 (hanging indent 문제)
+    - Condé Nast / `© Copyright` 문구를 stop_condition으로 쓰는 이유 (푸터 감지)
+    - `limit * 3` 순회 이유 (카테고리 필터 후 limit 개를 채우기 위함)
+    - Bandcamp에 Selenium을 쓰는 이유 (Cloudflare 봇 차단 우회)
+    - `_get_driver()` lazy init 이유 (드라이버를 필요한 시점에만 생성)
+    - 기사 간 `time.sleep(10)` 이유 (IP 차단 방지)
+    - 멜론 해시 URL에 Selenium이 필요한 이유 (hash 기반 라우팅)
+    - 3연속 중복 조기 종료 이유 (최신순 정렬 기준으로 이미 따라잡은 것으로 판단)
+- [x] `google_translator.py` 장문 본문 분할 번역 기능 추가
+  - 10,000자 초과 본문을 `\n\n` 경계 기준으로 청크 분할 후 순차 번역
+  - `_split_content()` — 마지막 `\n\n` 위치에서 분할, `\n\n` 없으면 강제 분할
+  - `_translate_content()` — 분기 처리 (10,000자 이하: 단건 / 초과: 분할)
+  - `_translate_chunk()` — 실제 Gemini API 호출 단위로 분리

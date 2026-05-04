@@ -4,14 +4,17 @@ from datetime import datetime
 from typing import List, Dict
 from .database_loader import SupabaseLoader
 
+# 봇 차단을 피하기 위해 일반 브라우저 UA로 위장
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 }
 
 URL = 'https://www.melon.com/new/album/listPaging.htm'
 
+# 싱글·컴필레이션 등은 제외하고 정규앨범과 EP만 수집
 ALLOWED_TYPES = ['정규', 'EP']
 
+# 멜론 API는 area_code로 국내/해외를 구분
 REGIONS = [
     {'area_code': 'I', 'name': '국내'},
     {'area_code': 'O', 'name': '해외'},
@@ -24,6 +27,7 @@ class MelonScraper:
         self.session.headers.update(HEADERS)
 
     def fetch_albums(self, area_code: str, region_name: str) -> List[Dict]:
+        """멜론 신보 목록 API를 호출해 허용 타입(정규/EP) 앨범 리스트를 반환한다."""
         print(f'멜론 {region_name} 앨범 수집 시작...')
         params = {
             'areaFlg': area_code,
@@ -83,6 +87,7 @@ class MelonScraper:
 
 
     def run(self):
+        """전체 파이프라인 실행: 국내/해외 앨범 수집 → 중복 제거 → DB 저장."""
         print('멜론 앨범 스크래핑 시작...')
         loader = SupabaseLoader()
 
@@ -104,6 +109,7 @@ class MelonScraper:
             artist = album.get('artist', '')
             if loader.album_exists(title, artist):
                 consecutive_exists += 1
+                # 최신순 정렬 기준으로 3개 연속 중복이면 이미 저장된 시점까지 따라잡은 것으로 판단해 조기 종료
                 if consecutive_exists >= 3:
                     print(f'최신 앨범 3개 연속 중복 확인 — 이후 항목 생략')
                     break

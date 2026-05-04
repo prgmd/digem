@@ -28,11 +28,13 @@ ALLOWED_TYPES = {'정규', 'EP'}
 
 
 def scrape_by_region(driver, area_code: str, region_name: str, loader: SupabaseLoader):
+    """멜론 신보 페이지를 PAGE_LIMIT 페이지까지 순회하며 앨범을 수집해 DB에 저장한다."""
     print(f'\n--- 멜론 {region_name} 수집 시작 ({PAGE_LIMIT}페이지) ---')
     total = 0
 
     for page in range(1, PAGE_LIMIT + 1):
         start_index = (page - 1) * ALBUMS_PER_PAGE + 1
+        # 멜론 신보 페이지는 해시 기반 라우팅을 사용해 requests로는 접근 불가 → Selenium 필요
         url = f'{MAIN_URL}#params[areaFlg]={area_code}&params[orderBy]=issueDate&po=pageObj&startIndex={start_index}'
 
         print(f'[{page}페이지] 수집 중...')
@@ -42,6 +44,7 @@ def scrape_by_region(driver, area_code: str, region_name: str, loader: SupabaseL
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, 'div.service_list_album > ul > li'))
             )
+            # JS 렌더링 완료 후 앨범 목록이 안착할 때까지 대기
             time.sleep(1)
         except Exception as e:
             print(f'  타임아웃, 중단: {e}')
@@ -92,6 +95,7 @@ def scrape_by_region(driver, area_code: str, region_name: str, loader: SupabaseL
 
 
 def main():
+    """국내/해외 전체를 시딩한다. 드라이버는 finally에서 반드시 종료."""
     loader = SupabaseLoader()
 
     chrome_options = Options()

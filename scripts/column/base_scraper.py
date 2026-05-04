@@ -10,6 +10,7 @@ from ..database_loader import SupabaseLoader
 
 class BaseScraper(ABC):
     def __init__(self):
+        # Session을 재사용해 TCP 연결을 유지함으로써 요청마다 handshake 비용을 줄임
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -17,13 +18,16 @@ class BaseScraper(ABC):
 
     @abstractmethod
     def fetch_articles(self, limit: int = 10) -> List[Dict]:
+        """RSS 피드에서 기사 메타데이터 목록을 수집해 반환한다."""
         pass
 
     @abstractmethod
     def fetch_full_content(self, url: str) -> Dict:
+        """기사 URL에 접속해 본문과 썸네일 크레딧을 추출해 반환한다."""
         pass
 
     def _parse_date(self, date_tuple) -> str:
+        """feedparser의 time.struct_time 튜플을 'YYYY-MM-DD HH:MM:SS' 문자열로 변환한다."""
         try:
             if date_tuple:
                 dt = datetime(*date_tuple[:6])
@@ -65,6 +69,7 @@ class BaseScraper(ABC):
         }
 
     def run(self, limit: int = 5):
+        """스크래핑 전체 파이프라인 실행: 목록 수집 → 중복 제거 → 본문 수집 → 번역 → DB 저장."""
         print(f'{self.__class__.__name__} 크롤링을 시작합니다...')
         translator = GeminiTranslator()
         loader = SupabaseLoader()
@@ -134,4 +139,5 @@ class BaseScraper(ABC):
                     print('DB 저장 실패.')
 
             if i < len(new_articles):
+                # 짧은 간격으로 반복 요청 시 IP 차단 위험이 있어 기사 간 10초 대기
                 time.sleep(10)

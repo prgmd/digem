@@ -10,11 +10,13 @@ class ConsequenceScraper(BaseScraper):
     EDITORIALS_URL = "https://consequence.net/category/music/music-editorials/?feed=rss2"
 
     def fetch_articles(self, limit: int = 10) -> List[Dict]:
+        """Editorials 피드만 수집해 반환한다. Features는 단순 앨범 소개가 많아 제외."""
         editorials = self._fetch_feed(self.EDITORIALS_URL, limit, 'Consequence Editorials')
         print(f'Editorials: {len(editorials)}개')
         return editorials
 
     def _fetch_feed(self, url: str, limit: int, label: str) -> List[Dict]:
+        """RSS 피드를 파싱해 기사 목록을 반환한다."""
         print(f'{label} 피드 수집 중...')
         try:
             feed = feedparser.parse(url)
@@ -36,6 +38,7 @@ class ConsequenceScraper(BaseScraper):
             return []
 
     def _parse_entry(self, entry) -> Dict:
+        """feedparser entry 객체에서 필요한 필드를 추출해 dict로 반환한다."""
         try:
             media = entry.get('media_content', [])
             tags = [t.get('term', '').strip() for t in entry.get('tags', [])]
@@ -47,6 +50,7 @@ class ConsequenceScraper(BaseScraper):
                 'summary': entry.get('summary', '').strip(),
                 'source': 'consequence',
                 'thumbnail_url': media[0].get('url', '') if media else None,
+                # Consequence는 media_content에 저작권 정보를 포함하므로 RSS 단계에서 바로 추출
                 'thumbnail_credit': media[0].get('media_copyright', None) if media else None,
                 'category': tags[0] if tags else '',
             }
@@ -55,6 +59,7 @@ class ConsequenceScraper(BaseScraper):
             return None
 
     def fetch_full_content(self, url: str) -> Dict:
+        """기사 페이지에서 본문을 추출한다."""
         try:
             print('전체 내용을 가져옵니다...')
             response = self.session.get(url, timeout=10)
