@@ -22,14 +22,15 @@ function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
     .split('\n')
     .filter(line => !line.match(/더\s*보기/))
     .join('\n')
-    .replace(/^### (.+)$/gm, '<p class="content-h3">$1</p>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
 
   if (lang === 'ko') {
     result = result
-      // 쌍따옴표: 가사·직접 인용 → 이탤릭
+      // 쌍따옴표 먼저: 이후 삽입될 class="..." 속성값과 충돌 방지
       .replace(/"([^"]+)"/g, '<span class="inline-quote">"$1"</span>')
+      // 헤더는 쌍따옴표 이후: class="content-h3"가 위 정규식에 잡히지 않도록
+      .replace(/^### (.+)$/gm, '<p class="content-h3">$1</p>')
   }
 
   return result
