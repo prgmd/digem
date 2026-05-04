@@ -24,6 +24,9 @@ function renderContent(raw: string): string {
     .join('\n')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // (대문자 시작 영문) 패턴을 인라인 주석으로 렌더링
+    // ex) 현대화(Modernization), 찰리 XCX(Charli XCX) 모두 커버
+    .replace(/\(([A-Z][A-Za-z0-9\s\-'&.,]{1,60})\)/g, '<span class="annotation">$1</span>')
     .replace(/\n/g, '<br />')
 }
 

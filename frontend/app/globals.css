@@ -226,6 +226,14 @@ body {
   background: #3d2000;
 }
 
+.annotation {
+  font-size: 0.75em;
+  opacity: 0.5;
+  letter-spacing: 0.02em;
+  margin-left: 0.15em;
+  font-style: normal;
+}
+
 .album-artwork {
   transition: none;
   cursor: default;

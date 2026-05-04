@@ -14,7 +14,7 @@ export const MOCK_ARTICLES: Article[] = [
     published_at: '2024-06-07T00:00:00Z',
     category: 'review',
     content_en: `Charli XCX has always been a maximalist working in minimalist drag. The pop star's seventh album, *Brat*, strips her sound to its studs — four-on-the-floor kick drums, trebly synth stabs, and vocals processed until they're barely recognizable as human — and in doing so, she's made one of the year's most exhilarating records.\n\nThe album opens with "360," a hyperpop mission statement in which Charli declares herself "the moment," all braggadocio and self-awareness colliding in three and a half minutes. It sets the tone for what follows: a breathless sprint through club-ready anthems, heartfelt confessionals, and everything in between.\n\n"Von Dutch" is a standout, a crystalline piece of dance-pop that sounds like it was beamed in from a rave in 2006 and 2034 simultaneously. "Apple" leans into the album's running theme of self-examination, while "B2b" is a stunning piece of vulnerability disguised as a banger.`,
-    content_ko: `찰리 XCX는 항상 미니멀리스트의 외양을 띤 맥시멀리스트였다. 그녀의 일곱 번째 앨범 *Brat*은 사운드를 뼈대까지 발라낸다 — 정박 킥 드럼, 날카로운 신스 스탭, 인간의 것인지 알아보기 힘들 정도로 처리된 보컬 — 그리고 바로 그렇게 함으로써 올해 가장 짜릿한 음반 중 하나를 만들어냈다.\n\n앨범은 "360"으로 시작한다. 자신이 "그 순간"임을 선언하는 하이퍼팝 선언문으로, 허풍과 자의식이 3분 반 안에 충돌한다. 이것이 이후에 펼쳐지는 것의 분위기를 설정한다: 클럽용 앤섬, 진심 어린 고백, 그리고 그 사이의 모든 것을 숨가쁘게 달려나가는 여정.\n\n"Von Dutch"는 2006년과 2034년 어딘가의 레이브에서 동시에 전송된 것 같은 수정처럼 맑은 댄스팝 명곡이다. "Apple"은 앨범의 자기 검열이라는 주제를 심화시키고, "B2b"는 클럽 뮤직으로 위장한 놀라운 취약성의 조각이다.`,
+    content_ko: `찰리 XCX(Charli XCX)는 항상 미니멀리스트의 외양을 띤 맥시멀리스트였다. 그녀의 일곱 번째 앨범 *Brat*은 사운드를 뼈대까지 발라낸다 — 정박 킥 드럼, 날카로운 신스 스탭, 인간의 것인지 알아보기 힘들 정도로 처리된 보컬 — 그리고 바로 그렇게 함으로써 올해 가장 짜릿한 음반 중 하나를 만들어냈다.\n\n앨범은 "360"으로 시작한다. 자신이 "그 순간"임을 선언하는 하이퍼팝 선언문으로, 허풍과 자의식이 3분 반 안에 충돌한다. 이것이 이후에 펼쳐지는 것의 분위기를 설정한다: 클럽용 앤섬, 진심 어린 고백, 그리고 그 사이의 모든 것을 숨가쁘게 달려나가는 여정.\n\n"Von Dutch"는 2006년과 2034년 어딘가의 레이브에서 동시에 전송된 것 같은 수정처럼 맑은 댄스팝 명곡이다. "Apple"은 앨범의 자기 검열이라는 주제를 심화시키고, "B2b"는 클럽 뮤직으로 위장한 놀라운 취약성의 조각이다.`,
   },
   {
     id: 2,
@@ -48,6 +48,17 @@ export const MOCK_ARTICLES: Article[] = [
     category: 'review',
     content_en: `Sabrina Carpenter has spent years being underestimated. *Short n' Sweet* is her response — a concise, immaculately crafted pop record that doesn't waste a second of its thirty-six minutes.\n\nThe singles already established her as one of the sharpest pop minds working today. "Espresso" is a masterclass in economy: a song that says everything it needs to say in two and a half minutes and not a word more.`,
     content_ko: `사브리나 카펜터는 수년간 과소평가를 받아왔다. *Short n' Sweet*은 그녀의 응답이다 — 36분 중 단 1초도 낭비하지 않는 간결하고 흠잡을 데 없이 제작된 팝 음반.\n\n싱글들은 이미 그녀를 현재 활동 중인 가장 예리한 팝 작가 중 한 명으로 확립시켰다. "Espresso"는 경제성의 교과서다.`,
+  },
+  {
+    id: 6,
+    title: '[Test] Annotation Rendering',
+    title_ko: '[테스트] 인라인 주석 렌더링 확인',
+    author: 'Test',
+    source: 'pitchfork',
+    published_at: '2026-05-04T00:00:00Z',
+    category: 'test',
+    content_en: 'Annotation test (English only)',
+    content_ko: `이 글은 인라인 주석 렌더링의 모든 케이스를 확인하기 위한 테스트 텍스트입니다.\n\n[케이스 1] 기본형 — 한글 바로 뒤 영문 병기\n현대화(Modernization)는 20세기의 핵심 담론이었다. 세속화(Secularization)와 합리화(Rationalization)도 함께 논의된다.\n\n[케이스 2] 한글+영문 혼합 뒤 영문 병기\n찰리 XCX(Charli XCX)는 항상 미니멀리스트의 외양을 띤 맥시멀리스트였다. 타일러 더 크리에이터(Tyler, the Creator)는 장르의 경계를 허문다.\n\n[케이스 3] 하이픈 · & 포함\n힙합(Hip-hop) 장르는 1970년대 브롱크스(Bronx)에서 탄생했다. 리듬 앤 블루스(Rhythm & Blues)는 소울(Soul)과 펑크(Funk)의 뿌리가 되었으며, 이후 록 앤 롤(Rock & Roll)에도 영향을 미쳤다.\n\n[케이스 4] 긴 영문 병기\n빌보드 핫 100(Billboard Hot 100)은 미국 음악 시장의 대표적인 차트다. 영국 오피셜 차트(UK Official Charts)와 함께 글로벌 지표로 활용된다.\n\n[케이스 5 — 주석 미적용 케이스]\n이 앨범은 2024년에 발매되었다(2024). 이 트랙은 협업곡이다(feat. 빌리 아일리시). 이 경우는(소문자로 시작하면) 주석이 붙지 않아야 한다.`,
   },
   {
     id: 5,
