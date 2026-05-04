@@ -239,6 +239,10 @@ body {
   font-style: normal;
 }
 
+.inline-quote {
+  font-style: italic;
+}
+
 .album-artwork {
   transition: none;
   cursor: default;

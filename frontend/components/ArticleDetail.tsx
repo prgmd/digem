@@ -17,16 +17,23 @@ interface Article {
   content_ko: string
 }
 
-function renderContent(raw: string): string {
-  return raw
+function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
+  let result = raw
     .split('\n')
     .filter(line => !line.match(/더\s*보기/))
     .join('\n')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // (대문자 시작 영문) 또는 (영문; 한글 설명) 패턴을 인라인 주석으로 렌더링
-    // ex) 현대화(Modernization), 힙합(Hip-hop; 1970년대 발생한 장르) 모두 커버
-    .replace(/\(([A-Z][A-Za-z0-9\s\-'&.,;가-힣]{1,120})\)/g, '<span class="annotation">$1</span>')
+
+  if (lang === 'ko') {
+    result = result
+      // 쌍따옴표: 가사·직접 인용 → 이탤릭
+      .replace(/"([^"]+)"/g, '<span class="inline-quote">"$1"</span>')
+  }
+
+  return result
+    // 백틱 마지막: 속성값에 따옴표 없어 충돌 없음
+    .replace(/`([^`]+)`/g, '<span class="annotation">$1</span>')
     .replace(/\n/g, '<br />')
 }
 
@@ -199,7 +206,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       {/* 본문 */}
       <div
         style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.3rem', lineHeight: 1.5, textAlign: 'left', wordBreak: 'keep-all' }}
-        dangerouslySetInnerHTML={{ __html: renderContent(content) }}
+        dangerouslySetInnerHTML={{ __html: renderContent(content, language) }}
       />
       </div>
     </main>

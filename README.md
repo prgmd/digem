@@ -603,10 +603,12 @@ python -m scripts.melon_scraper
   - CategoryHeader 로고·햄버거·메뉴 항목, ArticleDetail 버튼·링크, ArtistClient 뒤로/카드 hover 및 transition 전반 추가
 - [x] 로딩 화면 개선 — digem 로고 제거, dot wave 애니메이션으로 교체 (베이지 점 3개 순차 bounce)
   - `@keyframes dotWave` 추가 (`globals.css`), articles·albums `loading.tsx` 공통 적용
-- [x] 번역 본문 내 한영 병기 인라인 주석 렌더링 — `현대화(Modernization)` 형태에서 괄호 안 영문을 작은 글씨(`0.75em`, opacity 0.5)로 표시
-    - 정규식 `/\(([A-Z][A-Za-z0-9\s\-'&.,]{1,60})\)/g` — 대문자 시작, 숫자/특수문자 제외 (연도·피처링 등 비주석 패턴 자동 배제)
-    - CSS `.annotation` 클래스 (`globals.css`) + `renderContent()` 변환 (`ArticleDetail.tsx`)
+- [x] 번역 본문 렌더링 개선 (`ArticleDetail.tsx`, `globals.css`, `google_translator.py`)
+  - **인라인 주석**: 백틱 형식 `` 힙합`Hip-hop` `` → `<span class="annotation">` (작은 글씨, opacity 0.5)
+    - 기존 괄호 방식에서 전환 — 곡명 괄호·연도·feat. 등과의 false positive 원천 차단
+    - Gemini 프롬프트 병기 형식 변경 및 기본값 '병기 없음'으로 강화
+  - **가사·직접 인용** `"..."` → 이탤릭 (`inline-quote`)
+    - 렌더링 순서 고정 (쌍따옴표 → 백틱): 이후 삽입되는 `class="..."` 속성값과의 충돌 방지
+  - `renderContent(raw, lang)` 언어 파라미터 추가 — 영문 원문 뷰에서 인용 스타일 비활성 (아포스트로피 충돌 방지)
   - 10,000자 초과 본문을 `\n\n` 경계 기준으로 청크 분할 후 순차 번역
-  - `_split_content()` — 마지막 `\n\n` 위치에서 분할, `\n\n` 없으면 강제 분할
-  - `_translate_content()` — 분기 처리 (10,000자 이하: 단건 / 초과: 분할)
-  - `_translate_chunk()` — 실제 Gemini API 호출 단위로 분리
+    - `_split_content()` / `_translate_content()` / `_translate_chunk()` 분리
