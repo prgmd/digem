@@ -22,6 +22,7 @@ function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
     .split('\n')
     .filter(line => !line.match(/더\s*보기/))
     .join('\n')
+    .replace(/^### (.+)$/gm, '<p class="content-h3">$1</p>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
 
