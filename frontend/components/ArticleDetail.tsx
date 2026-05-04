@@ -24,9 +24,9 @@ function renderContent(raw: string): string {
     .join('\n')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // (대문자 시작 영문) 패턴을 인라인 주석으로 렌더링
-    // ex) 현대화(Modernization), 찰리 XCX(Charli XCX) 모두 커버
-    .replace(/\(([A-Z][A-Za-z0-9\s\-'&.,]{1,60})\)/g, '<span class="annotation">$1</span>')
+    // (대문자 시작 영문) 또는 (영문; 한글 설명) 패턴을 인라인 주석으로 렌더링
+    // ex) 현대화(Modernization), 힙합(Hip-hop; 1970년대 발생한 장르) 모두 커버
+    .replace(/\(([A-Z][A-Za-z0-9\s\-'&.,;가-힣]{1,120})\)/g, '<span class="annotation">$1</span>')
     .replace(/\n/g, '<br />')
 }
 
