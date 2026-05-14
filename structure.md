@@ -130,24 +130,41 @@ python -m scripts.melon_scraper
 ---
 
 ## 예정 기능
-
+ 
+### SEO & 동적 라우팅 (🔄 Day 12-13 롤백 후 재시도)
+- [ ] 개별 칼럼 페이지 동적 라우트 (`articles/[id]`)
+  - Server Component로 개별 기사 fetch
+  - `generateMetadata` 동적 OG/Twitter Card 생성
+  - ISR `revalidate = 86400` (24시간)
+- [ ] Sidebar `<li onClick>` → `<Link>` 전환
+  - `prefetch={false}` 성능 최적화
+- [ ] `sitemap.ts` + `robots.ts` SEO 지원
+- [ ] On-demand Revalidation API (`/api/revalidate`)
+  - Python 스크래퍼에서 새 칼럼 저장 후 호출
 ### 일반
 - [ ] Rolling Stone 스크래퍼
 - [ ] GitHub Actions 자동화
 - [ ] 아티스트 페이지 UUID 라우팅 전환
 - [ ] `next/image` + `remotePatterns` 썸네일 전환
-
+### 접근성 & 시맨틱
+- [ ] `:focus-visible` 전역 스타일 적용
+- [ ] `dangerouslySetInnerHTML` XSS 방어 (DOMPurify 또는 수동 escape)
+- [ ] CategoryHeader, AlbumsClient 비-시맨틱 요소 (`<span onClick>`, `<p onClick>`) → `<button>` / `<Link>`
+- [ ] 모바일 터치 타겟 44×44px 확보 (햄버거, 헤더 버튼, 페이지네이션)
+### 성능
+- [ ] 폰트 WOFF2 변환 + `next/font/local`
+- [ ] 보안 헤더 (CSP, HSTS, Referrer-Policy, Permissions-Policy)
+- [ ] `prefers-reduced-motion` 가드 + MeshBackground 최적화
+- [ ] layout.tsx 글로벌 OG/Twitter 메타데이터 (개별 칼럼 외 기본값)
 ### DB / 성능
 - [ ] `select('*')` → 목록 필요 컬럼만 명시 (`content_en`, `content_ko` 제외)
 - [ ] Supabase 인덱스: `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
 - [ ] `albums` 페이지네이션
-
 ### Upstash Redis
 - [ ] 조회수 카운터 + 인기순 정렬 (Sorted Set)
 - [ ] 목록 쿼리 캐싱 (Cache-Aside, TTL 10분)
 - [ ] Rate Limiting (IP 기준)
 - [ ] 앨범 중복 체크 Redis 선조회 (`SISMEMBER`)
-
 ### 검색
 - **방식**: `pg_trgm` + GIN 인덱스 (외부 서비스 없이 DB 레벨 해결)
 - **범위**: `articles.title_ko`, `articles.title`
@@ -156,3 +173,9 @@ python -m scripts.melon_scraper
   2. `GET /api/search?q=` Route Handler
   3. `CategoryHeader` 검색 UI (디바운스 300ms)
   4. Redis 결과 캐싱 (TTL 5분, 선택)
+### 디자인 & 유지보수
+- [ ] 디자인 토큰 정리 (spacing / font-size 시스템화)
+- [ ] Inline style → CSS Modules 또는 globals 클래스로 점진적 전환
+- [ ] Hover/Transition 핸들러 → CSS 의사클래스로 통합
+- [ ] 시각적 위계 보강 (사이드바 제목/메타 2단 구조 등)
+ 
