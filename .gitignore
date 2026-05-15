@@ -141,6 +141,7 @@ celerybeat.pid
 .venv
 env/
 venv/
+airflow_venv/  # Airflow 가상 환경 (GitHub Actions에서 새로 설치)
 ENV/
 env.bak/
 venv.bak/
