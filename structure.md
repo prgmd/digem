@@ -68,19 +68,47 @@ digem/
 
 ## 데이터 파이프라인
 
-```
-RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Gemini 번역 → Supabase 저장
+```mermaid
+graph TD
+    A[GitHub Actions 스케줄러] --> B[Airflow 초기화 및 DAG 검증]
+    B --> C[Airflow DAG 실행]
+    C --> D{병렬 실행}
+    D --> E[Pitchfork Scraper]
+    D --> F[Stereogum Scraper]
+    D --> G[Consequence Scraper]
+    D --> H[Bandcamp Scraper]
+    D --> I[Melon Scraper]
+    E & F & G & H & I --> J[수집/번역/저장 프로세스]
+    J --> K[완료 알림 및 로깅]
 ```
 
-| 스크래퍼 | 출처 | 방식 |
-|---|---|---|
-| `pitchfork_scrapers.py` | Pitchfork | requests + BS4 |
-| `stereogum_scraper.py` | Stereogum | requests + BS4 |
-| `consequence_scraper.py` | Consequence | requests + BS4 |
-| `bandcamp_scraper.py` | Bandcamp Daily | Selenium |
+1. **GitHub Actions (Cron)**: 매일 정해진 시간(09:00 KST)에 파이프라인 트리거
+2. **Apache Airflow (DAG)**: 5개 스크래퍼의 의존성 및 병렬 실행 관리 (`scraper_pool`을 통한 리소스 제어)
+3. **데이터 수집 프로세스**: RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Gemini 번역 → Supabase 저장
+   - 기사 간 10초 대기 (IP 차단 방지)
+   - 번역 실패 시 `translation_status = 'failed'` 저장 → 재수집 차단, 프론트 노출 제외
 
-- 기사 간 10초 대기 (IP 차단 방지)
-- 번역 실패 시 `translation_status = 'failed'` 저장 → 재수집 차단, 프론트 노출 제외
+---
+
+## 자동화 및 스케줄링
+
+### 1. GitHub Actions (`.github/workflows/digem-scraper.yml`)
+- **실행 주기**: 매일 00:00 UTC (09:00 KST)
+- **주요 단계**:
+  - `ubuntu-latest` 환경에서 Python 3.11 설정
+  - `apache-airflow` 및 프로젝트 의존성 설치
+  - Airflow DB 초기화 및 DAG 검증
+  - `airflow dags test digem_scraper_pipeline`을 통한 동기식 DAG 실행
+- **보안**: GitHub Secrets를 통한 `SUPABASE_URL`, `GEMINI_API_KEY` 등 관리
+
+### 2. Apache Airflow (`airflow/dags/digem_scraper_pipeline.py`)
+- **DAG ID**: `digem_scraper_pipeline`
+- **구조**: 5개 독립 Task 병렬 실행 후 `pipeline_complete` Task로 종료
+- **특징**:
+  - `PythonOperator`를 사용하여 기존 스크래핑 로직 재사용
+  - `scraper_pool`을 설정하여 동시 실행 Task 수 제어 가능
+  - 실패 시 자동 재시도 (1회, 5분 대기)
+  - 실행 타임아웃 1시간 설정
 
 ---
 
@@ -156,7 +184,7 @@ python -m scripts.melon_scraper
   - Python 스크래퍼에서 새 칼럼 저장 후 호출
 ### 일반
 - [ ] Rolling Stone 스크래퍼
-- [ ] GitHub Actions 자동화
+- [x] GitHub Actions 자동화
 - [ ] 아티스트 페이지 UUID 라우팅 전환
 - [ ] `next/image` + `remotePatterns` 썸네일 전환
 ### 접근성 & 시맨틱
