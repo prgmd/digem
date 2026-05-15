@@ -1,23 +1,32 @@
 import Link from 'next/link'
 
 const LINKS = [
-  { href: '/articles', label: 'ARTICLES' },
-  { href: '/albums',   label: 'ALBUMS'   },
+  { href: '/articles', label: 'articles' },
+  { href: '/albums',   label: 'albums'   },
 ]
 
 export default function HomeNav() {
   return (
-    <nav className="hero-nav" style={{ display: 'flex', gap: '4rem', alignItems: 'center' }}>
+    <nav
+      className="hero-nav"
+      style={{
+        display: 'flex',
+        gap: '2.5rem',
+        alignItems: 'center',
+        fontFamily: 'var(--mono)',
+      }}
+    >
       {LINKS.map(({ href, label }) => (
         <Link
           key={href}
           href={href}
+          className="bracket-btn"
           style={{
-            fontFamily: 'Pretendard, sans-serif',
-            fontWeight: 600,
-            fontSize: '1.1rem',
-            color: 'var(--meta-color)',
+            fontSize: '0.92rem',
+            letterSpacing: '0.12em',
+            color: 'var(--text-color)',
             textDecoration: 'none',
+            padding: '0.45rem 0.8rem',
           }}
         >
           {label}

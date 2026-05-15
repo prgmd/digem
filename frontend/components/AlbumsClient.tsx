@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 import Spinner from '@/components/Spinner'
 import { useAlbumFilters } from '@/components/useAlbumFilters'
-import { selectStyle, tabStyle, pageButtonStyle } from '@/lib/styles'
+import { selectStyle } from '@/lib/styles'
 
 export interface Album {
   id: string
@@ -22,7 +22,7 @@ const formatDate = (dateString: string) => {
   const y = date.getFullYear()
   const m = (date.getMonth() + 1).toString().padStart(2, '0')
   const d = date.getDate().toString().padStart(2, '0')
-  return `${y}/${m}/${d}`
+  return `${y}.${m}.${d}`
 }
 
 const PAGE_SIZE_CLIENT = 30
@@ -38,7 +38,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
   const router = useRouter()
   const [isExiting, setIsExiting] = useState(false)
   const [navigating, setNavigating] = useState(false)
-  const [hoveredArtist, setHoveredArtist] = useState<string | null>(null)
   const [fadeIn] = useState(() => {
     if (typeof sessionStorage === 'undefined') return true
     const skip = sessionStorage.getItem('nofade')
@@ -57,7 +56,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
 
   const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
 
-  // month-only 케이스: 서버가 월 필터 미적용 → 클라이언트에서 처리
   const isMonthOnly = monthFilter !== 'all' && selectedYear === 'all'
   const displayAlbums = isMonthOnly
     ? albums.filter(a => (new Date(a.release_date).getMonth() + 1).toString() === monthFilter)
@@ -69,7 +67,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
 
   const paginated = isMonthOnly
     ? displayAlbums.slice((page - 1) * PAGE_SIZE_CLIENT, page * PAGE_SIZE_CLIENT)
-    : displayAlbums  // 서버가 이미 페이지네이션 적용
+    : displayAlbums
 
   return (
     <div style={{
@@ -78,41 +76,69 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : (fadeIn ? 'pageFadeIn 0.4s ease both' : undefined),
+      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : (fadeIn ? 'pageFadeIn 0.4s steps(12, end) both' : undefined),
     }}>
       <CategoryHeader onLogoClick={handleExitToHome} currentCategory="albums" />
 
-      {/* 필터 */}
+      {/* 필터 바 */}
       <div className="album-filter-bar" style={{
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
-        gap: '0.6rem',
+        gap: '0.4rem 0.6rem',
         borderBottom: '1px solid var(--border)',
         flexShrink: 0,
       }}>
-        <button style={tabStyle(featuredOnly)} onClick={() => setFeaturedOnly(!featuredOnly)}>추천</button>
+        <span
+          className="mono"
+          style={{
+            fontSize: '0.65rem',
+            color: 'var(--meta-dim)',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            marginRight: '0.4rem',
+          }}
+        >
+          // filter
+        </span>
+        <button
+          onClick={() => setFeaturedOnly(!featuredOnly)}
+          className={`bracket-btn ${featuredOnly ? 'is-active' : ''}`}
+        >
+          ★ pick
+        </button>
         <select value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)} style={selectStyle}>
-          <option value="all">지역</option>
-          <option value="국내">국내</option>
-          <option value="해외">해외</option>
+          <option value="all">region · all</option>
+          <option value="국내">region · kr</option>
+          <option value="해외">region · intl</option>
         </select>
         <select value={selectedType} onChange={e => setSelectedType(e.target.value)} style={selectStyle}>
-          <option value="all">유형</option>
-          <option value="정규">정규</option>
-          <option value="EP">EP</option>
+          <option value="all">type · all</option>
+          <option value="정규">type · LP</option>
+          <option value="EP">type · EP</option>
         </select>
         <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={selectStyle}>
-          {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? '연도' : y}</option>)}
+          {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? 'year · all' : `year · ${y}`}</option>)}
         </select>
         <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={selectStyle}>
-          {availableMonths.map(m => <option key={m} value={m}>{m === 'all' ? '월' : `${m}월`}</option>)}
+          {availableMonths.map(m => <option key={m} value={m}>{m === 'all' ? 'month · all' : `month · ${m.padStart(2, '0')}`}</option>)}
         </select>
+
+        <span
+          className="mono"
+          style={{
+            marginLeft: 'auto',
+            fontSize: '0.7rem',
+            color: 'var(--meta-color)',
+            letterSpacing: '0.06em',
+          }}
+        >
+          {String(totalCount).padStart(4, '0')} records
+        </span>
       </div>
 
-      {/* 네비게이션 로딩 오버레이 */}
       {navigating && (
-        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'rgba(0,0,0,0.65)' }}>
           <Spinner />
         </div>
       )}
@@ -120,78 +146,124 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       {/* 앨범 그리드 */}
       <div className="album-grid-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
         {paginated.length === 0 && (
-          <p style={{
-            color: 'var(--meta-color)', fontSize: '1.05rem',
-            textAlign: 'center', padding: '4rem 0',
-          }}>
-            필터에 맞는 앨범이 없어요.
+          <p
+            className="mono"
+            style={{
+              color: 'var(--meta-color)',
+              fontSize: '0.9rem',
+              textAlign: 'center',
+              padding: '4rem 0',
+              letterSpacing: '0.05em',
+            }}
+          >
+            &gt; no records match the filter.
           </p>
         )}
         <div className="album-grid">
           {paginated.map((album, index) => (
-            <div key={album.id} style={{
-              opacity: 0,
-              animation: `fadeIn 0.5s ease-in-out ${index * 30}ms forwards`,
-              minWidth: 0,
-            }}>
-              <div className="album-artwork" style={{
-                width: '100%',
-                aspectRatio: '1 / 1',
-                background: 'var(--hover-bg)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '0.65rem',
-                overflow: 'hidden',
-                outline: album.is_featured ? '2px solid var(--meta-color)' : 'none',
-                outlineOffset: '2px',
-                position: 'relative',
-              }}>
+            <div
+              key={album.id}
+              className="album-card"
+              style={{
+                opacity: 0,
+                animation: `pixelFadeIn 0.5s steps(10, end) ${index * 30}ms forwards`,
+                minWidth: 0,
+              }}
+            >
+              <div
+                className="album-artwork"
+                style={{
+                  outline: album.is_featured ? '2px solid var(--meta-color)' : 'none',
+                  outlineOffset: '2px',
+                }}
+              >
                 {album.is_featured && (
-                  <span style={{
-                    position: 'absolute', top: 0, left: 0,
-                    fontFamily: 'bjorkfont, sans-serif',
-                    fontSize: '1rem',
-                    color: 'var(--bg-color)',
-                    background: 'var(--meta-color)',
-                    width: 24, height: 24,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    zIndex: 1,
-                    lineHeight: 1,
-                    paddingTop: '3px',
-                    paddingRight: '6px',
-                  }}>d</span>
+                  <span className="album-featured-mark">PICK</span>
                 )}
                 {album.artwork_url ? (
-                  <img
-                    src={album.artwork_url}
-                    alt={album.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                  <img src={album.artwork_url} alt={album.title} />
                 ) : (
-                  <span style={{ fontFamily: 'bjorkfont, sans-serif', fontSize: '2.5rem', color: 'var(--border)', userSelect: 'none' }}>
-                    {album.title[0]}
+                  <span
+                    className="mono"
+                    style={{
+                      fontSize: '2rem',
+                      color: 'var(--border-bright)',
+                      userSelect: 'none',
+                      letterSpacing: '0.2em',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {album.title[0].toUpperCase()}
                   </span>
                 )}
                 <div className="album-title-overlay">
-                  <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1.05rem', color: 'var(--text-color)', textAlign: 'center', lineHeight: 1.5, wordBreak: 'keep-all' }}>
+                  <span
+                    style={{
+                      fontFamily: 'Pretendard, sans-serif',
+                      fontWeight: 500,
+                      fontSize: '1rem',
+                      color: 'var(--text-color)',
+                      textAlign: 'center',
+                      lineHeight: 1.45,
+                      wordBreak: 'keep-all',
+                    }}
+                  >
                     {album.title}
                   </span>
                 </div>
               </div>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 600, fontSize: '1.2rem', color: 'var(--text-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.4rem' }}>
+
+              <p
+                style={{
+                  fontFamily: 'Pretendard, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  color: 'var(--text-color)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  marginBottom: '0.25rem',
+                }}
+              >
                 {album.title}
               </p>
+
               <p
-                onClick={(e) => { e.stopPropagation(); setNavigating(true); router.push(`/artists/${encodeURIComponent(album.artist)}`) }}
-                onMouseEnter={() => setHoveredArtist(album.id)}
-                onMouseLeave={() => setHoveredArtist(null)}
-                style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.0rem', color: hoveredArtist === album.id ? 'var(--text-color)' : 'var(--meta-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '0.35rem', cursor: 'pointer', transition: 'color 0.15s' }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setNavigating(true)
+                  router.push(`/artists/${encodeURIComponent(album.artist)}`)
+                }}
+                style={{
+                  fontFamily: 'Pretendard, sans-serif',
+                  fontWeight: 300,
+                  fontSize: '0.95rem',
+                  color: 'var(--meta-color)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  marginBottom: '0.35rem',
+                  cursor: 'pointer',
+                  transition: 'color 0.08s steps(2, end)',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
               >
                 {album.artist}
               </p>
-              <p style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '0.95rem', color: 'var(--meta-color)' }}>
-                {album.region}{album.album_type ? ` · ${album.album_type}` : ''}{album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
+
+              <p
+                className="mono"
+                style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--meta-dim)',
+                  letterSpacing: '0.05em',
+                  textTransform: 'lowercase',
+                }}
+              >
+                {album.region === '국내' ? 'kr' : 'intl'}
+                {album.album_type ? ` · ${album.album_type.toLowerCase()}` : ''}
+                {album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
               </p>
             </div>
           ))}
@@ -199,12 +271,42 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
 
         {/* 페이지네이션 */}
         {totalPages > 1 && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', padding: '2rem 0 1rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '0.3rem',
+              padding: '2rem 0 1rem',
+              flexWrap: 'wrap',
+            }}
+          >
+            <button
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page <= 1}
+              className="bracket-btn"
+              style={{ opacity: page <= 1 ? 0.3 : 1 }}
+            >
+              prev
+            </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-              <button key={p} onClick={() => setPage(p)} style={pageButtonStyle(page === p)}>
-                {p}
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`bracket-btn ${page === p ? 'is-active' : ''}`}
+                style={{ minWidth: '2.4rem' }}
+              >
+                {String(p).padStart(2, '0')}
               </button>
             ))}
+            <button
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={page >= totalPages}
+              className="bracket-btn"
+              style={{ opacity: page >= totalPages ? 0.3 : 1 }}
+            >
+              next
+            </button>
           </div>
         )}
       </div>

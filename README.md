@@ -386,3 +386,39 @@
 - **병렬 처리**: 독립적 작업의 동시 실행으로 성능 향상
 - **GitHub Actions 통합**: Linux 환경에서의 Airflow 실행
 - **환경 변수 관리**: GitHub Secrets을 통한 API 키 보안 관리
+
+---
+
+### **2026-05-16 (Day 15)**
+#### ✅ 완료
+- [x] 프론트엔드 비트-모노크롬 미학 전면 리뉴얼
+  - **CRT 레이어**: body::before scanline (1px, 8s 드리프트) + body::after vignette flicker (steps 80)
+  - **레트로 UI**: 모든 호버/전환을 `steps()` 애니메이션으로 변경 (cubic-bezier → 픽셀 스텝 페이드)
+  - **다이더링**: 앨범 아트워크 기본값 `grayscale + sepia + contrast` 필터 → hover 시 풀컬러
+  - **타이포그래피**: bjorkfont을 메인 홈 로고만으로 제한 (다른 곳은 Pretendard로 통일)
+  - **터미널 스타일**: 
+    - 홈 하단 `> sys / src / sync / db` 터미널 상태 블록 (Supabase 실시간 카운트, 시계, caret)
+    - 칼럼 메타를 `> SOURCE / BY / DATE / LINK` 박스로 변경
+    - 에러 페이지를 터미널 로그 스타일로 리디자인
+  - **어댑티브 UI**: 
+    - 모든 버튼 `[ label ]` 대괄호 래핑 + invert 호버 (amber bg → amber text)
+    - Sidebar 출처 선택기 `[ all ] [ pitchfork ] …` 토글 방식
+    - 페이지네이션 `[ prev ] 03/12 [ next ]` ASCII 스타일
+  - **독서 경험**: ArticleDetail 상단 1px amber reading-progress 바 추가
+  - **로딩**: Spinner → ASCII `▖▘▝▗` 회전 + `[████░░░░]` 진행 바 애니메이션
+  - **콜로폰**: Info 페이지 `cat about.txt` 스타일 + `colophon█` 깜빡이는 caret
+- [x] HomeStatus 컴포넌트 신규 생성
+  - 서버사이드 Supabase 쿼리로 articles/albums 카운트 fetch
+  - 클라이언트 타이머로 실시간 시계 표시
+  - 깜빡이는 caret 애니메이션
+
+---
+
+## 예정 기능
+
+- [ ] 개별 칼럼 동적 라우트 (`articles/[id]`) — SEO 최적화
+- [ ] Redis 캐싱 (Upstash) — 조회수, 인기순 정렬
+- [ ] pg_trgm 검색 (PostgreSQL) — 제목 전문 검색
+- [ ] Rolling Stone 스크래퍼 추가
+- [ ] 디더링 고도화 (Canvas/sharp 진정 Bayer 디더링)
+- [ ] 모바일 터치 최적화 (44×44px 타겟)

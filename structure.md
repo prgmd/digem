@@ -1,5 +1,12 @@
 # dig-em.com — 구조 및 플랜
 
+> **최신 디자인**: amber-on-black **bit-monochrom** CRT 터미널 미학
+> - 화면 위 1px CRT 스캔라인 (8초 드리프트)
+> - 모든 버튼 `[ label ]` 대괄호 + invert 호버
+> - 앨범 아트 디더링 필터 (hover 시 풀컬러)
+> - 터미널 스타일 메타데이터, 깜빡이는 caret, ASCII 구분선
+> - `steps()` 기반 stepped 트랜지션으로 디지털 끊김 느낌
+
 ## 기술 스택
 
 | 레이어 | 기술 |
@@ -170,53 +177,42 @@ python -m scripts.melon_scraper
 
 ---
 
+## 완료된 기능 (2026-05-16)
+- [x] **CRT 레이어** — body scanline + vignette flicker, selection invert
+- [x] **비트-모노크롬 UI** — `[ label ]` 대괄호 버튼, invert 호버, stepped 애니메이션
+- [x] **앨범 디더링** — CSS 필터 기반 grayscale+sepia, hover 시 컬러 복귀
+- [x] **터미널 스타일** — 홈 상태 블록, 칼럼 메타 박스, 에러 로그, colophon caret
+- [x] **reading-progress 바** — ArticleDetail 상단 스크롤 진행도
+- [x] **ASCII 로딩** — 회전 glyphs + 진행 바 애니메이션
+- [x] **실시간 홈 상태** — HomeStatus 서버사이드 Supabase fetch + 클라이언트 시계
+
 ## 예정 기능
- 
-### SEO & 동적 라우팅 (🔄 Day 12-13 롤백 후 재시도)
+
+### SEO & 동적 라우팅
 - [ ] 개별 칼럼 페이지 동적 라우트 (`articles/[id]`)
   - Server Component로 개별 기사 fetch
   - `generateMetadata` 동적 OG/Twitter Card 생성
   - ISR `revalidate = 86400` (24시간)
-- [ ] Sidebar `<li onClick>` → `<Link>` 전환
-  - `prefetch={false}` 성능 최적화
-- [ ] `sitemap.ts` + `robots.ts` SEO 지원
 - [ ] On-demand Revalidation API (`/api/revalidate`)
-  - Python 스크래퍼에서 새 칼럼 저장 후 호출
-### 일반
+
+### 데이터 수집
 - [ ] Rolling Stone 스크래퍼
-- [x] GitHub Actions 자동화
-- [ ] 아티스트 페이지 UUID 라우팅 전환
-- [ ] `next/image` + `remotePatterns` 썸네일 전환
-### 접근성 & 시맨틱
-- [ ] `:focus-visible` 전역 스타일 적용
-- [ ] `dangerouslySetInnerHTML` XSS 방어 (DOMPurify 또는 수동 escape)
-- [ ] CategoryHeader, AlbumsClient 비-시맨틱 요소 (`<span onClick>`, `<p onClick>`) → `<button>` / `<Link>`
-- [ ] 모바일 터치 타겟 44×44px 확보 (햄버거, 헤더 버튼, 페이지네이션)
-### 성능
-- [ ] 폰트 WOFF2 변환 + `next/font/local`
-- [ ] 보안 헤더 (CSP, HSTS, Referrer-Policy, Permissions-Policy)
-- [ ] `prefers-reduced-motion` 가드 + MeshBackground 최적화
-- [ ] layout.tsx 글로벌 OG/Twitter 메타데이터 (개별 칼럼 외 기본값)
-### DB / 성능
+
+### 캐싱 & 성능
 - [ ] `select('*')` → 목록 필요 컬럼만 명시 (`content_en`, `content_ko` 제외)
 - [ ] Supabase 인덱스: `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
-- [ ] `albums` 페이지네이션
-### Upstash Redis
-- [ ] 조회수 카운터 + 인기순 정렬 (Sorted Set)
-- [ ] 목록 쿼리 캐싱 (Cache-Aside, TTL 10분)
-- [ ] Rate Limiting (IP 기준)
-- [ ] 앨범 중복 체크 Redis 선조회 (`SISMEMBER`)
+- [ ] Redis (Upstash) — 조회수 카운터, 캐싱 (TTL), Rate Limiting
+
 ### 검색
-- **방식**: `pg_trgm` + GIN 인덱스 (외부 서비스 없이 DB 레벨 해결)
+- **방식**: `pg_trgm` + GIN 인덱스 (외부 서비스 없이 DB 레벨)
 - **범위**: `articles.title_ko`, `articles.title`
-- **단계**:
-  1. `CREATE EXTENSION pg_trgm` + GIN 인덱스
-  2. `GET /api/search?q=` Route Handler
-  3. `CategoryHeader` 검색 UI (디바운스 300ms)
-  4. Redis 결과 캐싱 (TTL 5분, 선택)
-### 디자인 & 유지보수
-- [ ] 디자인 토큰 정리 (spacing / font-size 시스템화)
-- [ ] Inline style → CSS Modules 또는 globals 클래스로 점진적 전환
-- [ ] Hover/Transition 핸들러 → CSS 의사클래스로 통합
-- [ ] 시각적 위계 보강 (사이드바 제목/메타 2단 구조 등)
+- **UI**: `CategoryHeader` 검색 바 + Redis 결과 캐싱
+
+### 비트-모노크롬 고도화
+- [ ] 앨범 아트 **진정 디더링** — Canvas/sharp Bayer 매트릭스 (CSS filter 대신)
+
+### 접근성 & 의미론
+- [ ] `:focus-visible` 전역 스타일
+- [ ] 모바일 터치 타겟 44×44px
+- [ ] 시맨틱 HTML (`<button>`, `<Link>` 등)
  

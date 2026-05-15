@@ -25,60 +25,144 @@ interface Props {
 export default function ArtistClient({ artist, albums }: Props) {
   const router = useRouter()
   const [hoveredAlbum, setHoveredAlbum] = useState<string | null>(null)
-  const [backHover, setBackHover] = useState(false)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000', padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#000',
+        padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
+        animation: 'pageFadeIn 0.4s steps(12, end) both',
+      }}
+    >
       <button
         onClick={() => router.back()}
-        onMouseEnter={() => setBackHover(true)}
-        onMouseLeave={() => setBackHover(false)}
-        style={{ background: 'none', border: 'none', color: backHover ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginBottom: '2rem', transition: 'color 0.2s' }}
+        className="bracket-btn"
+        style={{ marginBottom: '2.5rem' }}
       >
-        ← 뒤로
+        ← back
       </button>
 
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+      <div
+        className="mono"
+        style={{
+          fontSize: '0.7rem',
+          color: 'var(--meta-dim)',
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          marginBottom: '0.5rem',
+        }}
+      >
+        // artist
+      </div>
+
+      <h1
+        style={{
+          fontFamily: 'Pretendard, sans-serif',
+          fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+          fontWeight: 700,
+          marginBottom: '0.4rem',
+          lineHeight: 1.1,
+          letterSpacing: '0.04em',
+        }}
+      >
         {artist.name_ko || artist.name}
       </h1>
       {artist.name_ko && (
-        <p style={{ fontSize: '0.85rem', color: 'var(--meta-color)', marginBottom: '2.5rem' }}>{artist.name}</p>
+        <p
+          className="mono"
+          style={{ fontSize: '0.8rem', color: 'var(--meta-color)', letterSpacing: '0.06em' }}
+        >
+          {artist.name}
+        </p>
       )}
 
+      <div
+        className="mono"
+        style={{
+          marginTop: '1.5rem',
+          paddingBottom: '0.5rem',
+          fontSize: '0.72rem',
+          color: 'var(--meta-color)',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        discography · {String(albums.length).padStart(2, '0')} records
+      </div>
+
       {albums.length === 0 ? (
-        <p style={{ color: 'var(--meta-color)', marginTop: '2rem' }}>등록된 앨범이 없습니다.</p>
+        <p
+          className="mono"
+          style={{ color: 'var(--meta-color)', marginTop: '2rem', fontSize: '0.85rem' }}
+        >
+          &gt; no records on file.
+        </p>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-          gap: '1.5rem',
-          marginTop: '2rem',
-        }}>
+        <div
+          className="album-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: '1.6rem',
+            marginTop: '2rem',
+          }}
+        >
           {albums.map((album, i) => (
             <div
               key={album.id}
+              className="album-card"
               onMouseEnter={() => setHoveredAlbum(album.id)}
               onMouseLeave={() => setHoveredAlbum(null)}
-              style={{ opacity: 0, animation: `fadeIn 0.4s ease ${i * 40}ms forwards` }}
+              style={{
+                opacity: 0,
+                animation: `pixelFadeIn 0.4s steps(10, end) ${i * 35}ms forwards`,
+              }}
             >
-              <div style={{
-                aspectRatio: '1/1',
-                background: 'var(--hover-bg)',
-                overflow: 'hidden',
-                marginBottom: '0.6rem',
-                transform: hoveredAlbum === album.id ? 'scale(1.03)' : 'scale(1)',
-                transition: 'transform 0.3s ease',
-              }}>
+              <div className="album-artwork">
                 {album.artwork_url
-                  ? <img src={album.artwork_url} alt={album.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontFamily: 'bjorkfont, sans-serif', fontSize: '2rem', color: 'var(--border)' }}>{album.title[0]}</span>
-                    </div>
+                  ? <img src={album.artwork_url} alt={album.title} />
+                  : <span
+                      className="mono"
+                      style={{
+                        fontSize: '1.8rem',
+                        fontWeight: 700,
+                        color: 'var(--border-bright)',
+                        letterSpacing: '0.18em',
+                      }}
+                    >
+                      {album.title[0].toUpperCase()}
+                    </span>
                 }
               </div>
-              <p style={{ fontSize: '0.85rem', color: hoveredAlbum === album.id ? 'var(--text-color)' : 'var(--text-color)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', transition: 'opacity 0.2s', opacity: hoveredAlbum === album.id ? 1 : 0.85 }}>{album.title}</p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--meta-color)', opacity: 0.7 }}>
-                {album.album_type}{album.release_date ? ` · ${album.release_date.slice(0, 4)}` : ''}
+              <p
+                style={{
+                  fontFamily: 'Pretendard, sans-serif',
+                  fontSize: '0.95rem',
+                  fontWeight: 500,
+                  color: 'var(--text-color)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  marginBottom: '0.25rem',
+                  opacity: hoveredAlbum === album.id ? 1 : 0.92,
+                  transition: 'opacity 0.1s steps(3, end)',
+                }}
+              >
+                {album.title}
+              </p>
+              <p
+                className="mono"
+                style={{
+                  fontSize: '0.68rem',
+                  color: 'var(--meta-dim)',
+                  letterSpacing: '0.06em',
+                  textTransform: 'lowercase',
+                }}
+              >
+                {album.album_type ? album.album_type.toLowerCase() : ''}
+                {album.release_date ? ` · ${album.release_date.slice(0, 4)}` : ''}
               </p>
             </div>
           ))}

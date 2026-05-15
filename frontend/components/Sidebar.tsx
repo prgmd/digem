@@ -20,19 +20,38 @@ const SVG_SOURCES: Record<string, string> = {
 
 const INVERT_SOURCES = new Set(['pitchfork', 'bandcamp'])
 
-function SourceBadge({ source }: { source: string }) {
+function SourceBadge({ source, active }: { source: string; active?: boolean }) {
   const s = source.toLowerCase()
   if (SVG_SOURCES[s]) {
     return (
       <img
         src={SVG_SOURCES[s]}
         alt={source}
-        style={{ width: 18, height: 18, objectFit: 'contain', flexShrink: 0, opacity: 0.7, marginTop: 1, filter: INVERT_SOURCES.has(s) ? 'invert(1)' : undefined }}
+        style={{
+          width: 16,
+          height: 16,
+          objectFit: 'contain',
+          flexShrink: 0,
+          opacity: 0.85,
+          marginTop: 3,
+          filter: active
+            ? (INVERT_SOURCES.has(s) ? 'none' : 'invert(1)')
+            : (INVERT_SOURCES.has(s) ? 'invert(1)' : 'none'),
+        }}
       />
     )
   }
   return (
-    <span style={{ fontSize: '0.65rem', opacity: 0.6, flexShrink: 0, letterSpacing: '0.05em' }}>
+    <span
+      className="mono"
+      style={{
+        fontSize: '0.65rem',
+        opacity: 0.7,
+        flexShrink: 0,
+        letterSpacing: '0.05em',
+        marginTop: 2,
+      }}
+    >
       {source.slice(0, 2).toUpperCase()}
     </span>
   )
@@ -49,6 +68,14 @@ interface SidebarProps {
   totalPages: number
   onPageChange: (page: number) => void
   fullWidth?: boolean
+}
+
+const fmtDate = (iso: string) => {
+  const d = new Date(iso)
+  const y = String(d.getFullYear()).slice(2)
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}.${m}.${day}`
 }
 
 export default function Sidebar({
@@ -68,114 +95,151 @@ export default function Sidebar({
       width: fullWidth ? '100%' : '480px',
       height: '100%',
       borderRight: fullWidth ? 'none' : '1px solid var(--border)',
-      padding: fullWidth ? '1rem' : '2rem',
+      padding: fullWidth ? '1rem' : '1.5rem 1.25rem',
       overflowY: 'auto',
       flexShrink: 0,
       display: 'flex',
       flexDirection: 'column',
     }}>
-      {/* 출처 드롭다운 */}
-      <select
-        value={selectedSource ?? ''}
-        onChange={(e) => onSourceSelect(e.target.value || null)}
+      {/* 출처 필터 — 가로 토글 */}
+      <div
+        className="mono"
         style={{
-          background: 'transparent',
-          border: '1px solid var(--border)',
-          color: 'var(--text-color)',
-          fontFamily: 'Pretendard, sans-serif',
-          fontSize: '1.05rem',
-          padding: '0.35rem 0.6rem',
-          cursor: 'pointer',
-          marginBottom: '2rem',
-          appearance: 'none',
-          width: '100%',
+          fontSize: '0.65rem',
+          letterSpacing: '0.18em',
+          color: 'var(--meta-dim)',
+          textTransform: 'uppercase',
+          marginBottom: '0.5rem',
+          paddingLeft: '0.25rem',
         }}
       >
-        <option value="">All</option>
+        // source
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.2rem 0.4rem',
+          marginBottom: '1.25rem',
+          paddingBottom: '1rem',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        <button
+          onClick={() => onSourceSelect(null)}
+          className={`bracket-btn ${!selectedSource ? 'is-active' : ''}`}
+        >
+          all
+        </button>
         {sources.map(src => (
-          <option key={src} value={src} style={{ background: '#000' }}>
-            {src.charAt(0).toUpperCase() + src.slice(1)}
-          </option>
+          <button
+            key={src}
+            onClick={() => onSourceSelect(src)}
+            className={`bracket-btn ${selectedSource === src ? 'is-active' : ''}`}
+          >
+            {src}
+          </button>
         ))}
-      </select>
-
-      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0 0 1.5rem' }} />
+      </div>
 
       {/* 칼럼 목록 */}
       <ul style={{ listStyle: 'none', flex: 1 }}>
         {articles.length === 0 && (
-          <li style={{ color: 'var(--meta-color)', fontSize: '1.05rem', padding: '1rem 0' }}>
-            해당하는 글이 없어요.
+          <li
+            className="mono"
+            style={{
+              color: 'var(--meta-color)',
+              fontSize: '0.85rem',
+              padding: '1rem 0.5rem',
+            }}
+          >
+            &gt; no records found.
           </li>
         )}
         {articles.map(article => (
           <li
             key={article.id}
             onClick={() => onSelect(article.id)}
-            style={{
-              padding: '1rem',
-              marginBottom: '0.5rem',
-              cursor: 'pointer',
-              borderRadius: '4px',
-              backgroundColor: selectedId === article.id ? 'var(--selected-bg)' : 'transparent',
-              color: selectedId === article.id ? 'var(--text-color)' : 'inherit',
-              transition: 'background-color 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}
-            onMouseEnter={(e) => {
-              if (selectedId !== article.id) e.currentTarget.style.backgroundColor = 'var(--hover-bg)'
-            }}
-            onMouseLeave={(e) => {
-              if (selectedId !== article.id) e.currentTarget.style.backgroundColor = 'transparent'
-            }}
+            className={`list-item ${selectedId === article.id ? 'is-selected' : ''}`}
           >
-            <SourceBadge source={article.source} />
-            <span style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.2rem' }}>
-              {article.title_ko || article.title}
-            </span>
+            <SourceBadge source={article.source} active={selectedId === article.id} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <span className="list-item-meta">
+                {article.source} · {fmtDate(article.published_at)}
+              </span>
+              <span
+                style={{
+                  fontFamily: 'Pretendard, sans-serif',
+                  fontWeight: 400,
+                  fontSize: '1.05rem',
+                  lineHeight: 1.35,
+                  display: 'block',
+                  wordBreak: 'keep-all',
+                }}
+              >
+                {article.title_ko || article.title}
+              </span>
+            </div>
           </li>
         ))}
       </ul>
 
-      {/* 페이지네이션 */}
+      {/* 페이지네이션 — ASCII */}
       {totalPages > 1 && (
         <>
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '1rem 0' }} />
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+          <div
+            style={{
+              color: 'var(--border-bright)',
+              fontFamily: 'var(--mono)',
+              fontSize: '0.7rem',
+              margin: '1rem 0 0.75rem',
+              letterSpacing: '0.05em',
+              textAlign: 'center',
+            }}
+          >
+            ───────────────
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              paddingBottom: '0.5rem',
+            }}
+          >
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage <= 1}
+              className="bracket-btn"
               style={{
-                background: 'none',
-                border: '1px solid var(--border)',
-                color: currentPage <= 1 ? 'var(--meta-color)' : 'var(--text-color)',
-                fontFamily: 'Pretendard, sans-serif',
-                padding: '0.3rem 0.7rem',
+                opacity: currentPage <= 1 ? 0.3 : 1,
                 cursor: currentPage <= 1 ? 'default' : 'pointer',
-                fontSize: '1.05rem',
               }}
             >
-              ←
+              prev
             </button>
-            <span style={{ fontSize: '1.0rem', color: 'var(--meta-color)', fontFamily: 'Pretendard, sans-serif' }}>
-              {currentPage} / {totalPages}
+            <span
+              className="mono"
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--meta-color)',
+                letterSpacing: '0.08em',
+                padding: '0 0.5rem',
+              }}
+            >
+              {String(currentPage).padStart(2, '0')}/{String(totalPages).padStart(2, '0')}
             </span>
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages}
+              className="bracket-btn"
               style={{
-                background: 'none',
-                border: '1px solid var(--border)',
-                color: currentPage >= totalPages ? 'var(--meta-color)' : 'var(--text-color)',
-                fontFamily: 'Pretendard, sans-serif',
-                padding: '0.3rem 0.7rem',
+                opacity: currentPage >= totalPages ? 0.3 : 1,
                 cursor: currentPage >= totalPages ? 'default' : 'pointer',
-                fontSize: '1.05rem',
               }}
             >
-              →
+              next
             </button>
           </div>
         </>

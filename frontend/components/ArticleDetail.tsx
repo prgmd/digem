@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Spinner from '@/components/Spinner'
 
 interface Article {
@@ -27,16 +27,21 @@ function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
 
   if (lang === 'ko') {
     result = result
-      // 쌍따옴표 먼저: 이후 삽입될 class="..." 속성값과 충돌 방지
       .replace(/"([^"]+)"/g, '<span class="inline-quote">"$1"</span>')
-      // 헤더는 쌍따옴표 이후: class="content-h3"가 위 정규식에 잡히지 않도록
       .replace(/^### (.+)$/gm, '<p class="content-h3">$1</p>')
   }
 
   return result
-    // 백틱 마지막: 속성값에 따옴표 없어 충돌 없음
     .replace(/`([^`]+)`/g, '<span class="annotation">$1</span>')
     .replace(/\n/g, '<br />')
+}
+
+const fmtDate = (iso: string) => {
+  const d = new Date(iso)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}.${m}.${day}`
 }
 
 interface ArticleDetailProps {
@@ -47,32 +52,67 @@ interface ArticleDetailProps {
 export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const [language, setLanguage] = useState<'ko' | 'en'>('ko')
   const [ready, setReady] = useState(!article?.thumbnail_url)
+  const [progress, setProgress] = useState(0)
+  const mainRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    if (!article?.thumbnail_url) return
+    if (!article?.thumbnail_url) { setReady(true); return }
+    setReady(false)
     const img = new window.Image()
     img.src = article.thumbnail_url
     img.onload = () => setReady(true)
     img.onerror = () => setReady(true)
   }, [article?.thumbnail_url])
 
+  useEffect(() => {
+    const el = mainRef.current
+    if (!el) return
+    const onScroll = () => {
+      const max = el.scrollHeight - el.clientHeight
+      if (max <= 0) { setProgress(0); return }
+      setProgress(Math.min(100, Math.max(0, (el.scrollTop / max) * 100)))
+    }
+    el.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [article?.id, ready, language])
+
   if (!article) {
     return (
       <main style={{
         flex: 1,
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        gap: '1rem',
         height: '100vh'
       }}>
-        <h1 style={{
-          fontSize: '6rem',
-          opacity: 0.3,
-          fontWeight: 'normal',
-          fontFamily: 'bjorkfont, sans-serif'
-        }}>
+        <h1
+          className="glitch-on-hover"
+          style={{
+            fontSize: '6rem',
+            opacity: 0.22,
+            fontWeight: 300,
+            fontFamily: 'Pretendard, sans-serif',
+            userSelect: 'none',
+            cursor: 'default',
+            letterSpacing: '0.05em',
+          }}
+        >
           digem
         </h1>
+        <p
+          className="mono"
+          style={{
+            fontSize: '0.72rem',
+            color: 'var(--meta-dim)',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+          }}
+        >
+          // select a record →
+        </p>
       </main>
     )
   }
@@ -82,134 +122,182 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   if (!ready) {
     return (
       <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', animation: 'pageFadeIn 0.25s ease both' }}>
-        <div style={{ opacity: 0.4 }}>
-          <Spinner />
-        </div>
+        <Spinner />
       </main>
     )
   }
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', animation: 'pageFadeIn 0.25s ease both' }}>
-      {/* 고정 헤더: 뒤로가기 + 언어 토글 */}
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', position: 'relative', animation: 'pageFadeIn 0.25s steps(12, end) both' }}>
+      {/* 진행 바 */}
+      <div className="reading-progress" style={{ width: `${progress}%` }} />
+
+      {/* 헤더: 뒤로/언어 토글 */}
       <div style={{
         display: 'flex',
         justifyContent: onBack ? 'space-between' : 'flex-end',
         alignItems: 'center',
-        padding: '0 1.5rem',
-        height: '44px',
+        padding: '0 1.25rem',
+        height: '46px',
         borderBottom: '1px solid var(--border)',
         flexShrink: 0,
       }}>
         {onBack && (
           <button
             onClick={onBack}
-            style={{ background: 'none', border: 'none', color: 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', padding: 0, transition: 'color 0.2s' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
+            className="bracket-btn"
+            style={{ fontSize: '0.72rem' }}
           >
-            ← 목록
+            ← list
           </button>
         )}
-        <div>
+        <div style={{ display: 'flex', gap: '0.3rem' }}>
           <button
             onClick={() => setLanguage('en')}
-            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'en' ? 600 : 300, background: 'none', border: 'none', color: language === 'en' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', marginRight: '1rem', transition: 'color 0.2s' }}
+            className={`bracket-btn ${language === 'en' ? 'is-active' : ''}`}
           >
-            원문
+            en
           </button>
           <button
             onClick={() => setLanguage('ko')}
-            style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: language === 'ko' ? 600 : 300, background: 'none', border: 'none', color: language === 'ko' ? 'var(--text-color)' : 'var(--meta-color)', fontSize: '0.9rem', cursor: 'pointer', transition: 'color 0.2s' }}
+            className={`bracket-btn ${language === 'ko' ? 'is-active' : ''}`}
           >
-            번역
+            ko
           </button>
         </div>
       </div>
 
-    <main style={{
-      flex: 1,
-      padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
-      overflowY: 'auto',
-      filter: 'blur(0.3px)',
-      animation: 'fadeIn 0.5s'
-    }}>
+    <main
+      ref={mainRef}
+      style={{
+        flex: 1,
+        padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
+        overflowY: 'auto',
+        animation: 'fadeIn 0.5s steps(14, end) both',
+      }}
+    >
       <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+
+      {/* 카테고리 라벨 */}
+      <div
+        className="mono"
+        style={{
+          fontSize: '0.7rem',
+          color: 'var(--meta-color)',
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          marginBottom: '0.7rem',
+        }}
+      >
+        // {article.category || 'article'} · #{String(article.id).padStart(4, '0')}
+      </div>
+
       {/* 제목 */}
       <h1 style={{
-        fontSize: '3rem',
-        marginBottom: '1rem',
-        lineHeight: 1.3
+        fontSize: 'clamp(1.8rem, 3.5vw, 2.85rem)',
+        marginBottom: '1.5rem',
+        lineHeight: 1.25,
+        fontWeight: 700,
+        wordBreak: 'keep-all',
       }}>
         {language === 'en' ? article.title : (article.title_ko || article.title)}
       </h1>
 
-      {/* 메타 */}
-      <div style={{
-        fontSize: '0.9rem',
-        color: 'var(--meta-color)',
-        marginBottom: '3rem',
-        display: 'flex',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '0.25rem',
-      }}>
-        <span>{article.author}</span>
-        <span style={{ margin: '0 0.25rem' }}>·</span>
-        <span>{article.source}</span>
-        <span style={{ margin: '0 0.25rem' }}>·</span>
-        <span>{new Date(article.published_at).toLocaleDateString('ko-KR')}</span>
-      </div>
-
-      {/* 썸네일 */}
-      {article.thumbnail_url && (
-        <div style={{ marginBottom: '2rem' }}>
-          <img
-            src={article.thumbnail_url}
-            alt={article.title}
-            style={{
-              width: '100%',
-              maxHeight: '360px',
-              objectFit: 'cover',
-              borderRadius: '4px',
-              display: 'block',
-            }}
-          />
-          {article.thumbnail_credit && (
-            <p style={{ fontSize: '0.8rem', color: 'var(--meta-color)', marginTop: '0.4rem', textAlign: 'left' }}>
-              {article.thumbnail_credit}
-            </p>
-          )}
-          {article.source_url && (
+      {/* 메타 — 터미널 블록 */}
+      <div
+        style={{
+          marginBottom: '2.5rem',
+          padding: '0.85rem 1rem',
+          border: '1px solid var(--border)',
+          borderLeft: '2px solid var(--meta-color)',
+          background: 'rgba(232, 213, 160, 0.015)',
+        }}
+      >
+        <div className="terminal-line">
+          <span className="terminal-key">src</span>{article.source}
+        </div>
+        <div className="terminal-line">
+          <span className="terminal-key">by</span>{article.author || '—'}
+        </div>
+        <div className="terminal-line">
+          <span className="terminal-key">date</span>{fmtDate(article.published_at)}
+        </div>
+        {article.source_url && (
+          <div className="terminal-line">
+            <span className="terminal-key">link</span>
             <a
               href={article.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
               style={{
-                display: 'inline-block',
-                marginTop: '1rem',
-                padding: '0.4rem 1rem',
-                borderRadius: '2px',
-                background: 'var(--meta-color)',
-                color: '#000',
-                fontSize: '0.85rem',
-                textDecoration: 'none',
-                transition: 'opacity 0.2s',
+                color: 'var(--text-color)',
+                textDecoration: 'underline',
+                textDecorationStyle: 'dotted',
+                textUnderlineOffset: '3px',
               }}
             >
-              원문 보기 →
+              {(() => {
+                try { return new URL(article.source_url).hostname.replace(/^www\./, '') } catch { return article.source_url }
+              })()}
+              <span style={{ marginLeft: '0.35em', opacity: 0.6 }}>↗</span>
             </a>
+          </div>
+        )}
+      </div>
+
+      {/* 썸네일 */}
+      {article.thumbnail_url && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <div className="dither" style={{ overflow: 'hidden', border: '1px solid var(--border)' }}>
+            <img
+              src={article.thumbnail_url}
+              alt={article.title}
+              style={{
+                width: '100%',
+                maxHeight: '420px',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+          </div>
+          {article.thumbnail_credit && (
+            <p
+              className="mono"
+              style={{
+                fontSize: '0.7rem',
+                color: 'var(--meta-dim)',
+                marginTop: '0.5rem',
+                letterSpacing: '0.04em',
+                textAlign: 'left',
+              }}
+            >
+              ◇ {article.thumbnail_credit}
+            </p>
           )}
         </div>
       )}
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.3rem', lineHeight: 1.5, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.2rem', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content, language) }}
       />
+
+      {/* 끝 표식 */}
+      <div
+        className="mono"
+        style={{
+          textAlign: 'center',
+          marginTop: '4rem',
+          paddingTop: '2rem',
+          borderTop: '1px solid var(--border)',
+          color: 'var(--meta-dim)',
+          fontSize: '0.8rem',
+          letterSpacing: '0.3em',
+        }}
+      >
+        ── ◆ EOF ◆ ──
+      </div>
       </div>
     </main>
     </div>
