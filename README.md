@@ -51,6 +51,30 @@
 
 ---
 
+### **2026-05-15 (Day 13-14)**
+#### ✅ 완료
+- [x] Apache Airflow 데이터 파이프라인 자동화
+  - Airflow DAG 설정 (digem_scraper_pipeline.py)
+  - 5개 스크래퍼 병렬 실행 구조 구현
+  - Task 간 의존성 관리 (PythonOperator)
+  - 실패 시 자동 재시도 로직 (retries: 1, retry_delay: 5분)
+- [x] GitHub Actions 워크플로우 설정
+  - 24시간 스케줄 자동 실행 (cron: `0 0 * * *`)
+  - 수동 트리거 옵션 (workflow_dispatch)
+  - 환경 변수 관리 (GitHub Secrets)
+  - Airflow DAG 검증 및 실행
+- [x] 로컬 git 계정 통일 (`prgmd` / `neon9008@gmail.com`)
+  - 과거 62개 커밋 author 일괄 변경
+  - git filter-branch를 통한 히스토리 재작성
+
+#### 📚 학습 포인트
+- **Airflow DAG 설계**: Task 의존성 표현 (`>>` 연산자)
+- **병렬 처리**: 독립적 작업의 동시 실행으로 성능 향상
+- **GitHub Actions 통합**: Linux 환경에서의 Airflow 실행
+- **환경 변수 관리**: GitHub Secrets을 통한 API 키 보안 관리
+
+---
+
 ### **2026-03-19 (Day 3)**
 #### ✅ 완료
 - [x] Next.js 프론트엔드 초기 세팅 (`digem/frontend`)

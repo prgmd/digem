@@ -11,8 +11,11 @@ on:
 
 # ==================== 2️⃣ 환경 변수 ====================
 env:
-  AIRFLOW_HOME: ./airflow
+  AIRFLOW_HOME: /tmp/airflow  # GitHub Actions는 절대 경로 필요
   PYTHONPATH: .
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: sqlite:////tmp/airflow.db  # SQLite 절대 경로
+  AIRFLOW__CORE__LOAD_EXAMPLES: false  # 예제 DAG 로드 방지
+  AIRFLOW__CORE__DAGS_FOLDER: /home/runner/work/digem/digem/airflow/dags
   # GitHub Secrets에서 가져온 환경 변수
   # GitHub Settings → Secrets and variables → Actions에서 설정
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

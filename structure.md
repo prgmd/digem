@@ -9,6 +9,8 @@
 | 캐시/카운터 | Upstash Redis (미구현) |
 | 번역 AI | Google Gemini 2.5 Flash |
 | 데이터 수집 | Python 3.13, requests, BeautifulSoup4, feedparser, Selenium |
+| 워크플로우 자동화 | Apache Airflow 2.10 (DAG 기반 파이프라인) |
+| CI/CD | GitHub Actions (24h 스케줄 자동 실행) |
 | 배포 | Vercel (프론트엔드) |
 
 ---
@@ -17,6 +19,10 @@
 
 ```
 digem/
+├── .github/
+│   └── workflows/
+│       └── digem-scraper.yml        # GitHub Actions 자동화 워크플로우
+│
 ├── frontend/
 │   ├── app/
 │   │   ├── page.tsx                 # 홈
@@ -36,6 +42,11 @@ digem/
 │   │   └── MeshBackground.tsx       # 자율 부유 blob 배경
 │   └── lib/supabase.ts
 │
+├── airflow/
+│   └── dags/
+│       ├── digem_scraper_pipeline.py # 실제 파이프라인 DAG
+│       └── hello_digem.py            # 학습용 테스트 DAG
+│
 ├── scripts/
 │   ├── column/
 │   │   ├── base_scraper.py          # 공통 추상 기반 클래스
@@ -48,7 +59,9 @@ digem/
 │   ├── database_loader.py
 │   └── main.py                      # 전체 파이프라인 진입점
 │
-└── tools/melon_seed.py              # 멜론 대량 시딩 (일회성)
+├── tools/melon_seed.py              # 멜론 대량 시딩 (일회성)
+├── AIRFLOW_SETUP.md                 # Airflow 설정 가이드
+└── requirements.txt                 # Python 의존성
 ```
 
 ---
