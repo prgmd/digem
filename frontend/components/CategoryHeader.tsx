@@ -62,19 +62,17 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
           <span
             className="glitch-on-hover"
             style={{
-              fontFamily: 'Pretendard, sans-serif',
-              fontWeight: 700,
-              fontSize: '1.8rem',
+              fontFamily: 'bjorkfont, sans-serif',
+              fontSize: '1.85rem',
               color: logoHover ? 'var(--text-bright)' : 'var(--text-color)',
               lineHeight: 1,
               transition: 'color 0.08s steps(2, end)',
-              letterSpacing: '0.05em',
             }}
           >
             d
           </span>
           <span
-            className="mono"
+            className="mono header-tag"
             style={{
               fontSize: '0.65rem',
               letterSpacing: '0.18em',
@@ -82,15 +80,16 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
               textTransform: 'uppercase',
               opacity: logoHover ? 1 : 0.5,
               transition: 'opacity 0.12s steps(3, end)',
+              whiteSpace: 'nowrap',
             }}
           >
             // {currentCategory}
           </span>
         </div>
 
-        {/* 중앙 라이브 표시 */}
+        {/* 중앙 라이브 표시 — 모바일에서는 숨김 */}
         <div
-          className="mono"
+          className="mono header-live"
           style={{
             position: 'absolute',
             left: '50%',

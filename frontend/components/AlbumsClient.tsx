@@ -163,7 +163,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           {paginated.map((album, index) => (
             <div
               key={album.id}
-              className="album-card"
+              className={`album-card ${album.is_featured ? 'is-featured' : ''}`}
               style={{
                 opacity: 0,
                 animation: `pixelFadeIn 0.5s steps(10, end) ${index * 30}ms forwards`,
@@ -173,7 +173,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
               <div
                 className="album-artwork"
                 style={{
-                  outline: album.is_featured ? '2px solid var(--meta-color)' : 'none',
+                  outline: album.is_featured ? '2px solid var(--text-color)' : 'none',
                   outlineOffset: '2px',
                 }}
               >
@@ -269,14 +269,14 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           ))}
         </div>
 
-        {/* 페이지네이션 */}
+        {/* 페이지네이션 — prev / current·total / next */}
         {totalPages > 1 && (
           <div
             style={{
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              gap: '0.3rem',
+              gap: '0.4rem',
               padding: '2rem 0 1rem',
               flexWrap: 'wrap',
             }}
@@ -289,16 +289,19 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
             >
               prev
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`bracket-btn ${page === p ? 'is-active' : ''}`}
-                style={{ minWidth: '2.4rem' }}
-              >
-                {String(p).padStart(2, '0')}
-              </button>
-            ))}
+            <span
+              className="mono"
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--meta-color)',
+                letterSpacing: '0.08em',
+                padding: '0 0.5rem',
+                minWidth: '4.5rem',
+                textAlign: 'center',
+              }}
+            >
+              {String(page).padStart(2, '0')}/{String(totalPages).padStart(2, '0')}
+            </span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page >= totalPages}

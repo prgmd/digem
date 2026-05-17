@@ -180,6 +180,7 @@ python -m scripts.melon_scraper
 ## 완료된 기능 (2026-05-16)
 - [x] **CRT 레이어** — body scanline + vignette flicker, selection invert
 - [x] **비트-모노크롬 UI** — `[ label ]` 대괄호 버튼, invert 호버, stepped 애니메이션
+- [x] **bjorkfont 최소화** — 홈 로고 `digem.` + 헤더 로고 `d`만 유지 (가시성)
 - [x] **앨범 디더링** — CSS 필터 기반 grayscale+sepia, hover 시 컬러 복귀
 - [x] **터미널 스타일** — 홈 상태 블록, 칼럼 메타 박스, 에러 로그, colophon caret
 - [x] **reading-progress 바** — ArticleDetail 상단 스크롤 진행도

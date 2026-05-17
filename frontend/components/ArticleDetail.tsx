@@ -89,15 +89,15 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         height: '100vh'
       }}>
         <h1
-          className="glitch-on-hover"
+          className="glitch-on-hover hero-empty"
           style={{
-            fontSize: '6rem',
+            fontSize: 'clamp(3.5rem, 12vw, 6rem)',
             opacity: 0.22,
-            fontWeight: 300,
-            fontFamily: 'Pretendard, sans-serif',
+            fontWeight: 'normal',
+            fontFamily: 'bjorkfont, sans-serif',
             userSelect: 'none',
             cursor: 'default',
-            letterSpacing: '0.05em',
+            lineHeight: 1,
           }}
         >
           digem
@@ -279,7 +279,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: '1.2rem', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content, language) }}
       />
 
@@ -288,12 +288,13 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         className="mono"
         style={{
           textAlign: 'center',
-          marginTop: '4rem',
+          marginTop: '3rem',
           paddingTop: '2rem',
           borderTop: '1px solid var(--border)',
           color: 'var(--meta-dim)',
-          fontSize: '0.8rem',
-          letterSpacing: '0.3em',
+          fontSize: 'clamp(0.65rem, 2vw, 0.8rem)',
+          letterSpacing: '0.2em',
+          wordBreak: 'keep-all',
         }}
       >
         ── ◆ EOF ◆ ──

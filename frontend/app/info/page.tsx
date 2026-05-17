@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section style={{ marginBottom: '3rem' }}>
+  <section style={{ marginBottom: '2.5rem' }}>
     <h2
-      className="mono"
+      className="mono info-section-title"
       style={{
         fontSize: '0.72rem',
         letterSpacing: '0.18em',
@@ -15,9 +15,24 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
         marginBottom: '1.25rem',
         paddingBottom: '0.5rem',
         borderBottom: '1px solid var(--border-bright)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        width: '100%',
       }}
     >
-      ── {title} ─────────────────────────────────────
+      <span>── {title}</span>
+      <span
+        aria-hidden
+        style={{
+          flex: 1,
+          color: 'var(--border-bright)',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        ──────────────────────────────────────────────────
+      </span>
     </h2>
     {children}
   </section>
@@ -25,6 +40,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div
+    className="info-row"
     style={{
       display: 'flex',
       gap: '1.5rem',
@@ -35,7 +51,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     }}
   >
     <span
-      className="mono"
+      className="mono info-row-label"
       style={{
         fontSize: '0.7rem',
         color: 'var(--meta-color)',

@@ -1,27 +1,6 @@
 import HomeNav from '@/components/HomeNav'
-import HomeStatus from '@/components/HomeStatus'
-import { supabase } from '@/lib/supabase'
 
-export const revalidate = 600 // 10 min
-
-async function getCounts() {
-  try {
-    const [articlesRes, albumsRes] = await Promise.all([
-      supabase.from('articles').select('id', { count: 'exact', head: true }).neq('translation_status', 'failed'),
-      supabase.from('albums').select('id', { count: 'exact', head: true }),
-    ])
-    return {
-      articles: articlesRes.count ?? 0,
-      albums: albumsRes.count ?? 0,
-    }
-  } catch {
-    return { articles: 0, albums: 0 }
-  }
-}
-
-export default async function Home() {
-  const counts = await getCounts()
-
+export default function Home() {
   return (
     <div style={{
       display: 'flex',
@@ -83,19 +62,17 @@ export default async function Home() {
         ─────── ◆ ───────
       </div>
 
-      {/* 하단: 네비 + 터미널 상태 */}
+      {/* 하단: 네비 */}
       <div style={{
         flex: 0.9,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        paddingTop: '1.75rem',
-        gap: '3rem',
+        paddingTop: '2.5rem',
         width: '100%',
       }}>
         <HomeNav />
-        <HomeStatus articleCount={counts.articles} albumCount={counts.albums} />
       </div>
     </div>
   )
