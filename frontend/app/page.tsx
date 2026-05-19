@@ -21,17 +21,21 @@ export default function Home() {
         paddingBottom: '1.5rem',
       }}>
         <span
-          className="hero-logo glitch-on-hover"
-          style={{
-            fontFamily: 'bjorkfont, sans-serif',
-            fontSize: '8rem',
-            color: 'var(--text-color)',
-            lineHeight: 1,
-            cursor: 'default',
-            userSelect: 'none',
-          }}
+          className="glitch-on-hover"
+          style={{ display: 'inline-block', cursor: 'default', userSelect: 'none' }}
         >
-          digem.
+          <span
+            className="hero-logo"
+            style={{
+              fontFamily: 'bjorkfont, sans-serif',
+              fontSize: '8rem',
+              color: 'var(--text-color)',
+              lineHeight: 1,
+              display: 'inline-block',
+            }}
+          >
+            digem.
+          </span>
         </span>
         <span
           className="hero-tagline mono"
