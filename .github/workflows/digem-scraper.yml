@@ -30,11 +30,11 @@ jobs:
     steps:
       # Step 1: 코드 체크아웃 (GitHub에서 코드 다운로드)
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Step 2: Python 설정 (버전 3.11)
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'  # pip 캐시 (속도 개선)

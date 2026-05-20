@@ -414,9 +414,16 @@
 
 ---
 
+### **2026-05-20 (Day 16)**
+#### ✅ 완료
+- [x] GitHub Actions Node.js 24 호환성 업데이트 (`checkout@v4→v5`, `setup-python@v4→v5`)
+
+---
+
 ## 예정 기능
 
 - [ ] 개별 칼럼 동적 라우트 (`articles/[id]`) — SEO 최적화
+- [ ] SQL 튜닝 — 컬럼 명시, 페이지네이션, 인덱스 최적화
 - [ ] Redis 캐싱 (Upstash) — 조회수, 인기순 정렬
 - [ ] pg_trgm 검색 (PostgreSQL) — 제목 전문 검색
 - [ ] Rolling Stone 스크래퍼 추가
