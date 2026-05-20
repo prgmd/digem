@@ -13,7 +13,7 @@ export default async function ArticlesPage({
 
   let query = supabase
     .from('articles')
-    .select('*', { count: 'exact' })
+    .select('id,title,title_ko,author,source,source_url,thumbnail_url,thumbnail_credit,published_at,category', { count: 'exact' })
     .eq('translation_status', 'success')
     .order('published_at', { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)

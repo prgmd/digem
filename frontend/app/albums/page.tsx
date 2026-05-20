@@ -22,7 +22,7 @@ export default async function AlbumsPage({
 
   let query = supabase
     .from('albums')
-    .select('*', { count: 'exact' })
+    .select('id,title,artist,artwork_url,release_date,region,album_type,is_featured', { count: 'exact' })
     .order('release_date', { ascending: false })
 
   if (region !== 'all')    query = query.eq('region', region)
@@ -48,7 +48,7 @@ export default async function AlbumsPage({
 
   const [{ data, error, count }, { data: yearRows }] = await Promise.all([
     query,
-    supabase.from('albums').select('release_date').not('release_date', 'is', null),
+    supabase.from('albums').select('release_date').not('release_date', 'is', null).order('release_date', { ascending: false }),
   ])
 
   if (error) throw error

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
 import Spinner from '@/components/Spinner'
 
 interface Article {
@@ -13,8 +14,8 @@ interface Article {
   thumbnail_credit?: string
   published_at: string
   category: string
-  content_en: string
-  content_ko: string
+  content_en?: string
+  content_ko?: string
 }
 
 function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
@@ -53,6 +54,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const [language, setLanguage] = useState<'ko' | 'en'>('ko')
   const [ready, setReady] = useState(!article?.thumbnail_url)
   const [progress, setProgress] = useState(0)
+  const [fullArticle, setFullArticle] = useState<Article | null>(article ?? null)
   const mainRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -63,6 +65,26 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
     img.onload = () => setReady(true)
     img.onerror = () => setReady(true)
   }, [article?.thumbnail_url])
+
+  // 본문(content_en, content_ko)을 동적으로 로드
+  useEffect(() => {
+    if (!article?.id) return
+    if (fullArticle?.content_en && fullArticle?.content_ko) return // 이미 로드됨
+
+    const fetchContent = async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('content_en,content_ko')
+        .eq('id', article.id)
+        .single()
+
+      if (!error && data) {
+        setFullArticle(prev => prev ? { ...prev, ...data } : { ...article, ...data })
+      }
+    }
+
+    fetchContent()
+  }, [article?.id])
 
   useEffect(() => {
     const el = mainRef.current
@@ -117,7 +139,8 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
     )
   }
 
-  const content = language === 'ko' ? article.content_ko : article.content_en
+  const displayArticle = fullArticle || article
+  const content = language === 'ko' ? (displayArticle?.content_ko || '') : (displayArticle?.content_en || '')
 
   if (!ready) {
     return (
