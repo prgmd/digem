@@ -430,6 +430,11 @@
     - Articles 데이터 크기: 200 kB → 16.8 kB (**92% ↓**)
     - Articles 로딩 시간: 3.14초 → 252ms (**92% ↓**)
     - Albums 로딩 시간: 112ms (매우 빠름)
+- [x] TypeScript 타입 중앙화
+  - Mock data 전체 삭제 (`/app/dev` 디렉토리)
+  - `lib/types.ts` 신규 작성: Article, Album, Artist 공유 타입 정의
+  - ArticlesClient, ArticleDetail, Sidebar, AlbumsClient, ArtistClient에서 import
+  - **효과**: 타입 불일치 버그 제거, 유지보수 용이
 
 ---
 

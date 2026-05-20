@@ -1,21 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-
-interface Artist {
-  id: string
-  name: string
-  name_ko?: string
-}
-
-interface Album {
-  id: string
-  title: string
-  artist: string
-  artwork_url: string
-  release_date: string
-  album_type: string
-}
+import { Album, Artist } from '@/lib/types'
 
 interface Props {
   artist: Artist

@@ -1,15 +1,5 @@
 'use client'
-
-interface Article {
-  id: number
-  title: string
-  title_ko?: string
-  author: string
-  source: string
-  source_url?: string
-  published_at: string
-  category: string
-}
+import { Article } from '@/lib/types'
 
 const SVG_SOURCES: Record<string, string> = {
   pitchfork: '/files/pitchfork.svg',

@@ -1,21 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Album } from '@/lib/types'
 import CategoryHeader from '@/components/CategoryHeader'
 import Spinner from '@/components/Spinner'
 import { useAlbumFilters } from '@/components/useAlbumFilters'
 import { selectStyle } from '@/lib/styles'
 
-export interface Album {
-  id: string
-  title: string
-  artist: string
-  artwork_url: string
-  release_date: string
-  region: string
-  album_type: string
-  is_featured: boolean
-}
+export type { Album }
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)

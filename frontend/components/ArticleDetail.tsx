@@ -1,21 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
+import { Article } from '@/lib/types'
 import Spinner from '@/components/Spinner'
-
-interface Article {
-  id: number
-  title: string
-  title_ko?: string
-  author: string
-  source: string
-  source_url?: string
-  thumbnail_url?: string
-  thumbnail_credit?: string
-  published_at: string
-  content_en?: string
-  content_ko?: string
-}
 
 function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
   let result = raw
