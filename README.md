@@ -420,6 +420,19 @@
 
 ---
 
+### **2026-05-20 (Day 17)**
+#### ✅ 완료
+- [x] SQL 쿼리 최적화 — 불필요한 컬럼 제거
+  - `articles` 목록: `select('*')` → 명시적 컬럼 선택 (content_en, content_ko 제외)
+  - `articles` 본문 지연 로드: ArticleDetail에서 클릭 시에만 fetch
+  - `albums` 목록: `select('*')` → 필요한 컬럼만 선택
+  - **실제 측정 결과** (DevTools Network Tab - 캐시 비활성화):
+    - Articles 데이터 크기: 200 kB → 16.8 kB (**92% ↓**)
+    - Articles 로딩 시간: 3.14초 → 252ms (**92% ↓**)
+    - Albums 로딩 시간: 112ms (매우 빠름)
+
+---
+
 ## 예정 기능
 
 - [ ] 개별 칼럼 동적 라우트 (`articles/[id]`) — SEO 최적화

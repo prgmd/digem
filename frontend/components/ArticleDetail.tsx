@@ -13,7 +13,6 @@ interface Article {
   thumbnail_url?: string
   thumbnail_credit?: string
   published_at: string
-  category: string
   content_en?: string
   content_ko?: string
 }
@@ -212,7 +211,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
           marginBottom: '0.7rem',
         }}
       >
-        // {article.category || 'article'} · #{String(article.id).padStart(4, '0')}
+        // article · #{String(article.id).padStart(4, '0')}
       </div>
 
       {/* 제목 */}

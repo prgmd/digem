@@ -15,9 +15,8 @@ export interface Article {
   thumbnail_url?: string
   thumbnail_credit?: string
   published_at: string
-  category: string
-  content_en: string
-  content_ko: string
+  content_en?: string
+  content_ko?: string
 }
 
 const SOURCES = ['pitchfork', 'stereogum', 'consequence', 'bandcamp']
