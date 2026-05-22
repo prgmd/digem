@@ -5,6 +5,7 @@ import { Album } from '@/lib/types'
 import CategoryHeader from '@/components/CategoryHeader'
 import Spinner from '@/components/Spinner'
 import { useAlbumFilters } from '@/components/useAlbumFilters'
+import MarqueeText from '@/components/MarqueeText'
 import { selectStyle } from '@/lib/styles'
 
 export type { Album }
@@ -18,6 +19,107 @@ const formatDate = (dateString: string) => {
 }
 
 const PAGE_SIZE_CLIENT = 30
+
+interface AlbumCardProps {
+  album: Album
+  index: number
+  onArtistClick: (artist: string) => void
+}
+
+function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <div
+      className={`album-card ${album.is_featured ? 'is-featured' : ''}`}
+      style={{
+        opacity: 0,
+        animation: `pixelFadeIn 0.5s steps(10, end) ${index * 30}ms forwards`,
+        minWidth: 0,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div
+        className="album-artwork"
+        style={{
+          outline: album.is_featured ? '2px solid var(--accent-green)' : 'none',
+          outlineOffset: '2px',
+        }}
+      >
+        {album.is_featured && (
+          <span className="album-featured-mark">PICK</span>
+        )}
+        {album.artwork_url ? (
+          <img src={album.artwork_url} alt={album.title} />
+        ) : (
+          <span
+            className="mono"
+            style={{
+              fontSize: '2rem',
+              color: 'var(--border-bright)',
+              userSelect: 'none',
+              letterSpacing: '0.2em',
+              fontWeight: 700,
+            }}
+          >
+            {album.title[0].toUpperCase()}
+          </span>
+        )}
+      </div>
+
+      <MarqueeText
+        active={isHovered}
+        style={{
+          fontFamily: 'Pretendard, sans-serif',
+          fontWeight: 600,
+          fontSize: '1.1rem',
+          color: 'var(--text-color)',
+          marginBottom: '0.25rem',
+        }}
+      >
+        {album.title}
+      </MarqueeText>
+
+      <p
+        onClick={(e) => {
+          e.stopPropagation()
+          onArtistClick(album.artist)
+        }}
+        style={{
+          fontFamily: 'Pretendard, sans-serif',
+          fontWeight: 300,
+          fontSize: '0.95rem',
+          color: 'var(--meta-color)',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          marginBottom: '0.35rem',
+          cursor: 'pointer',
+          transition: 'color 0.08s steps(2, end)',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
+      >
+        {album.artist}
+      </p>
+
+      <p
+        className="mono"
+        style={{
+          fontSize: '0.7rem',
+          color: 'var(--meta-dim)',
+          letterSpacing: '0.05em',
+          textTransform: 'lowercase',
+        }}
+      >
+        {album.region === '국내' ? 'kr' : 'intl'}
+        {album.album_type ? ` · ${album.album_type.toLowerCase()}` : ''}
+        {album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
+      </p>
+    </div>
+  )
+}
 
 interface Props {
   albums: Album[]
@@ -153,111 +255,15 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
         )}
         <div className="album-grid">
           {paginated.map((album, index) => (
-            <div
+            <AlbumCard
               key={album.id}
-              className={`album-card ${album.is_featured ? 'is-featured' : ''}`}
-              style={{
-                opacity: 0,
-                animation: `pixelFadeIn 0.5s steps(10, end) ${index * 30}ms forwards`,
-                minWidth: 0,
+              album={album}
+              index={index}
+              onArtistClick={(artist) => {
+                setNavigating(true)
+                router.push(`/artists/${encodeURIComponent(artist)}`)
               }}
-            >
-              <div
-                className="album-artwork"
-                style={{
-                  outline: album.is_featured ? '2px solid var(--text-color)' : 'none',
-                  outlineOffset: '2px',
-                }}
-              >
-                {album.is_featured && (
-                  <span className="album-featured-mark">PICK</span>
-                )}
-                {album.artwork_url ? (
-                  <img src={album.artwork_url} alt={album.title} />
-                ) : (
-                  <span
-                    className="mono"
-                    style={{
-                      fontSize: '2rem',
-                      color: 'var(--border-bright)',
-                      userSelect: 'none',
-                      letterSpacing: '0.2em',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {album.title[0].toUpperCase()}
-                  </span>
-                )}
-                <div className="album-title-overlay">
-                  <span
-                    style={{
-                      fontFamily: 'Pretendard, sans-serif',
-                      fontWeight: 500,
-                      fontSize: '1rem',
-                      color: 'var(--text-color)',
-                      textAlign: 'center',
-                      lineHeight: 1.45,
-                      wordBreak: 'keep-all',
-                    }}
-                  >
-                    {album.title}
-                  </span>
-                </div>
-              </div>
-
-              <p
-                style={{
-                  fontFamily: 'Pretendard, sans-serif',
-                  fontWeight: 600,
-                  fontSize: '1.1rem',
-                  color: 'var(--text-color)',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {album.title}
-              </p>
-
-              <p
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setNavigating(true)
-                  router.push(`/artists/${encodeURIComponent(album.artist)}`)
-                }}
-                style={{
-                  fontFamily: 'Pretendard, sans-serif',
-                  fontWeight: 300,
-                  fontSize: '0.95rem',
-                  color: 'var(--meta-color)',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  marginBottom: '0.35rem',
-                  cursor: 'pointer',
-                  transition: 'color 0.08s steps(2, end)',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
-              >
-                {album.artist}
-              </p>
-
-              <p
-                className="mono"
-                style={{
-                  fontSize: '0.7rem',
-                  color: 'var(--meta-dim)',
-                  letterSpacing: '0.05em',
-                  textTransform: 'lowercase',
-                }}
-              >
-                {album.region === '국내' ? 'kr' : 'intl'}
-                {album.album_type ? ` · ${album.album_type.toLowerCase()}` : ''}
-                {album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
-              </p>
-            </div>
+            />
           ))}
         </div>
 

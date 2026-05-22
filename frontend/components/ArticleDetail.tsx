@@ -218,7 +218,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
           marginBottom: '2.5rem',
           padding: '0.85rem 1rem',
           border: '1px solid var(--border)',
-          borderLeft: '2px solid var(--meta-color)',
+          borderLeft: '2px solid var(--accent-green)',
           background: 'rgba(232, 213, 160, 0.015)',
         }}
       >

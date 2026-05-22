@@ -87,36 +87,6 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
           </span>
         </div>
 
-        {/* 중앙 라이브 표시 — 모바일에서는 숨김 */}
-        <div
-          className="mono header-live"
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '0.65rem',
-            color: 'var(--meta-dim)',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            pointerEvents: 'none',
-          }}
-        >
-          <span
-            style={{
-              display: 'inline-block',
-              width: 6,
-              height: 6,
-              background: 'var(--text-color)',
-              animation: 'caretBlink 1.4s steps(2, end) infinite',
-            }}
-          />
-          live
-        </div>
-
         {/* 햄버거 */}
         <button
           onClick={() => menuOpen ? closeMenu() : setMenuOpen(true)}
@@ -161,8 +131,8 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
             gap: '0.4rem',
             padding: '0 2.5rem',
             animation: menuClosing
-              ? 'menuSlideOutRight 0.3s steps(14, end) forwards'
-              : 'menuSlideInRight 0.35s steps(14, end)',
+              ? 'menuSlideOutRight 0.32s cubic-bezier(0.55, 0, 0.7, 0.2) forwards'
+              : 'menuSlideInRight 0.42s cubic-bezier(0.16, 1, 0.3, 1)',
           }}>
             <div
               className="mono"
