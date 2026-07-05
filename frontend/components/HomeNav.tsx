@@ -11,7 +11,7 @@ export default function HomeNav() {
       className="hero-nav"
       style={{
         display: 'flex',
-        gap: '2.5rem',
+        gap: '1.2rem',
         alignItems: 'center',
         fontFamily: 'var(--mono)',
       }}
@@ -20,14 +20,7 @@ export default function HomeNav() {
         <Link
           key={href}
           href={href}
-          className="bracket-btn"
-          style={{
-            fontSize: '0.92rem',
-            letterSpacing: '0.12em',
-            color: 'var(--text-color)',
-            textDecoration: 'none',
-            padding: '0.45rem 0.8rem',
-          }}
+          className="home-nav-btn"
         >
           {label}
         </Link>

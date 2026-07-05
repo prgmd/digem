@@ -183,18 +183,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
         borderBottom: '1px solid var(--border)',
         flexShrink: 0,
       }}>
-        <span
-          className="mono"
-          style={{
-            fontSize: '0.65rem',
-            color: 'var(--meta-dim)',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            marginRight: '0.4rem',
-          }}
-        >
-          // filter
-        </span>
         <button
           onClick={() => setFeaturedOnly(!featuredOnly)}
           className={`bracket-btn ${featuredOnly ? 'is-active' : ''}`}

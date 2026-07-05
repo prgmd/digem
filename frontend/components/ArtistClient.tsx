@@ -30,16 +30,15 @@ export default function ArtistClient({ artist, albums }: Props) {
       </button>
 
       <div
-        className="mono"
         style={{
-          fontSize: '0.7rem',
-          color: 'var(--meta-dim)',
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          marginBottom: '0.5rem',
+          fontFamily: 'bjorkfont, sans-serif',
+          fontSize: '1.5rem',
+          color: 'var(--meta-color)',
+          letterSpacing: '0.04em',
+          marginBottom: '0.35rem',
         }}
       >
-        // artist
+        artist
       </div>
 
       <h1

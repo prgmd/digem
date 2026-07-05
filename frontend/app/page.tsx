@@ -47,7 +47,7 @@ export default function Home() {
             textTransform: 'uppercase',
           }}
         >
-          // dig your uncut gems
+          dig your uncut gems
         </span>
       </div>
 
@@ -55,16 +55,12 @@ export default function Home() {
       <div
         className="hero-divider"
         style={{
-          fontFamily: 'var(--mono)',
-          color: 'var(--meta-dim)',
-          fontSize: '0.85rem',
-          letterSpacing: '0.05em',
+          width: '48px',
+          height: '1px',
+          background: 'var(--border-bright)',
           flexShrink: 0,
-          userSelect: 'none',
         }}
-      >
-        ─────── ◆ ───────
-      </div>
+      />
 
       {/* 하단: 네비 */}
       <div style={{

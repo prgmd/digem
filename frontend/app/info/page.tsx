@@ -67,7 +67,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
       style={{
         fontFamily: 'Pretendard, sans-serif',
         fontSize: '0.92rem',
-        fontWeight: 300,
+        fontWeight: 400,
         color: 'var(--text-color)',
         lineHeight: 1.75,
         wordBreak: 'keep-all',
@@ -101,18 +101,6 @@ export default function InfoPage() {
       <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 6vw, 5rem)' }}>
         <div style={{ maxWidth: '720px' }}>
 
-          <div
-            className="mono"
-            style={{
-              fontSize: '0.7rem',
-              color: 'var(--meta-dim)',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              marginBottom: '0.75rem',
-            }}
-          >
-            // cat about.txt
-          </div>
           <h1
             style={{
               fontFamily: 'Pretendard, sans-serif',
@@ -163,18 +151,6 @@ export default function InfoPage() {
             </Row>
           </Section>
 
-          <div
-            className="mono"
-            style={{
-              textAlign: 'left',
-              marginTop: '3rem',
-              color: 'var(--meta-dim)',
-              fontSize: '0.75rem',
-              letterSpacing: '0.08em',
-            }}
-          >
-            ─── EOF ─────────────────────────────────────
-          </div>
         </div>
       </div>
     </div>
