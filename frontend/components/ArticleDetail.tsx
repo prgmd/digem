@@ -110,17 +110,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         >
           digem
         </h1>
-        <p
-          className="mono"
-          style={{
-            fontSize: '0.72rem',
-            color: 'var(--meta-dim)',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-          }}
-        >
-          // select a record →
-        </p>
       </main>
     )
   }
@@ -186,20 +175,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       }}
     >
       <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-
-      {/* 카테고리 라벨 */}
-      <div
-        className="mono"
-        style={{
-          fontSize: '0.7rem',
-          color: 'var(--meta-color)',
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          marginBottom: '0.7rem',
-        }}
-      >
-        // article · #{String(article.id).padStart(4, '0')}
-      </div>
 
       {/* 제목 */}
       <h1 style={{
@@ -288,26 +263,10 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 300, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content, language) }}
       />
 
-      {/* 끝 표식 */}
-      <div
-        className="mono"
-        style={{
-          textAlign: 'center',
-          marginTop: '3rem',
-          paddingTop: '2rem',
-          borderTop: '1px solid var(--border)',
-          color: 'var(--meta-dim)',
-          fontSize: 'clamp(0.65rem, 2vw, 0.8rem)',
-          letterSpacing: '0.2em',
-          wordBreak: 'keep-all',
-        }}
-      >
-        ── ◆ EOF ◆ ──
-      </div>
       </div>
     </main>
     </div>

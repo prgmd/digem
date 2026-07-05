@@ -93,19 +93,6 @@ export default function Sidebar({
     }}>
       {/* 출처 필터 — 가로 토글 */}
       <div
-        className="mono"
-        style={{
-          fontSize: '0.65rem',
-          letterSpacing: '0.18em',
-          color: 'var(--meta-dim)',
-          textTransform: 'uppercase',
-          marginBottom: '0.5rem',
-          paddingLeft: '0.25rem',
-        }}
-      >
-        // source
-      </div>
-      <div
         style={{
           display: 'flex',
           flexWrap: 'wrap',

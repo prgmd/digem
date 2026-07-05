@@ -108,8 +108,8 @@ body::before {
   pointer-events: none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(232, 213, 160, 0.045) 0px,
-    rgba(232, 213, 160, 0.045) 1px,
+    rgba(232, 213, 160, 0.022) 0px,
+    rgba(232, 213, 160, 0.022) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -123,16 +123,15 @@ body::after {
   inset: 0;
   z-index: 9998;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, 0.55) 100%);
-  animation: crtFlicker 7s steps(80, end) infinite;
+  background: radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.45) 100%);
 }
 
 @media (max-width: 768px) {
   body::before {
     background: repeating-linear-gradient(
       to bottom,
-      rgba(232, 213, 160, 0.03) 0px,
-      rgba(232, 213, 160, 0.03) 1px,
+      rgba(232, 213, 160, 0.015) 0px,
+      rgba(232, 213, 160, 0.015) 1px,
       transparent 1px,
       transparent 4px
     );
@@ -236,35 +235,6 @@ body::after {
   .hero-logo    { font-size: 3.6rem !important; }
   .hero-tagline { font-size: 0.62rem !important; }
 }
-
-/* ── mesh-bg (analog warmth kept smooth) ───────────────── */
-.mesh-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-.mesh-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, #000 42%, transparent 42%);
-  background-size: 7px 7px;
-  pointer-events: none;
-}
-.mesh-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(48px);
-  opacity: 0.85;
-  will-change: transform;
-  transform: translateZ(0);
-}
-.mesh-blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #0A3D2C 0%, #073026 50%, #04211B 100%); }
-.mesh-blob-2 { width: 550px; height: 550px; background: radial-gradient(circle, #093526 0%, #062821 50%, #03191A 100%); }
-.mesh-blob-3 { width: 450px; height: 450px; background: radial-gradient(circle, #04211B 0%, #02150F 50%, #010C08 100%); }
-.mesh-blob-4 { width: 600px; height: 600px; background: radial-gradient(circle, #062821 0%, #04201B 50%, #021511 100%); }
 
 /* ── article content classes ───────────────────────────── */
 .annotation {
@@ -412,11 +382,11 @@ body::after {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   background: none;
-  border: none;
-  color: var(--meta-color);
+  border: 1px solid var(--border-bright);
+  color: var(--text-color);
   cursor: pointer;
   padding: 0.35rem 0.5rem;
-  transition: color 0.08s steps(2, end), background 0.08s steps(2, end);
+  transition: color 0.08s steps(2, end), background 0.08s steps(2, end), border-color 0.08s steps(2, end);
   white-space: nowrap;
 }
 @media (max-width: 480px) {
@@ -431,10 +401,12 @@ body::after {
 .bracket-btn:hover {
   color: var(--bg-color);
   background: var(--text-color);
+  border-color: var(--text-color);
 }
 .bracket-btn.is-active {
   color: var(--bg-color);
   background: var(--text-color);
+  border-color: var(--text-color);
 }
 .bracket-btn.is-active::before,
 .bracket-btn.is-active::after { opacity: 1; }
@@ -446,6 +418,23 @@ body::after {
 .bracket-btn:disabled:hover {
   background: none;
   color: var(--meta-color);
+}
+
+/* home nav — filled amber button, black text */
+.home-nav-btn {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  text-decoration: none;
+  background: var(--text-color);
+  color: var(--bg-color);
+  padding: 0.6rem 1.6rem;
+  transition: background 0.1s steps(2, end), color 0.1s steps(2, end);
+}
+.home-nav-btn:hover {
+  background: var(--text-bright);
+  color: var(--bg-color);
 }
 
 /* ── albums ────────────────────────────────────────────── */
@@ -531,7 +520,7 @@ body::after {
   .album-grid-wrapper { padding: 1rem; }
   html { font-size: 14px; }
   .category-header { padding: 0 1rem !important; height: 52px !important; }
-  .header-tag { font-size: 0.58rem !important; letter-spacing: 0.12em !important; }
+  .header-tag { font-size: 1rem !important; letter-spacing: 0.03em !important; }
 }
 @media (max-width: 480px) {
   .album-grid { gap: 0.6rem; }

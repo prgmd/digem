@@ -71,20 +71,6 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
           >
             d
           </span>
-          <span
-            className="mono header-tag"
-            style={{
-              fontSize: '0.65rem',
-              letterSpacing: '0.18em',
-              color: 'var(--meta-dim)',
-              textTransform: 'uppercase',
-              opacity: logoHover ? 1 : 0.5,
-              transition: 'opacity 0.12s steps(3, end)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            // {currentCategory}
-          </span>
         </div>
 
         {/* 햄버거 */}
@@ -134,18 +120,6 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
               ? 'menuSlideOutRight 0.32s cubic-bezier(0.55, 0, 0.7, 0.2) forwards'
               : 'menuSlideInRight 0.42s cubic-bezier(0.16, 1, 0.3, 1)',
           }}>
-            <div
-              className="mono"
-              style={{
-                fontSize: '0.7rem',
-                letterSpacing: '0.18em',
-                color: 'var(--meta-dim)',
-                textTransform: 'uppercase',
-                marginBottom: '1.2rem',
-              }}
-            >
-              // navigate
-            </div>
             {CATEGORIES.map(cat => {
               const isCurrent = cat.key === currentCategory
               return (
