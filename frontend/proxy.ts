@@ -22,7 +22,7 @@ function isOpenPath(pathname: string): boolean {
   return false
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const password = process.env.SITE_PASSWORD
   const secret = process.env.GATE_SECRET
 
