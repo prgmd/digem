@@ -2,13 +2,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Article } from '@/lib/types'
+import { VISIBLE_SOURCES } from '@/lib/features'
 import CategoryHeader from '@/components/CategoryHeader'
 import Sidebar from '@/components/Sidebar'
 import ArticleDetail from '@/components/ArticleDetail'
 
 export type { Article }
 
-const SOURCES = ['pitchfork', 'stereogum', 'consequence', 'bandcamp']
+const SOURCES = [...VISIBLE_SOURCES]
 
 interface Props {
   articles: Article[]

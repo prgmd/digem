@@ -210,3 +210,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# 로컬 코드 분석 문서 (git 추적 제외)
+docs/
