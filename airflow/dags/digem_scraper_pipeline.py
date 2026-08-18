@@ -2,15 +2,15 @@
 dig-em.com 데이터 수집 파이프라인 DAG
 
 이 DAG는:
-1. 5개의 스크래퍼를 병렬로 실행 (Pitchfork, Stereogum, Consequence, Bandcamp, Melon)
+1. 4개의 스크래퍼를 병렬로 실행 (Pitchfork, Stereogum, Consequence, Melon)
+   * Bandcamp는 2026-08-18 약관 이슈로 제외 (docs/09-copyright-review.md §2.4)
 2. 각 스크래퍼는 독립적으로 작동 (번역, DB 저장 포함)
 3. 모든 스크래퍼 완료 후 완료 신호 발송
 
 구조:
-┌─ pitchfork_task ─┐
+┌─ pitchfork_task ──┐
 ├─ stereogum_task ──┤
 ├─ consequence_task ┼─→ pipeline_complete
-├─ bandcamp_task ───┤
 └─ melon_task ──────┘
 
 ** 주요 개념 **
@@ -48,14 +48,6 @@ def run_consequence_scraper():
     scraper = ConsequenceScraper()
     scraper.run(limit=5)
     print("✅ Consequence 스크래핑 완료")
-
-
-def run_bandcamp_scraper():
-    """Bandcamp 스크래퍼 실행"""
-    from scripts.column.bandcamp_scraper import BandcampDailyScraper
-    scraper = BandcampDailyScraper()
-    scraper.run(limit=5)
-    print("✅ Bandcamp 스크래핑 완료")
 
 
 def run_melon_scraper():
@@ -125,13 +117,6 @@ consequence_task = PythonOperator(
     dag=dag,
 )
 
-bandcamp_task = PythonOperator(
-    task_id='run_bandcamp_scraper',
-    python_callable=run_bandcamp_scraper,
-    pool='scraper_pool',
-    dag=dag,
-)
-
 melon_task = PythonOperator(
     task_id='run_melon_scraper',
     python_callable=run_melon_scraper,
@@ -152,7 +137,7 @@ complete_task = PythonOperator(
 # 모든 스크래퍼는 서로 독립적 → 병렬 실행
 
 
-[pitchfork_task, stereogum_task, consequence_task, bandcamp_task, melon_task] >> complete_task
+[pitchfork_task, stereogum_task, consequence_task, melon_task] >> complete_task
 
 # 해석:
 # - [task1, task2, task3] >> final_task

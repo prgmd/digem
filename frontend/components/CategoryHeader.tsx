@@ -1,16 +1,20 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ARTICLES_ENABLED } from '@/lib/features'
 
 interface CategoryHeaderProps {
   onLogoClick: () => void
   currentCategory: 'articles' | 'albums' | 'info'
 }
 
-const CATEGORIES = [
+const ALL_CATEGORIES = [
   { label: 'articles', path: '/articles', key: 'articles' },
   { label: 'albums',   path: '/albums',   key: 'albums'   },
 ] as const
+
+// 칼럼 섹션 비공개 중에는 메뉴에서 제외한다.
+const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_ENABLED)
 
 const INFO_ITEM = { label: 'info', path: '/info', key: 'info' } as const
 
