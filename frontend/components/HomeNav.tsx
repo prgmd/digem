@@ -1,8 +1,10 @@
 import Link from 'next/link'
+import { ARTICLES_ENABLED } from '@/lib/features'
 
 const LINKS = [
-  { href: '/articles', label: 'articles' },
-  { href: '/albums',   label: 'albums'   },
+  // 칼럼 섹션 비공개 중에는 진입점 자체를 노출하지 않는다.
+  ...(ARTICLES_ENABLED ? [{ href: '/articles', label: 'articles' }] : []),
+  { href: '/albums', label: 'albums' },
 ]
 
 export default function HomeNav() {

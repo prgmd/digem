@@ -1,3 +1,22 @@
+"""
+Bandcamp Daily 스크래퍼 — 2026-08-18 부로 **비활성**.
+
+수집 중단 사유:
+  Bandcamp의 Acceptable Use and Moderation Policy가 스크래핑·크롤링·
+  텍스트/데이터 마이닝을 명시적으로 금지한다. 수집 대상 매체 중 유일하게
+  약관에서 직접·명문으로 금지하는 곳이라 파이프라인에서 제외했다.
+  상세: docs/09-copyright-review.md §2.4
+
+변경 사항:
+  - scripts/main.py 의 COLUMN_SCRAPERS 에서 제외 (자동 실행 안 됨)
+  - Airflow DAG 에서 task 제거
+  - 봇 탐지 우회 옵션(--disable-blink-features / excludeSwitches) 삭제
+  - 기존 수집분은 DB에 보존하되 프론트 노출에서 제외
+    (frontend/lib/features.ts 의 VISIBLE_SOURCES)
+
+이 파일은 구현 참고용으로만 남겨둔다. 다시 켜려면 약관 재확인이 먼저다.
+"""
+
 import feedparser
 from typing import List, Dict
 from bs4 import BeautifulSoup
@@ -77,9 +96,6 @@ class BandcampDailyScraper(BaseScraper):
             options.add_argument('--headless')
             options.add_argument('--no-sandbox')
             options.add_argument('--disable-dev-shm-usage')
-            # Bandcamp는 자동화 탐지를 사용하므로 automation 플래그를 숨김
-            options.add_argument('--disable-blink-features=AutomationControlled')
-            options.add_experimental_option('excludeSwitches', ['enable-automation'])
             self._driver = webdriver.Chrome(service=Service(), options=options)
         return self._driver
 

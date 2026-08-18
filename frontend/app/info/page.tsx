@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
+import { ARTICLES_ENABLED } from '@/lib/features'
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section style={{ marginBottom: '2.5rem' }}>
@@ -114,29 +115,48 @@ export default function InfoPage() {
             colophon<span className="caret" style={{ marginLeft: '0.2em' }} aria-hidden />
           </h1>
 
+          {!ARTICLES_ENABLED && (
+            <Section title="notice">
+              <Row label="columns">
+                칼럼 섹션은 현재 <strong>비공개</strong>입니다. 원문 매체의 저작권 정책을
+                재검토하는 동안 일시적으로 닫아두었습니다. 정리가 끝나는 대로
+                적법한 형태로 다시 공개할 예정입니다.
+              </Row>
+              <Row label="status">
+                앨범 정보 섹션은 정상적으로 이용하실 수 있습니다.
+              </Row>
+            </Section>
+          )}
+
           <Section title="about">
             <Row label="service">
-              음악 웹진 칼럼을 자동 수집·번역하여 아카이빙하는 개인 프로젝트입니다.
-              원문 링크를 함께 제공하며, 번역은 참고용으로만 활용하시기 바랍니다.
+              음악 신보 정보를 정리해 아카이빙하는 비영리 개인 프로젝트입니다.
+              어떠한 광고·구독·유료 기능도 운영하지 않습니다.
             </Row>
-            <Row label="sources">Pitchfork · Stereogum · Consequence · Bandcamp · Melon</Row>
-            <Row label="engine">Gemini 2.5 Flash · Python pipeline · Apache Airflow · Supabase</Row>
+            <Row label="sources">Melon{ARTICLES_ENABLED && ' · Pitchfork · Stereogum · Consequence'}</Row>
+            <Row label="engine">Python pipeline · Apache Airflow · Supabase{ARTICLES_ENABLED && ' · Gemini 2.5 Flash'}</Row>
           </Section>
 
           <Section title="copyright">
             <Row label="content">
-              각 기사의 저작권은 원 출처에 있습니다. Pitchfork는 Condé Nast,
-              Rolling Stone은 Penske Media Corporation 소유입니다.
-              digem은 원문 출처 링크를 제공하며 어떠한 소유권도 주장하지 않습니다.
+              각 저작물의 저작권은 원 출처에 있습니다. digem은 어떠한 소유권도 주장하지 않으며,
+              원문 출처 링크를 함께 제공합니다.
             </Row>
-            <Row label="thumbnails">
-              각 썸네일 이미지의 저작권은 해당 사진가 및 에이전시에 있습니다.
-              저작권 표기는 이미지 하단에 기재되어 있습니다.
+            <Row label="artwork">
+              앨범 아트워크의 저작권은 해당 아티스트 및 음반사에 있습니다.
+              digem은 이미지를 복제·재호스팅하지 않고 원 출처를 참조합니다.
             </Row>
-            <Row label="translations">
-              자동 번역된 텍스트는 참고 목적으로만 제공됩니다.
-              번역의 정확성을 보장하지 않으며, 원문 확인을 권장합니다.
+            <Row label="takedown">
+              게재된 내용에 대해 삭제 또는 수정을 요청하시려면 아래 연락처로 알려주시기 바랍니다.
+              확인 후 신속히 조치하겠습니다.
             </Row>
+            <Row label="contact">{/* TODO: 공개용 연락처 기입 */}—</Row>
+            {ARTICLES_ENABLED && (
+              <Row label="translations">
+                자동 번역된 텍스트는 참고 목적으로만 제공됩니다.
+                번역의 정확성을 보장하지 않으며, 원문 확인을 권장합니다.
+              </Row>
+            )}
           </Section>
 
           <Section title="fonts">
