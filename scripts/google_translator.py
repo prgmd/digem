@@ -148,8 +148,21 @@ def strip_noise(text: str) -> str:
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(kept)).strip()
 
 
+# 목록 기호는 프론트에 대응 렌더링이 없어 화면에 '* ' 가 그대로 노출된다(규칙 6 위반).
+#
+# 단, '### ' 는 제거하지 않는다 — ArticleDetail.tsx 가 이를 .content-h3 소제목으로
+# 렌더링하므로 마크다운 잔재가 아니라 이 프로젝트가 의도적으로 쓰는 마크업이다.
+#
+# \s 대신 [ \t] 를 쓰는 이유: \s 는 개행까지 먹어 앞 줄과 합쳐진다.
+_MD_BULLET = re.compile(r'^[ \t]{0,3}[*-][ \t]+', re.M)
+
+
+def strip_list_markers(text: str) -> str:
+    return _MD_BULLET.sub('', text)
+
+
 def postprocess(text: str) -> str:
-    return dedupe_annotations(strip_noise(text))
+    return strip_list_markers(dedupe_annotations(strip_noise(text)))
 
 
 class GeminiTranslator:
