@@ -15,7 +15,8 @@ supabase>=2.9.0
 upstash-redis==1.6.0
 
 # AI/Translation
-google-generativeai==0.3.2
+# Gemini는 REST(generativelanguage.googleapis.com)를 requests 로 직접 호출한다.
+# 구 SDK(google-generativeai)는 thinking 설정을 지원하지 않고 버전 호환 이슈가 있어 제거함.
 
 # Utilities
 python-dotenv==1.0.1

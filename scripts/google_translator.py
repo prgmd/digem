@@ -1,9 +1,116 @@
 import os
+import re
 from typing import Optional
-import google.generativeai as genai
+
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+
+MODEL = 'gemini-2.5-flash'
+API_URL = f'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent'
+
+# thinking(내부 추론)을 끈다.
+#
+# 2.5-flash는 thinking이 기본 활성이며 출력 예산과 요금을 함께 소모한다.
+# 실측: 번역문 대비 1.7~4.9배의 토큰이 thinking에만 쓰이고 있었다(전체의 약 65%).
+# 번역 품질 자체는 켜고 끈 차이가 거의 없었고, 차이가 나던 항목
+# (중복 병기 정리, 앞뒤 노이즈 제거)은 아래 후처리로 결정론적으로 해결한다.
+# 상세: docs/11-prompt-analysis.md
+#
+# 주의: 중간값(2048·4096)은 오히려 용어 설명(규칙 4b)이 사라진다. 0 아니면 기본값.
+THINKING_BUDGET = 0
+
+# SDK 대신 REST를 직접 호출하는 이유:
+# google-generativeai 구버전에는 thinking 설정 자체가 없고, 버전별 호환 문제가 보고되어 있다.
+# REST는 요청 형식이 고정되어 있어 SDK 버전에 영향받지 않는다.
+
+
+# ==================== 번역 후처리 ====================
+# AI를 쓰지 않는 결정론적 정리. 프롬프트만으로는 100% 보장되지 않는 두 가지를 처리한다.
+#   1) 중복 병기 — "첫 언급 시에만 병기"(규칙 1). 문자열 대조라 규칙으로 확실히 해결된다.
+#   2) 앞뒤 노이즈 — 매체 템플릿에서 나오는 타임스탬프·예고 문구(규칙 7).
+# 실측: 11건 적용 시 중복 병기 5개 → 0개, 노이즈 7줄 제거, 본문 손실 0.
+
+_ANNOT = re.compile(r'`([^`]+)`')
+
+
+def dedupe_annotations(text: str) -> str:
+    """같은 항목의 2번째 이후 병기를 제거한다.
+
+    병기 형식이 `한글`English`` 구조라 백틱 부분만 지우면 앞의 한글이 그대로 남는다.
+    규칙 1(첫 언급 시에만 병기)이 원하는 결과와 정확히 일치한다.
+    """
+    best = {}
+    for h in _ANNOT.findall(text):
+        k = h.split(';')[0].strip()
+        # 같은 항목이 4a/4b 두 형태로 나오면 설명(;)이 있는 쪽을 남긴다
+        if k not in best or (';' in h and ';' not in best[k]):
+            best[k] = h
+    seen = set()
+
+    def repl(m):
+        k = m.group(1).split(';')[0].strip()
+        if k in seen:
+            return ''
+        seen.add(k)
+        return '`' + best[k] + '`'
+
+    return _ANNOT.sub(repl, text)
+
+
+# 노이즈는 본문 앞뒤에만 붙는다는 관찰에 근거해 위치를 제한한다.
+# 중간 문단은 건드리지 않는다 — 오탐 시 본문이 잘리기 때문.
+_HEAD_SCAN, _TAIL_SCAN = 3, 4
+
+_HEAD_NOISE = [
+    # stereogum 기사 상단 타임스탬프 (표본 3/3에서 동일 형식으로 등장)
+    r'^\d{4}년\s*\d{1,2}월\s*\d{1,2}일.*(표준시|오전|오후)',
+    r'^(사진|이미지|글)\s*[:：]',
+]
+_TAIL_NOISE = [
+    # stereogum 하단 다음 코너 예고 (표본 3/3)
+    r'이번 주.{0,10}가장 중요한 음악.*밈',
+    # pitchfork 하단 (프론트엔드도 별도 필터링 중)
+    r'더 보기\s*$',
+    r'(구독|뉴스레터|newsletter|subscribe)',
+    r'(이 책을|책을 사|구매하실|주문하실)',
+]
+
+# 콜론으로 끝나고 뒤에 내용이 없는 짧은 줄 = 잘린 소제목
+# (예: "이번 주 주목할 만한 다른 앨범들:", "제가 듣고 있는 것:")
+# 콜론 뒤에 실제 내용이 있으면 본문으로 보고 남긴다.
+_DANGLING_HEADER = re.compile(r'^.{0,40}[:：]\s*$')
+
+
+def _strip_edge(lines, patterns, from_end=False):
+    idx = range(len(lines) - 1, -1, -1) if from_end else range(len(lines))
+    scan = _TAIL_SCAN if from_end else _HEAD_SCAN
+    drop, checked = set(), 0
+    for i in idx:
+        if not lines[i].strip():
+            continue
+        checked += 1
+        if checked > scan:
+            break
+        if any(re.search(p, lines[i]) for p in patterns):
+            drop.add(i)
+        elif from_end and _DANGLING_HEADER.match(lines[i].strip()):
+            drop.add(i)
+    return drop
+
+
+def strip_noise(text: str) -> str:
+    """본문 앞뒤의 메타데이터·홍보 문구를 제거한다."""
+    lines = text.split('\n')
+    drop = _strip_edge(lines, _HEAD_NOISE) | _strip_edge(lines, _TAIL_NOISE, from_end=True)
+    kept = [l for i, l in enumerate(lines) if i not in drop]
+    return re.sub(r'\n{3,}', '\n\n', '\n'.join(kept)).strip()
+
+
+def postprocess(text: str) -> str:
+    return dedupe_annotations(strip_noise(text))
+
 
 class GeminiTranslator:
     def __init__(self):
@@ -11,11 +118,23 @@ class GeminiTranslator:
         if not api_key:
             raise ValueError('API KEY가 환경 변수에 설정되지 않았습니다.')
 
-        genai.configure(api_key=api_key)
-        # 2.5-flash: 번역 품질과 속도·비용의 균형점, pro 대비 응답 지연이 적어 배치 처리에 적합
-        self.model = genai.GenerativeModel('models/gemini-2.5-flash')
+        self.api_key = api_key
+        self.session = requests.Session()
 
         print('Gemini 초기화 완료')
+
+    def _generate(self, prompt: str) -> str:
+        """Gemini에 프롬프트를 보내고 응답 텍스트를 반환한다."""
+        body = {
+            'contents': [{'parts': [{'text': prompt}]}],
+            'generationConfig': {'thinkingConfig': {'thinkingBudget': THINKING_BUDGET}},
+        }
+        response = self.session.post(
+            API_URL, params={'key': self.api_key}, json=body, timeout=300
+        )
+        response.raise_for_status()
+        candidate = response.json()['candidates'][0]
+        return ''.join(p.get('text', '') for p in candidate['content']['parts'])
 
     def translate_article(self, title: str, content: str) -> dict:
         """기사 제목과 본문을 한국어로 번역해 반환한다. 실패 시 status='failed'로 표기된 dict 반환."""
@@ -35,10 +154,9 @@ class GeminiTranslator:
         # 제목은 짧아서 아티스트명을 항상 병기해도 가독성에 무리 없음
         # 본문(_translate_content)과 달리 '첫 언급 시에만' 규칙을 적용하지 않음
         prompt = f'당신은 음악 평론 전문 번역가입니다. 다음 음악 칼럼 제목을 한국어로 번역해주세요. 아티스트명은 한글 뒤에 백틱으로 영문 병기 (ex: 테일러 스위프트`Taylor Swift`). 부연 설명 없이 번역된 제목만 출력. 자연스러운 한국어로 번역. 제목: {title}'
-        response = self.model.generate_content(prompt)
-        return response.text.strip()
+        return self._generate(prompt).strip()
 
-    def _split_content(self, content: str, chunk_size: int = 10000) -> list:
+    def _split_content(self, content: str, chunk_size: int = 40000) -> list:
         """10,000자 초과 본문을 \n\n 경계 기준으로 청크 리스트로 분할한다."""
         chunks = []
         while len(content) > chunk_size:
@@ -53,8 +171,14 @@ class GeminiTranslator:
         return chunks
 
     def _translate_content(self, content: str) -> str:
-        """기사 본문을 한국어로 번역한다. 10,000자 초과 시 청크 분할 후 순차 번역."""
-        if len(content) > 10000:
+        """기사 본문을 한국어로 번역한다. 40,000자 초과 시 청크 분할 후 순차 번역.
+
+        임계값 근거: 최장 기사(원문 27,840자)를 단일 호출로 번역해도 출력 예산의 38%만
+        사용했다(실측). 40,000자여도 약 58%로 여유가 있다. 기존 10,000자는 근거 없이
+        보수적이어서 전체의 42%가 불필요하게 분할되고 있었고, 청크 경계마다
+        "첫 언급 시에만 병기" 규칙이 초기화되어 장문에서 위반율이 100%였다.
+        """
+        if len(content) > 40000:
             print(f'본문이 {len(content)}자로 길어 분할 번역합니다.')
             chunks = self._split_content(content)
             translated = [self._translate_chunk(chunk) for chunk in chunks]
@@ -87,8 +211,7 @@ class GeminiTranslator:
         # 규칙 4 — 백틱 방식: 괄호는 곡명·연도·feat. 등 다른 용도와 충돌하므로 백틱으로 대체
         # 규칙 6 — 저장 포맷이 plain text이므로 마크다운 기호가 그대로 노출됨
         # 규칙 7 — 웹 스크래핑 특성상 광고·구독 유도 문구가 본문에 섞여 들어옴
-        response = self.model.generate_content(prompt)
-        return response.text.strip()
+        return self._generate(prompt).strip()
 
 def main():
     translator = GeminiTranslator()
