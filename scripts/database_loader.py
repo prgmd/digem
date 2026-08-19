@@ -37,7 +37,14 @@ class SupabaseLoader:
                 # 번역 실패 기사도 저장하되, 번역 완료 시각은 성공한 경우에만 기록
                 'translated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S') if article_data.get('translation_status', 'success') == 'success' else None
             }
-            result = self.client.table('articles').insert(data).execute()
+            # 실패 사유는 실패했을 때만 넣는다.
+            # 성공 기사에는 키 자체를 넣지 않아, 아래 컬럼 미존재 대비 경로가
+            # 정상 동작(대다수)에는 영향을 주지 않도록 한다.
+            error = article_data.get('translation_error')
+            if error:
+                data['translation_error'] = str(error)[:500]
+
+            self._insert_article(data)
 
             print('DB 저장 완료')
             return True
@@ -45,6 +52,23 @@ class SupabaseLoader:
         except Exception as e:
             print(f'DB 저장 실패: {e}')
             return False
+
+    def _insert_article(self, data: Dict) -> None:
+        """articles insert. translation_error 컬럼이 아직 없으면 그 필드만 빼고 재시도한다.
+
+        컬럼 추가(supabase/add-translation-error.sql)는 콘솔에서 수동 실행해야 하므로,
+        누락된 상태로 파이프라인이 돌 수 있다. 그때 기사 자체를 잃는 것보다
+        사유만 포기하는 편이 낫다.
+        """
+        try:
+            self.client.table('articles').insert(data).execute()
+        except Exception as e:
+            if 'translation_error' not in data or 'translation_error' not in str(e):
+                raise
+            print('translation_error 컬럼이 없어 사유 없이 저장합니다. (마이그레이션 필요)')
+            self.client.table('articles').insert(
+                {k: v for k, v in data.items() if k != 'translation_error'}
+            ).execute()
 
     def article_exists(self, source_url: str) -> bool:
         """source_url로 기사 존재 여부를 확인한다. 중복 저장 방지용."""

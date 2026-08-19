@@ -25,6 +25,46 @@ THINKING_BUDGET = 0
 # google-generativeai 구버전에는 thinking 설정 자체가 없고, 버전별 호환 문제가 보고되어 있다.
 # REST는 요청 형식이 고정되어 있어 SDK 버전에 영향받지 않는다.
 
+REQUEST_TIMEOUT = 300
+
+# 실패 사유는 DB 컬럼에 한 줄로 저장되므로 길이를 제한한다.
+MAX_ERROR_LEN = 500
+
+
+class TranslationError(Exception):
+    """번역 실패 사유를 사람이 읽을 수 있는 한 줄로 담는 예외.
+
+    requests·KeyError 등 원본 예외를 그대로 흘리면 "KeyError: 'parts'" 같은
+    해석 불가능한 문자열이 DB에 남는다. 실패 지점을 이 예외로 정규화한다.
+    """
+
+
+# API 키는 요청 URL의 쿼리스트링에 실리므로 requests 예외 메시지에 그대로 들어온다.
+# 사유가 DB와 실행 로그에 남는 이상 반드시 가려야 한다.
+_SECRET = re.compile(r'(key=|AIza)[\w\-]+')
+
+
+def _redact(text: str) -> str:
+    return _SECRET.sub(lambda m: m.group(1) + '***', text)
+
+
+def _api_error_message(response) -> str:
+    """Gemini 오류 응답에서 status/message를 뽑는다. 형식이 다르면 본문 앞부분으로 대체."""
+    try:
+        err = response.json().get('error') or {}
+        detail = f"{err.get('status', '')} {err.get('message', '')}".strip()
+    except ValueError:
+        detail = response.text[:200]
+    return _redact(detail) or response.reason
+
+
+def _failure(stage: str, exc: Exception) -> dict:
+    """실패 결과 dict를 만든다. 사유는 '단계: 유형: 상세' 한 줄로 정규화한다."""
+    detail = str(exc) if isinstance(exc, TranslationError) else f'{type(exc).__name__}: {_redact(str(exc))}'
+    reason = f'{stage}: {detail}'[:MAX_ERROR_LEN]
+    print(f'번역 실패 — {reason}')
+    return {'title_ko': None, 'content_ko': None, 'status': 'failed', 'error': reason}
+
 
 # ==================== 번역 후처리 ====================
 # AI를 쓰지 않는 결정론적 정리. 프롬프트만으로는 100% 보장되지 않는 두 가지를 처리한다.
@@ -124,30 +164,83 @@ class GeminiTranslator:
         print('Gemini 초기화 완료')
 
     def _generate(self, prompt: str) -> str:
-        """Gemini에 프롬프트를 보내고 응답 텍스트를 반환한다."""
+        """Gemini에 프롬프트를 보내고 응답 텍스트를 반환한다.
+
+        모든 실패 경로를 TranslationError로 좁혀 사유를 분류 가능한 형태로 만든다.
+        분류를 나눠둔 이유는 대응 방법이 서로 다르기 때문이다 —
+        http_429는 재실행하면 되고, prompt_blocked는 그 기사를 포기해야 한다.
+        """
         body = {
             'contents': [{'parts': [{'text': prompt}]}],
             'generationConfig': {'thinkingConfig': {'thinkingBudget': THINKING_BUDGET}},
         }
-        response = self.session.post(
-            API_URL, params={'key': self.api_key}, json=body, timeout=300
-        )
-        response.raise_for_status()
-        candidate = response.json()['candidates'][0]
-        return ''.join(p.get('text', '') for p in candidate['content']['parts'])
+        try:
+            response = self.session.post(
+                API_URL, params={'key': self.api_key}, json=body, timeout=REQUEST_TIMEOUT
+            )
+        except requests.Timeout:
+            raise TranslationError(f'timeout: {REQUEST_TIMEOUT}초 내 응답 없음')
+        except requests.RequestException as e:
+            raise TranslationError(f'network: {_redact(str(e))}')
+
+        if response.status_code != 200:
+            raise TranslationError(f'http_{response.status_code}: {_api_error_message(response)}')
+
+        try:
+            payload = response.json()
+        except ValueError:
+            raise TranslationError('bad_response: JSON 파싱 실패')
+
+        # 프롬프트 자체가 차단되면 candidates가 아예 오지 않는다.
+        blocked = (payload.get('promptFeedback') or {}).get('blockReason')
+        if blocked:
+            raise TranslationError(f'prompt_blocked: {blocked}')
+
+        candidates = payload.get('candidates') or []
+        if not candidates:
+            raise TranslationError('empty_response: candidates 없음')
+
+        candidate = candidates[0]
+        reason = candidate.get('finishReason', 'STOP')
+        parts = (candidate.get('content') or {}).get('parts') or []
+        if not parts:
+            # SAFETY·RECITATION 등으로 본문 없이 종료된 경우
+            raise TranslationError(f'no_content: finishReason={reason}')
+
+        text = ''.join(p.get('text', '') for p in parts)
+        # 아래 둘 다 부분 응답이지만 원인이 정반대라 이름을 나눈다.
+        # 부분 응답을 성공으로 저장하면 본문이 중간에서 끊긴 채 사이트에 노출된다.
+        if reason == 'MAX_TOKENS':
+            # 길이 문제. 실측상 최장 기사도 출력 한도의 14%만 쓰므로 나오지 않아야 정상이다.
+            # 찍힌다면 chunk_size 전제가 깨졌다는 신호다.
+            raise TranslationError(f'truncated: 출력 한도 초과 ({len(text)}자까지 생성)')
+        if reason != 'STOP':
+            # 길이와 무관한 중단. RECITATION(학습 데이터 재현 차단)이 대표적이며,
+            # 가사 인용이 잦은 음악 평론에서는 실제로 나올 수 있다. 청크를 줄여도 해결되지 않는다.
+            raise TranslationError(f'incomplete: finishReason={reason} ({len(text)}자까지 생성)')
+        return text
 
     def translate_article(self, title: str, content: str) -> dict:
-        """기사 제목과 본문을 한국어로 번역해 반환한다. 실패 시 status='failed'로 표기된 dict 반환."""
+        """기사 제목과 본문을 한국어로 번역해 반환한다.
+
+        실패해도 예외를 올리지 않고 status='failed' + error(사유)를 담아 반환한다.
+        호출부가 이 사유를 기사와 함께 DB에 저장하므로, 재수집 없이 나중에
+        원인별로 집계할 수 있다 (base_scraper.run / database_loader.save_article 참고).
+        """
         # 제목과 본문을 별도 메서드로 분리한 이유: 각각 다른 프롬프트 규칙이 필요하기 때문
-        # 실패 시 None을 반환하되 status 필드로 구분 → DB에 실패 기록도 저장 가능 (database_loader 참고)
+        # 사유에 단계를 붙이는 것도 같은 맥락 — 둘은 프롬프트도 길이도 달라 실패 양상이 다르다
         print('번역을 시작합니다.')
         try:
             title_ko = self._translate_title(title)
-            content_ko = self._translate_content(content)
-            return {'title_ko': title_ko, 'content_ko': content_ko, 'status': 'success'}
         except Exception as e:
-            print(f'번역 실패: {e}')
-            return {'title_ko': None, 'content_ko': None, 'status': 'failed', 'error': str(e)}
+            return _failure('title', e)
+
+        try:
+            content_ko = self._translate_content(content)
+        except Exception as e:
+            return _failure('content', e)
+
+        return {'title_ko': title_ko, 'content_ko': content_ko, 'status': 'success', 'error': None}
 
     def _translate_title(self, title: str) -> str:
         """기사 제목을 한국어로 번역한다. 아티스트명은 항상 한글(영문) 병기."""

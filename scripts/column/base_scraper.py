@@ -106,6 +106,8 @@ class BaseScraper(ABC):
 
             result = translator.translate_article(article['title'], full_content)
             if result['status'] != 'success':
+                # 실패 사유를 함께 저장한다. 이 기사는 재수집되지 않으므로(중복 체크에 걸림)
+                # 지금 남기지 않으면 왜 실패했는지 확인할 방법이 없다.
                 print('번역 실패. 영문 상태로 DB에 저장합니다.')
                 loader.save_article({
                     'title': article['title'],
@@ -119,6 +121,7 @@ class BaseScraper(ABC):
                     'thumbnail_url': article.get('thumbnail_url'),
                     'thumbnail_credit': thumbnail_credit,
                     'translation_status': 'failed',
+                    'translation_error': result.get('error'),
                 })
             else:
                 print('번역 완료')

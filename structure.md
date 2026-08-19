@@ -93,7 +93,7 @@ graph TD
 2. **Apache Airflow (DAG)**: 5개 스크래퍼의 의존성 및 병렬 실행 관리 (`scraper_pool`을 통한 리소스 제어)
 3. **데이터 수집 프로세스**: RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Gemini 번역 → Supabase 저장
    - 기사 간 10초 대기 (IP 차단 방지)
-   - 번역 실패 시 `translation_status = 'failed'` 저장 → 재수집 차단, 프론트 노출 제외
+   - 번역 실패 시 `translation_status = 'failed'` + `translation_error`(사유) 저장 → 재수집 차단, 프론트 노출 제외
 
 ---
 
@@ -123,7 +123,7 @@ graph TD
 
 | 테이블 | 주요 컬럼 |
 |---|---|
-| `articles` | id, title, title_ko, content_en, content_ko, source, source_url, author, published_at, thumbnail_url, thumbnail_credit, translation_status |
+| `articles` | id, title, title_ko, content_en, content_ko, source, source_url, author, published_at, thumbnail_url, thumbnail_credit, translation_status, translation_error |
 | `albums` | id, title, artist, release_date, artwork_url, album_type, region, is_featured |
 | `artists` | id, name |
 | `album_artists` | album_id, artist_id, order |
