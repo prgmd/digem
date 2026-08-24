@@ -1,449 +1,280 @@
-# dig-em.com
-음악 칼럼 자동 수집 및 번역 아카이빙 서비스
+<div align="center">
 
-→ 구조·플랜: [structure.md](structure.md)
+# digem
 
----
+**dig your uncut gems**
 
-## 📅 개발 진행 상황
+해외 음악 웹진의 칼럼을 매일 자동으로 모아 한국어로 번역해 쌓아 둡니다.
 
-### **2026-02-28 (Day 1)**
-#### ✅ 완료
-- [x] Supabase 프로젝트 생성 및 DB 스키마 설계
-  - albums, artists, genres, articles, lyrics, chart_history 테이블 생성
-  - 다대다 관계 설계 (album_artists, album_genres, article_albums 등)
-- [x] Upstash Redis 생성 (Seoul region)
-- [x] GitHub 레포지토리 생성 및 기본 구조 세팅
-- [x] 프로젝트 의존성 설정 (requirements.txt)
-- [x] 환경변수 템플릿 작성 (.env.example)
-- [x] Pitchfork RSS 크롤러 구현 (v0.1)
-  - RSS 피드 파싱 (feedparser)
-  - 기사 메타데이터 추출 (제목, 저자, 날짜, 요약, 썸네일)
-  - 전문 크롤링 (BeautifulSoup)
-  - figcaption 필터링 (사진 캡션 제외)
-  - 저작권 문구 이후 컨텐츠 제외
+<a href="https://www.dig-em.com/"><img src="https://img.shields.io/badge/dig--em.com-4169E1?style=for-the-badge&logo=vercel&logoColor=white" alt="dig-em.com"></a>
+
+![Python](https://img.shields.io/badge/Python%203.11-3776AB?style=flat-square&logo=python&logoColor=white)
+![Airflow](https://img.shields.io/badge/Airflow%202.10-017CEE?style=flat-square&logo=apacheairflow&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=flat-square&logo=supabase&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini%202.5%20Flash-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js%2016-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
+
+</div>
 
 ---
 
-### **2026-03-04 (Day 2)**
-#### ✅ 완료
-- [x] Gemini 2.5 Flash 번역 모듈 구현
-  - 제목 번역 (아티스트명 원문 병기)
-  - 본문 번역 (음악 용어 보존)
-  - 재시도 로직 (타임아웃 대응)
-- [x] Supabase 데이터 저장 로직 구현
-  - articles 테이블 INSERT
-  - 중복 체크 (source_url 기준)
-  - 새 칼럼만 필터링
-- [x] 전체 파이프라인 통합 및 테스트
-  - RSS 파싱 → 크롤링 → 번역 → DB 저장
-  - 3개 칼럼 성공적으로 저장 확인
-- [x] 카테고리 필터링 기능 추가
-  - Photo Gallery 제외
-  - Interview, Afterword 등만 수집
-- [x] 파일 구조 개선
-  - scripts 폴더 단일화
-  - pitchfork_scraper.py, google_translator.py, database_loader.py
+## 왜 만들었나
 
-#### 🚧 이슈
-- [x] 간헐적 Gemini API 타임아웃 (504 에러)
-  - 해결 방안: 재시도 로직 강화 필요
+음악 평론에서 읽을 만한 글은 대부분 영어입니다. Pitchfork, Stereogum, Consequence 같은 매체가 매일 롱폼 칼럼을 내놓는데, 번역기에 통째로 넣으면 장르명과 연주 기법이 엉뚱하게 바뀌어 문장이 무너집니다.
+
+digem은 이 문제를 **수집과 번역을 파이프라인으로 고정하는 방식**으로 풀었습니다. 매일 정해진 시각에 새 칼럼만 골라 가져오고, 음악 평론 문맥을 반영한 규칙으로 번역해 쌓습니다. 사람이 개입하는 단계는 없습니다.
 
 ---
 
-### **2026-03-19 (Day 3)**
-#### ✅ 완료
-- [x] Next.js 프론트엔드 초기 세팅 (`digem/frontend`)
-  - `digem-test` 작업 내용 전체 이식 (로고 이미지 제외)
-  - 불필요 코드 제거 (Tailwind 임포트, Geist 폰트, grain 애니메이션, 픽셀 그리드 오버레이 등)
-- [x] 디자인 토큰 정립 (globals.css)
-  - 색상 4종으로 통일: 옅은 베이지(`#E8D5A0`), 검정(`#000`), 짙은 초록(`#0a3d2e`), 메타(`#8a7a5a`)
-  - CSS 커스텀 프로퍼티 (`--text-color`, `--meta-color`, `--border`, `--hover-bg`, `--selected-bg` 등)
-- [x] Animated Mesh Gradient 배경 구현
-  - `MeshBackground.tsx` 컴포넌트 생성 (blurred div 3개)
-  - `requestAnimationFrame` + lerp(0.04)로 마우스 추적 그래디언트 이동
-  - `layout.tsx`에 전역 적용
-- [x] 페이지 전환 애니메이션 통일
-  - 홈 입장: `heroSlideUp`, `heroSlideInLeft`, `heroSlideInRight` 순차 애니메이션
-  - 카테고리 페이지 입장: `pageFadeIn 0.4s`, 퇴장: `pageFadeOut 0.35s`
-  - 카테고리 간 이동 시 전환 효과 제거 (`sessionStorage` `nofade` 플래그)
-- [x] Articles 페이지 리디자인
-  - 출처 필터를 드롭다운 단일 선택 방식으로 변경 (All 포함)
-  - 햄버거 버튼 → 오른쪽 슬라이드 패널 네비게이션 (`menuSlideInRight/OutRight`)
-  - 좌측 사이드바 너비 확장 (`480px`)
-- [x] Albums 페이지 신규 생성
-  - 지역 / 유형 / 연도 / 월 필터 (select)
-  - 앨범 그리드 (`auto-fill minmax(180px, 1fr)`), 카드별 staggered fadeIn
-- [x] `CategoryHeader` 공유 컴포넌트 추출
-  - 로고(좌) + 햄버거(우) + 오른쪽 슬라이드 패널을 단일 컴포넌트로 분리
-  - Props: `onLogoClick`, `currentCategory`
-  - Articles, Albums 페이지에 공통 적용
+## 아키텍처 — 서로를 모르는 두 반쪽
 
-#### 🚧 이슈
-- [x] 카테고리 간 이동 시 메시 그래디언트 플래시 현상
-  - 해결: `sessionStorage` 플래그로 카테고리→카테고리 이동 시 `pageFadeIn` 스킵
+```mermaid
+flowchart TB
+    GA["GitHub Actions<br/>매일 09:00 KST"]
+    AF["Airflow DAG<br/>digem_scraper_pipeline"]
+    SC["스크래퍼 5개<br/>Pitchfork, Stereogum, Consequence,<br/>Bandcamp Daily, Melon"]
+    GM["Gemini 2.5 Flash"]
+    DB[("Supabase PostgreSQL<br/>articles, albums, artists")]
+    SV["Next.js Server Component<br/>목록, 필터, 페이지네이션"]
+    CL["Client Component<br/>인터랙션, 본문 조회"]
+
+    GA --> AF --> SC
+    GM -. 번역 .-> SC
+    SC -- "service_role_key (INSERT)" --> DB
+    DB -- "anon_key (SELECT only)" --> SV --> CL
+```
+
+수집하는 쪽과 보여주는 쪽이 **서로의 존재를 모릅니다.** 스크래퍼는 프론트엔드가 있는지 모르고, 프론트엔드는 데이터가 어떻게 만들어졌는지 모릅니다. 둘 사이의 계약은 **DB 스키마 하나**뿐입니다.
+
+한쪽을 고쳐도 다른 쪽이 깨지지 않는 대신, **스키마를 바꾸면 양쪽을 손으로 맞춰야 합니다.** 컴파일러가 잡아주지 않는 종류의 결합입니다.
 
 ---
 
-### **2026-03-20 (Day 4)**
-#### ✅ 완료
-- [x] Supabase 연동 및 Server Component 전환
-  - `lib/supabase.ts` 생성 (클라이언트 설정)
-  - `app/articles/page.tsx` → Server Component (`async` 함수, `published_at` 내림차순 fetch)
-  - UI/인터랙션 로직 `components/ArticlesClient.tsx`로 분리 (`'use client'`)
-- [x] Articles 출처 필터 구조 변경
-  - NME, The Wire, Stereogum 제거 → All, Pitchfork, Rolling Stone 3종 고정 탭 버튼
-- [x] 사이드바 출처 아이콘 표기
-  - Pitchfork: SVG 로고 (`/files/pitchfork.svg`) + `filter: invert(1)`로 흰색 처리
-  - Rolling Stone: `RS` 텍스트 배지
-- [x] 번역 제목(`title_ko`) 파이프라인 통합
-  - `pitchfork_scrapers.py` `article_data`에 `title_ko` 추가
-  - `database_loader.py` `save_article()`에 `title_ko` 저장
-  - 프론트엔드 사이드바 및 상세 페이지 제목 `title_ko` 우선 표시
-- [x] 썸네일 파이프라인 통합
-  - `pitchfork_scrapers.py` `article_data`에 `thumbnail_url` 추가
-  - `database_loader.py` `save_article()`에 `thumbnail_url` 저장
-  - `ArticleDetail`에 썸네일 이미지 표시 (제목 상단)
-- [x] 원문 보기 링크 추가
-  - `ArticleDetail` 메타 정보 줄에 `source_url` 기반 외부 링크
-- [x] 번역 품질 개선 (Gemini 프롬프트)
-  - 마크다운 문법 출력 금지 (`**`, `*`, `#` 등)
-  - 본문 무관 내용 제거 지시 (더 보기, 광고, 뉴스레터 구독 유도 등)
-- [x] 프론트엔드 콘텐츠 클리닝
-  - `renderContent()` 함수: `더 보기` 라인 필터링 + `**bold**`/`*italic*` 마크다운 → HTML 변환
-- [x] Mesh Gradient 블롭 초기 위치 랜덤화
-  - 페이지 로드마다 3개 블롭 위치 랜덤 배치 (JS 초기화, CSS 고정값 제거)
-- [x] .gitignore 수정
-  - Python 템플릿의 `lib/` 무시 규칙으로 `frontend/lib/`가 누락되는 문제 해결 (`!frontend/lib/` 예외 추가)
+## 칼럼 한 건이 지나가는 길
 
-#### 🚧 이슈
-- [x] Vercel 배포 시 `sessionStorage is not defined` 오류
-  - 해결: `useState` 초기화 함수 내 `typeof sessionStorage === 'undefined'` 가드 추가
-- [x] Vercel 배포 시 `supabaseUrl is required` 오류
-  - 해결: `.gitignore`의 `lib/` 규칙으로 `frontend/lib/supabase.ts` 미포함 → 예외 규칙 추가
+```mermaid
+flowchart LR
+    A["RSS 피드"] --> B["카테고리 필터<br/>롱폼만 통과"]
+    B --> C{"이미 있는<br/>source_url?"}
+    C -- 있음 --> X["탈락"]
+    C -- 없음 --> D["전문 크롤링"]
+    D --> E["Gemini 번역"]
+    E --> F["규칙 기반 후처리"]
+    F --> G[("articles INSERT")]
+    E -- 실패 --> H["status=failed로<br/>그대로 저장"]
+    H --> G
+```
+
+순서에 의도가 들어간 지점이 두 곳입니다. **중복 체크가 크롤링과 번역보다 앞에 있고**, **번역 실패도 버리지 않고 저장합니다.** 둘 다 아래에 이유를 적었습니다.
 
 ---
 
-### **2026-03-20 (Day 4 - 후반)**
-#### ✅ 완료
-- [x] Supabase `articles` 테이블 `title_ko`, `thumbnail_url` 컬럼 추가
-- [x] Albums 페이지 Supabase 연동 및 Server Component 전환
-  - `app/albums/page.tsx` → Server Component, `components/AlbumsClient.tsx` 분리
-  - 기본 필터 전부 `all`, 페이지당 30개 번호 페이지네이션
-  - `is_featured` 컬럼 추가 및 추천 탭 필터 구현
-- [x] 멜론 스크래퍼 파이프라인 완성
-  - `melon_scraper.py` 신규 작성 (국내/해외 정규/EP 수집)
-  - `database_loader.py` 앨범 저장 메서드 추가 (`save_album`, `filter_new_albums`)
-  - 앨범 저장 시 `artists` 테이블 `get_or_create` + `album_artists` 자동 연결
-- [x] 아티스트 페이지 신규 생성
-  - `app/artists/[name]/page.tsx` — 아티스트명 기반 라우팅, album_artists 조인으로 앨범 목록 fetch
-  - `components/ArtistClient.tsx` — 뒤로가기 + 아티스트명 + 앨범 그리드 (간결한 구성)
-  - Albums 그리드에서 아티스트명 클릭 시 이동
-- [x] 번역 프롬프트 개선
-  - 아티스트명 첫 언급만 한글(영문) 병기, 이후 한글만 사용
-  - 앨범명·싱글명·곡명 원문 유지
-  - 장르·음악 용어 등 생소한 단어에 한해 병기 유지
-- [x] ArticleDetail UX 개선
-  - 원문 전환 시 제목도 영어 원제로 변경
-  - 썸네일 본문 바로 위로 이동
-  - 썸네일 로딩 완료 후 본문과 함께 표시 (스피너 로딩 UI)
-  - 본문 양쪽 맞춤 (`text-align: justify`) + `word-break: keep-all`
-  - 본문 영역 중앙 정렬 (`margin: 0 auto`)
-- [x] 추천작(`is_featured`) 강조 디자인
-  - 썸네일 초록 outline 테두리
-  - 왼쪽 상단 초록 배경 흰 글자 `d` 뱃지 (bjorkfont)
-- [x] 모바일 반응형 개선
-  - `html { font-size: 14px }` 모바일 전체 글씨 축소
-  - CategoryHeader, Sidebar, ArticleDetail 모바일 패딩 축소
-- [x] `tools/melon_seed.py` 신규 작성
-  - Selenium 기반 일회성 대량 시딩 스크립트 (국내/해외 각 N페이지)
-  - `tools/` 폴더로 메인 파이프라인과 분리
-- [x] ArticleDetail 본문 max-width 760px 제한 + 스크롤 렉 개선
-  - mesh blob `filter: blur` 70px 축소 + `will-change: transform` + `translateZ(0)` 추가
+## 설계 판단
 
-#### 🚧 이슈
-- [ ] 멜론 API 페이지네이션 미지원 — `startIndex`, `pageIndex` 등 모든 파라미터 무시됨
-  - `tools/melon_seed.py` Selenium으로 우회 (hash URL 방식)
+<details>
+<summary><b>중복 체크를 번역보다 앞에 둔 이유</b></summary>
 
----
+<br/>
 
-### **2026-03-23 (Day 5)**
-#### ✅ 완료
-- [x] 홈 페이지 세로 레이아웃 개선
-  - 구분선(`hr`)이 정확히 `50vh`에 위치하도록 상/하 절반 flex 분리
-  - 로고·태그라인은 상단 절반 하단 정렬, 네비게이션은 하단 절반 상단 정렬
-  - 모바일에서 콘텐츠가 아래로 쏠리던 문제 해결
-- [x] ArticleDetail sticky 헤더 도입
-  - `← 목록` + `원문/번역` 버튼을 스크롤에 고정되는 상단 바로 분리 (높이 44px)
-  - 모바일에서 긴 본문 스크롤 시에도 뒤로가기·언어 전환 항상 접근 가능
-- [x] 햄버거 메뉴 패널 너비 축소
-  - 고정 `220px` → `fit-content`로 변경, Articles/Albums 텍스트 너비에 자동 맞춤
-- [x] Albums 그리드 반응형 고정 열 수 적용
-  - `auto-fill minmax` 방식 폐기 → 브레이크포인트별 고정 열: `≥1200px` 6열, `900–1199px` 5열, `768–899px` 3열, `<768px` 2열
-  - 항상 정확히 30개 표시 → 마지막 줄 빈 공간 문제 자연 해결
-  - 6열 기준 `maxWidth: 1200px` 중앙 정렬로 초광폭 화면 대응
-- [x] Albums 모바일 그리드 잘림 수정
-  - grid item에 `minWidth: 0` 추가 — `whiteSpace: nowrap` 텍스트가 `1fr` 셀을 밀어내던 CSS Grid 기본값 문제 해결
-- [x] 썸네일 저작권 크레딧 파이프라인 추가
-  - `pitchfork_scrapers.py` — `fetch_full_content` 반환값을 dict로 변경, 첫 번째 `<figure>` → `<figcaption>` 텍스트를 `thumbnail_credit`으로 추출
-  - `database_loader.py` — `save_article`에 `thumbnail_credit` 저장 추가
-  - Supabase `articles` 테이블에 `thumbnail_credit TEXT` 컬럼 추가
-  - `ArticleDetail.tsx` — 썸네일 이미지 하단 왼쪽에 크레딧 텍스트 표시 (`0.8rem`, `var(--meta-color)`)
-- [x] Info 페이지 신규 생성 (`/info`)
-  - 햄버거 메뉴 맨 하단(구분선 아래)에서만 접근 가능
-  - About / 저작권 / 폰트 세 섹션으로 구성
-  - 햄버거 패널 항목 가로 중앙 정렬 적용
-  - bjorkfont 출처 수정 (FontZone 무료 배포 서체, 제작자 미상)
-- [x] 카카오톡 인앱 브라우저 로고 잘림 수정
-  - `html`에 `overflow-x: hidden` + `max-width: 100%` 추가 — 블롭 translate 시 body 폭이 순간 확장되던 문제 차단
+Gemini 호출은 돈이 들고 느립니다. 이미 수집한 기사를 다시 번역하면 그만큼 그대로 낭비됩니다.
 
----
+그래서 중복 판정을 **전문 크롤링보다도 먼저** 돌립니다. RSS에서 받은 `source_url` 목록으로 DB를 한 번 조회해 이미 있는 것을 걸러내고, 남은 것만 크롤링과 번역으로 넘깁니다.
 
-### **2026-04-07 (Day 6)**
-#### ✅ 완료
-- [x] Python 3.13 호환성 수정 (requirements.txt)
-  - `pydantic==2.5.3` → `2.10.6` (Python 3.13 pre-built wheel 없어 Rust 컴파일 시도 → 실패)
-  - `lxml==5.1.0` → `5.3.0` (동일 원인)
-- [x] `melon_scraper.py` 실행 — 국내/해외 정규·EP 7개 신규 저장
-- [x] `pitchfork_scrapers.py` The Pitch 칼럼 피드 추가
-  - `COLUMN_URL` 추가 (`feed-the-pitch/rss`), 기존 `RSS_URL` → `FEATURE_URL` rename
-  - `fetch_latest_reviews` 분리: `fetch_features()` / `fetch_columns()` / `_fetch_feed()` (private)
-    - The Pitch 피드는 칼럼 전용이므로 `filter_categories=False` 캡슐화
-  - 중복 `filter_new_articles` 이중 호출 버그 수정
-- [x] `pitchfork_scrapers.py` 실행 — features 2개 + columns 3개 수집, 신규 3개 번역 후 저장
+비용이 드는 단계를 뒤로 밀고, 싼 판정을 앞으로 당기는 순서입니다.
 
----
+</details>
 
-### **2026-04-20 (Day 7)**
-#### ✅ 완료
-- [x] Supabase RLS 적용
-  - `articles`, `albums`, `artists`, `album_artists` 테이블 RLS 활성화
-  - 퍼블릭 SELECT 전용 정책 추가 (anon 키 노출 대응)
-- [x] iOS WebKit 메인 로고 잘림 수정
-  - iPhone Chrome(WebKit)에서 `heroSlideInRight` 애니메이션이 순간적으로 레이아웃 너비를 확장, 중앙 정렬된 `digem` 로고 오른쪽이 잘리는 현상
-  - `app/page.tsx` 최상단 div에 `width: '100%'`, `overflowX: 'hidden'` 추가
-- [x] Stereogum 스크래퍼 추가 (`scripts/stereogum_scraper.py`)
-  - RSS 피드 파싱 (Columns, Reviews, Lists 카테고리 필터)
-  - BeautifulSoup 전문 크롤링 + 썸네일 크레딧 추출
-  - Gemini 번역 → Supabase 저장 파이프라인 연결
-- [x] Consequence 스크래퍼 추가 (`scripts/consequence_scraper.py`)
-  - Features(`?feed=rss2`), Editorials 두 피드 수집
-  - `/feed/` 경로 차단 우회: `?feed=rss2` 파라미터 사용
-- [x] Supabase service_role 키 오류 수정
-  - `scripts/.env`의 anon/service_role 키 혼용 문제 확인 및 수정
-  - JWT 디코딩으로 키 role 검증
-- [x] 출처 아이콘 SVG 확장
-  - `Sidebar.tsx` `SourceBadge` 리팩토링 — SVG 출처 맵(`SVG_SOURCES`) 도입
-  - Stereogum, Consequence SVG 로고 추가 (`public/files/`)
+<details>
+<summary><b>번역이 실패해도 저장하고, 재시도하지 않는 이유</b></summary>
 
----
+<br/>
 
-### **2026-04-20 (Day 8)**
-#### ✅ 완료
-- [x] 프론트엔드 출처 필터 탭 확장
-  - `ArticlesClient.tsx` SOURCES Rolling Stone 제거 → Stereogum, Consequence, Bandcamp 추가
-- [x] 출처 아이콘 Bandcamp SVG 추가 및 Stereogum 색반전 제외
-  - `Sidebar.tsx` `INVERT_SOURCES` Set 도입으로 출처별 invert 개별 제어
-- [x] `ArticleDetail` UI 개선
-  - 이미지·본문 중앙 정렬 불일치 수정 (본문 `maxWidth: 720px` 제거)
-  - 원문 보기 메타 텍스트에서 분리 → 썸네일 하단 단독 버튼으로 변경 (베이지 배경 + 검정 글씨)
-- [x] Bandcamp Daily 스크래퍼 추가 (`scripts/bandcamp_scraper.py`)
-  - RSS 피드 파싱 (Features, Lists, Scene Report 카테고리 필터)
-  - Cloudflare 봇 차단 우회: Selenium Chrome headless로 본문 크롤링
-  - `requirements.txt`에 `selenium>=4.20.0` 추가
-- [x] Consequence 썸네일 크레딧 RSS 직접 수집
-  - `media:copyright` 필드를 RSS 파싱 시 바로 추출 (HTML 스크래핑 불필요)
-  - HTML figcaption 폴백 유지
+번역이 실패하면 원문만 넣고 `translation_status='failed'`로 표시해 저장합니다. 프론트엔드는 `success`인 것만 조회하므로 화면에는 나오지 않습니다.
 
----
+**재시도 로직을 만들지 않고 "한 번 실패하면 버린다"를 택했습니다.** 실패 건도 DB에 남기 때문에 다음 실행에서 `source_url` 중복 체크에 걸려 다시 시도되지 않습니다.
 
-### **2026-04-23 (Day 9)**
-#### ✅ 완료
-- [x] `pitchforkScraper` → `PitchforkScraper` 클래스명 PEP 8 수정
-- [x] Pitchfork 저작권 체크 개선
-  - `'© 2026 Condé Nast' in text or '© 2025 Condé Nast'` → `'Condé Nast' in text` (연도 하드코딩 제거)
-- [x] `STRUCTURE.md` 삭제 → 내용을 `README.md` 상단에 통합
-  - 기술 스택, 디렉토리 구조, 데이터 파이프라인, DB 스키마, 환경변수 섹션 추가
-  - 디렉토리 구조에 Day 7/8에 추가된 스크래퍼 파일 반영
-- [x] `README.md` 개발 일지 정리
-  - 날짜 순서 수정 (Day 5→6→7→8 순으로 재배치)
-  - 일별 "다음 단계" 섹션 제거 → 상단 "미구현 / 예정 기능" 섹션에서 단일 관리
-- [x] 칼럼 스크래퍼 `scripts/column/` 패키지로 분리
-  - `scripts/__init__.py`, `scripts/column/__init__.py` 추가 (패키지화)
-  - `pitchfork_scrapers.py`, `stereogum_scraper.py`, `consequence_scraper.py`, `bandcamp_scraper.py` 이동
-  - 상대 import 방식으로 전환 (`from .base_scraper import BaseScraper` 등)
-- [x] `scripts/column/base_scraper.py` 신규 작성
-  - 4개 스크래퍼에 중복되던 공통 로직 추상 기반 클래스로 통합
-  - `_parse_date()` — 동일 구현이 4개 파일에 복사되던 것
-  - `_extract_content()` — figure 크레딧 + 단락 파싱 공통 헬퍼 (container selector, stop condition 파라미터)
-  - `run()` — 수집 → 중복체크 → 크롤링 → 번역 → 저장 → sleep 전체 파이프라인
-  - `article_data` dict 구성 — 4곳에서 반복되던 것 일원화
-- [x] `BandcampDailyScraper` 구조 개선
-  - `__del__` 제거 → `run()` override + `finally` 블록으로 드라이버 정리 보장
-  - `__init__`에서 즉시 초기화하던 Selenium 드라이버 → `_get_driver()` 지연 초기화로 전환
-- [x] `melon_scraper.py` 개선
-  - 모듈 수준 `main()` → 클래스 메서드 `run()`으로 전환
-  - import를 상대경로(`from .database_loader import SupabaseLoader`)로 수정
-- [x] `scripts/main.py` 신규 작성
-  - 칼럼 4종 + 멜론 앨범 전체 파이프라인을 단일 진입점에서 실행
-  - 실행: `python -m scripts.main` (정기 자동화 대비)
-- [x] 번역 실패 처리 개선
-  - 기존: 번역 실패 시 skip → 다음 수집 때 재시도 → 무한 실패 반복
-  - 변경: 실패 시 `translation_status = 'failed'`로 DB 저장 → 재수집 차단
-  - `database_loader.py` — `translation_status`를 하드코딩 대신 `article_data`에서 수신
-  - `app/articles/page.tsx` — Supabase 쿼리에 `.eq('translation_status', 'success')` 필터 추가
-- [x] Gemini 번역 재시도 로직 제거
-  - Exponential Backoff (최대 3회) 제거 → 단건 시도로 단순화
-  - 근거: 2차·3차 시도에서 성공한 사례 없음. 실패 시 위 번역 실패 처리로 대응
-- [x] Articles 페이지 출처 필터 드롭다운 전환 + Bandcamp 추가
-  - 탭 버튼 방식 → `<select>` 드롭다운으로 교체 (All + 4개 출처)
-  - `ArticlesClient.tsx` SOURCES에 `bandcamp` 추가
-- [x] Articles 페이지 서버사이드 페이지네이션 추가
-  - 전체 로딩 → 페이지당 20개 (`PAGE_SIZE = 20`)
-  - `articles/page.tsx` — Supabase `.range()` + `count: 'exact'`로 서버사이드 슬라이싱
-  - URL 파라미터 기반 상태 관리 (`?source=...&page=...`)
-  - `ArticlesClient.tsx` — `router.push` + `URLSearchParams`로 필터/페이지 이동
-  - `Sidebar.tsx` — 하단 `← N/M →` 페이지네이션 컨트롤 추가
+재시도를 넣으면 무엇을 몇 번까지 다시 할지, 실패가 쌓일 때 어떻게 멈출지를 모두 설계해야 합니다. 하루에 한 번 도는 배치에서 기사 몇 건을 놓치는 비용이 그 복잡도보다 싸다고 봤습니다.
+
+실패 사유는 한 줄로 정규화해 컬럼에 남깁니다. 원본 예외를 그대로 흘리면 해석할 수 없는 문자열이 DB에 쌓입니다.
+
+</details>
+
+<details>
+<summary><b>모델의 추론을 끄고 규칙 기반 후처리로 옮긴 이유 — 토큰 65% 절감</b></summary>
+
+<br/>
+
+`gemini-2.5-flash`는 thinking(내부 추론)이 기본으로 켜져 있고, 출력 예산과 요금을 함께 씁니다.
+
+실측해 보니 **번역문 대비 1.7~4.9배의 토큰이 thinking에만 쓰이고 있었습니다. 전체의 약 65%입니다.**
+
+그런데 켜고 끈 번역 품질 차이는 거의 없었습니다. 차이가 나는 항목이 딱 두 개였는데, **중복 영문 병기 정리**와 **앞뒤 노이즈 제거**였습니다. 둘 다 문자열 대조로 판정할 수 있는 일이라 결정론적 후처리로 옮기고 thinking 예산을 0으로 내렸습니다.
+
+**모델이 못 지키는 규칙을 모델에게 반복해서 요구하는 대신, 모델에게는 식별 가능한 표시만 맡기고 판정은 코드로 내렸습니다.** 품질은 유지하고 토큰은 65% 줄었습니다.
+
+중간값(2048, 4096)은 오히려 용어 설명 규칙이 사라져서 쓰지 않습니다. 0 아니면 기본값입니다.
+
+</details>
+
+<details>
+<summary><b>중복 영문 병기를 어떻게 지우는가 — 백틱을 표시로 쓴다</b></summary>
+
+<br/>
+
+번역 규칙은 "아티스트명은 첫 언급에만 영문을 병기하고 이후에는 한글만"입니다. 프롬프트로 요구해도 장문에서는 지켜지지 않았습니다.
+
+해법은 판정을 코드로 옮기는 것이었는데, 그러려면 **병기가 어디인지 기계가 알아야** 합니다. 그래서 프롬프트에서 영문 부분을 백틱으로 감싸게 했습니다. 병기가 자연어가 아니라 **식별 가능한 마크업**이 되는 순간입니다.
+
+이제 후처리는 정규식으로 백틱 구간만 뽑아 **두 번째 등장부터 지웁니다.**
+
+```python
+def repl(m):
+    k = m.group(1).split(';')[0].strip()
+    if k in seen:
+        return ''
+    seen.add(k)
+    return '`' + best[k] + '`'
+```
+
+**백틱 구간만 지우면 앞의 한글은 그대로 남습니다.** 문장이 깨지지 않으니 삭제가 안전합니다. 같은 항목이 한국어 풀이가 딸린 형태와 없는 형태로 둘 다 나오면, 설명이 있는 쪽을 첫 등장 위치에 남깁니다.
+
+실측: 11건에 적용해 **중복 병기 5건에서 0건, 노이즈 7줄 제거, 본문 손실 0건.**
+
+</details>
+
+<details>
+<summary><b>노이즈 제거를 본문 앞뒤로만 제한한 이유</b></summary>
+
+<br/>
+
+매체 템플릿에서 들어오는 타임스탬프, 다음 코너 예고, 뉴스레터 홍보 같은 문구를 지웁니다.
+
+이때 **본문 전체를 훑지 않고 앞 3줄과 뒤 4줄만 검사합니다.** 노이즈가 앞뒤에만 붙는다는 관찰에 근거한 제한입니다.
+
+중간 문단을 건드리지 않는 이유는 **오탐의 대가가 비대칭이기 때문**입니다. 노이즈 한 줄이 남는 것과 본문 한 문단이 잘려 나가는 것은 심각도가 다릅니다. 검사 범위를 좁히면 놓치는 노이즈가 생기지만, 본문을 훼손할 가능성은 사라집니다.
+
+</details>
+
+<details>
+<summary><b>매체 5곳을 템플릿 메서드로 묶은 이유</b></summary>
+
+<br/>
+
+매체마다 RSS 구조와 HTML이 다릅니다. 그런데 **"RSS를 읽고, 카테고리로 걸러내고, 중복을 확인하고, 본문을 가져와, 번역하고, 저장한다"는 순서는 전부 같습니다.**
+
+그래서 `BaseScraper`가 순서를 확정하고, 서브클래스는 달라지는 두 지점만 채웁니다.
+
+```
+BaseScraper (ABC)
+├── run(limit)              전체 흐름. 서브클래스가 건드리지 않는다
+├── _parse_date()           공통 유틸
+├── _extract_content()      공통 유틸, 본문 문단 수집
+├── fetch_articles()        @abstractmethod  매체마다 다름
+└── fetch_full_content()    @abstractmethod  매체마다 다름
+```
+
+매체를 추가할 때 파이프라인 순서를 다시 쓰지 않아도 되고, 순서를 고치면 5곳에 한 번에 반영됩니다.
+
+예외는 `BandcampDailyScraper` 하나입니다. Cloudflare 때문에 Selenium을 쓰는데, `run()`을 오버라이드해 부모의 `run()`을 `try` 안에서 호출하고 `finally`에서 드라이버를 종료합니다. **예외가 나든 말든 브라우저 프로세스를 반드시 정리해야** 하기 때문입니다. 안 하면 러너에 좀비 프로세스가 남습니다.
+
+</details>
+
+<details>
+<summary><b>서버 없이 Airflow를 돌리는 방법</b></summary>
+
+<br/>
+
+Airflow는 보통 스케줄러가 상시 떠 있어야 합니다. 개인 프로젝트에서 그 서버를 유지하는 비용이 아까웠습니다.
+
+digem은 **GitHub Actions 러너 안에서 Airflow를 매번 새로 설치하고 초기화한 뒤 한 번 실행하고 버립니다.**
+
+```
+GitHub Actions      언제 돌릴 것인가, 실행 환경 제공
+      ↓
+Apache Airflow      무엇을 어떤 순서로, 재시도와 타임아웃 정책
+      ↓
+Python 스크래퍼     실제로 무엇을 할 것인가
+```
+
+스케줄링과 오케스트레이션을 다른 계층으로 나눈 셈입니다. 스케줄링은 Actions의 cron이 맡고, Airflow는 DAG 정의와 실패 정책만 담당합니다.
+
+`PYTHONPATH`를 저장소 루트로 지정하지 않으면 DAG 안의 `scripts` 패키지 import가 실패합니다. Airflow 설정은 `AIRFLOW__<섹션>__<키>` 형식의 환경변수로 덮어씁니다.
+
+</details>
+
+<details>
+<summary><b>읽기 키와 쓰기 키를 나눈 이유</b></summary>
+
+<br/>
+
+Supabase에 두 개의 키로 접근합니다.
+
+| 주체 | 키 | 권한 |
+| --- | --- | --- |
+| 스크래퍼 | `service_role_key` | RLS 우회, INSERT |
+| 프론트엔드 | `anon_key` | SELECT only |
+
+프론트엔드 키는 **브라우저로 내려가기 때문에 공개된 것으로 취급해야 합니다.** 그 키로 쓰기가 되면 누구나 데이터를 넣을 수 있습니다.
+
+Row Level Security로 `anon` 역할에 SELECT만 허용하고, 쓰기는 서버 쪽에서만 쓰는 `service_role_key`로 제한했습니다. 키가 노출되는 것을 막는 대신 **노출되어도 할 수 있는 일을 줄이는** 접근입니다.
+
+</details>
 
 ---
 
-### **2026-04-30 (Day 10)**
-#### ✅ 완료
-- [x] `melon_scraper.py` 조기 종료 로직 추가
-  - 중복 체크 시 3개 앨범 연속 DB 존재 확인 시 이후 항목 순회 중단
-  - 멜론 목록이 최신순 정렬이므로 연속 3개 중복 = 이후 전부 기존 데이터로 간주
-  - 기존 `filter_new_albums()` 일괄 호출 → `album_exists()` 인라인 루프로 대체 (공용 메서드 영향 없음)
-  - 신규 앨범 발견 시 카운터 리셋
-- [x] 홈 페이지 네비게이션 로딩 피드백 추가
-  - `HomeNav` 클라이언트 컴포넌트 분리 — 클릭 즉시 스피너 표시, 반대 항목 fade out
-  - `app/articles/loading.tsx`, `app/albums/loading.tsx` 추가 — Server Component 데이터 fetch 중 자동 표시
-- [ ] DB 쿼리 최적화 검토
-  - `articles` 목록: `select('*')`로 `content_en`, `content_ko` 본문 전체 포함 중 → 컬럼 명시로 개선 예정
-  - `albums`: 페이지네이션 없이 전체 로딩 중
-  - 권장 인덱스: `(translation_status, published_at DESC)`, `(translation_status, source, published_at DESC)`, `albums(release_date DESC)`
+## 기술 스택
+
+| 영역 | 사용 기술 |
+| --- | --- |
+| **수집** | Python 3.11, requests, BeautifulSoup4, feedparser, lxml, Selenium(Bandcamp), Pydantic |
+| **번역** | Gemini 2.5 Flash (REST 직접 호출, thinking 비활성) |
+| **오케스트레이션** | Apache Airflow 2.10, GitHub Actions (cron 스케줄링) |
+| **저장** | Supabase (PostgreSQL), Row Level Security |
+| **캐시** | Upstash Redis |
+| **프론트엔드** | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4 |
+| **배포** | Vercel |
+| **수집 대상** | Pitchfork, Stereogum, Consequence, Bandcamp Daily, Melon |
+
+SDK 대신 Gemini REST API를 직접 호출합니다. `google-generativeai` 구버전에는 thinking 설정 자체가 없고 버전별 호환 문제가 보고되어 있어서, 요청 형식이 고정된 REST가 SDK 버전에 영향받지 않기 때문입니다.
 
 ---
 
-### **2026-05-04 (Day 11)**
-#### ✅ 완료
-- [x] Python 스크립트 전체 주석 정비
-  - 대상: `database_loader.py`, `google_translator.py`, `melon_scraper.py`, `base_scraper.py`, `pitchfork_scrapers.py`, `stereogum_scraper.py`, `consequence_scraper.py`, `bandcamp_scraper.py`, `main.py`, `tools/melon_seed.py`
-  - 모든 메서드에 docstring 추가 (무슨 함수인지 한 줄 요약)
-  - WHAT 주석(코드가 이미 설명하는 것) 제거, WHY 주석(설계 의도·비자명한 동작)으로 대체
-  - 주요 WHY 주석 예시:
-    - `service_role` 키를 사용하는 이유 (RLS 우회)
-    - `list-inside` → `list-outside` 교체 이유 (hanging indent 문제)
-    - Condé Nast / `© Copyright` 문구를 stop_condition으로 쓰는 이유 (푸터 감지)
-    - `limit * 3` 순회 이유 (카테고리 필터 후 limit 개를 채우기 위함)
-    - Bandcamp에 Selenium을 쓰는 이유 (Cloudflare 봇 차단 우회)
-    - `_get_driver()` lazy init 이유 (드라이버를 필요한 시점에만 생성)
-    - 기사 간 `time.sleep(10)` 이유 (IP 차단 방지)
-    - 멜론 해시 URL에 Selenium이 필요한 이유 (hash 기반 라우팅)
-    - 3연속 중복 조기 종료 이유 (최신순 정렬 기준으로 이미 따라잡은 것으로 판단)
-- [x] `google_translator.py` 장문 본문 분할 번역 기능 추가
-- [x] 프론트엔드 UI 개선
-  - 메인 페이지 blob 마우스 추적 → 자체 부유 애니메이션 전환 (sin/cos RAF)
-  - blob 4개로 확장
-  - 메인 페이지 콘텐츠 세로 위치 조정 (flex 1.1 / 0.9)
-  - articles 본문 제목(2.5→3rem), 본문(1.1→1.3rem), 목록·필터 전반 폰트 크기 +0.2rem
-  - albums 카드·필터 전반 폰트 크기 +0.2rem
-  - 아티스트 페이지 아티스트명 볼드 처리
-  - CategoryHeader 로고·햄버거·메뉴 항목, ArticleDetail 버튼·링크, ArtistClient 뒤로/카드 hover 및 transition 전반 추가
-- [x] 로딩 화면 개선 — digem 로고 제거, dot wave 애니메이션으로 교체 (베이지 점 3개 순차 bounce)
-  - `@keyframes dotWave` 추가 (`globals.css`), articles·albums `loading.tsx` 공통 적용
-- [x] 번역 본문 렌더링 개선 (`ArticleDetail.tsx`, `globals.css`, `google_translator.py`)
-  - **인라인 주석**: 백틱 형식 `` 힙합`Hip-hop` `` → `<span class="annotation">` (작은 글씨, opacity 0.5)
-    - 기존 괄호 방식에서 전환 — 곡명 괄호·연도·feat. 등과의 false positive 원천 차단
-    - Gemini 프롬프트 병기 형식 변경 및 기본값 '병기 없음'으로 강화
-  - **가사·직접 인용** `"..."` → 이탤릭 (`inline-quote`)
-    - 렌더링 순서 고정 (쌍따옴표 → 백틱): 이후 삽입되는 `class="..."` 속성값과의 충돌 방지
-  - `renderContent(raw, lang)` 언어 파라미터 추가 — 영문 원문 뷰에서 인용 스타일 비활성 (아포스트로피 충돌 방지)
-  - **본문 내 소제목** `### 텍스트` → `.content-h3` (1.4rem, bold) — Gemini 자동 생성 금지, 수동 편집 전용
-    - 렌더링 순서: 쌍따옴표 → 소제목 → 백틱 (class 속성값 충돌 방지)
-  - 10,000자 초과 본문을 `\n\n` 경계 기준으로 청크 분할 후 순차 번역
-    - `_split_content()` / `_translate_content()` / `_translate_chunk()` 분리
+## 프로젝트 구조
+
+```
+digem/
+├── scripts/
+│   ├── main.py                    진입점, 스크래퍼 순차 실행
+│   ├── column/
+│   │   ├── base_scraper.py        파이프라인의 심장, 템플릿 메서드
+│   │   ├── pitchfork_scrapers.py  피드 2개 병합, 카테고리 화이트리스트
+│   │   ├── stereogum_scraper.py   태그 기반 필터
+│   │   ├── consequence_scraper.py Editorials만, RSS에서 크레딧 추출
+│   │   └── bandcamp_scraper.py    Selenium, 드라이버 정리
+│   ├── melon_scraper.py           앨범 메타, 번역 없음
+│   ├── google_translator.py       Gemini 번역과 규칙 기반 후처리
+│   └── database_loader.py         Supabase CRUD 전담
+├── airflow/dags/
+│   └── digem_scraper_pipeline.py  DAG 정의
+├── frontend/                      Next.js
+│   ├── app/                       App Router 페이지
+│   ├── components/                기사 상세 등
+│   └── lib/                       Supabase 클라이언트, 타입
+├── supabase/                      스키마와 마이그레이션
+├── tools/melon_seed.py            일회성 대량 시딩
+└── docs/                          아키텍처, 파이프라인, 데이터 모델 문서
+```
 
 ---
 
-### **2026-05-15 (Day 13-14)**
-#### ✅ 완료
-- [x] Apache Airflow 데이터 파이프라인 자동화
-  - Airflow DAG 설정 (digem_scraper_pipeline.py)
-  - 5개 스크래퍼 병렬 실행 구조 구현
-  - Task 간 의존성 관리 (PythonOperator)
-  - 실패 시 자동 재시도 로직 (retries: 1, retry_delay: 5분)
-- [x] GitHub Actions 워크플로우 설정
-  - 24시간 스케줄 자동 실행 (cron: `0 0 * * *`)
-  - 수동 트리거 옵션 (workflow_dispatch)
-  - 환경 변수 관리 (GitHub Secrets)
-  - Airflow DAG 검증 및 실행
-- [x] 로컬 git 계정 통일 (`prgmd` / `neon9008@gmail.com`)
-  - 과거 62개 커밋 author 일괄 변경
-  - git filter-branch를 통한 히스토리 재작성
+## 알려진 한계
 
-#### 📚 학습 포인트
-- **Airflow DAG 설계**: Task 의존성 표현 (`>>` 연산자)
-- **병렬 처리**: 독립적 작업의 동시 실행으로 성능 향상
-- **GitHub Actions 통합**: Linux 환경에서의 Airflow 실행
-- **환경 변수 관리**: GitHub Secrets을 통한 API 키 보안 관리
+문서화 과정에서 코드를 다시 읽으며 확인한 것들입니다. 고치지 않은 상태로 기록해 둡니다.
 
----
-
-### **2026-05-16 (Day 15)**
-#### ✅ 완료
-- [x] 프론트엔드 비트-모노크롬 미학 전면 리뉴얼
-  - **CRT 레이어**: body::before scanline (1px, 8s 드리프트) + body::after vignette flicker (steps 80)
-  - **레트로 UI**: 모든 호버/전환을 `steps()` 애니메이션으로 변경 (cubic-bezier → 픽셀 스텝 페이드)
-  - **다이더링**: 앨범 아트워크 기본값 `grayscale + sepia + contrast` 필터 → hover 시 풀컬러
-  - **타이포그래피**: bjorkfont을 메인 홈 로고만으로 제한 (다른 곳은 Pretendard로 통일)
-  - **터미널 스타일**: 
-    - 홈 하단 `> sys / src / sync / db` 터미널 상태 블록 (Supabase 실시간 카운트, 시계, caret)
-    - 칼럼 메타를 `> SOURCE / BY / DATE / LINK` 박스로 변경
-    - 에러 페이지를 터미널 로그 스타일로 리디자인
-  - **어댑티브 UI**: 
-    - 모든 버튼 `[ label ]` 대괄호 래핑 + invert 호버 (amber bg → amber text)
-    - Sidebar 출처 선택기 `[ all ] [ pitchfork ] …` 토글 방식
-    - 페이지네이션 `[ prev ] 03/12 [ next ]` ASCII 스타일
-  - **독서 경험**: ArticleDetail 상단 1px amber reading-progress 바 추가
-  - **로딩**: Spinner → ASCII `▖▘▝▗` 회전 + `[████░░░░]` 진행 바 애니메이션
-  - **콜로폰**: Info 페이지 `cat about.txt` 스타일 + `colophon█` 깜빡이는 caret
-- [x] HomeStatus 컴포넌트 신규 생성
-  - 서버사이드 Supabase 쿼리로 articles/albums 카운트 fetch
-  - 클라이언트 타이머로 실시간 시계 표시
-  - 깜빡이는 caret 애니메이션
-
----
-
-### **2026-05-20 (Day 16)**
-#### ✅ 완료
-- [x] GitHub Actions Node.js 24 호환성 업데이트 (`checkout@v4→v5`, `setup-python@v4→v5`)
-
----
-
-### **2026-05-20 (Day 17)**
-#### ✅ 완료
-- [x] SQL 쿼리 최적화 — 불필요한 컬럼 제거
-  - `articles` 목록: `select('*')` → 명시적 컬럼 선택 (content_en, content_ko 제외)
-  - `articles` 본문 지연 로드: ArticleDetail에서 클릭 시에만 fetch
-  - `albums` 목록: `select('*')` → 필요한 컬럼만 선택
-  - **실제 측정 결과** (DevTools Network Tab - 캐시 비활성화):
-    - Articles 데이터 크기: 200 kB → 16.8 kB (**92% ↓**)
-    - Articles 로딩 시간: 3.14초 → 252ms (**92% ↓**)
-    - Albums 로딩 시간: 112ms (매우 빠름)
-- [x] TypeScript 타입 중앙화
-  - Mock data 전체 삭제 (`/app/dev` 디렉토리)
-  - `lib/types.ts` 신규 작성: Article, Album, Artist 공유 타입 정의
-  - ArticlesClient, ArticleDetail, Sidebar, AlbumsClient, ArtistClient에서 import
-  - **효과**: 타입 불일치 버그 제거, 유지보수 용이
-
----
-
-## 예정 기능
-
-- [ ] 개별 칼럼 동적 라우트 (`articles/[id]`) — SEO 최적화
-- [ ] SQL 튜닝 — 컬럼 명시, 페이지네이션, 인덱스 최적화
-- [ ] Redis 캐싱 (Upstash) — 조회수, 인기순 정렬
-- [ ] pg_trgm 검색 (PostgreSQL) — 제목 전문 검색
-- [ ] Rolling Stone 스크래퍼 추가
-- [ ] 디더링 고도화 (Canvas/sharp 진정 Bayer 디더링)
-- [ ] 모바일 터치 최적화 (44×44px 타겟)
+- **Airflow가 실제로는 순차 실행됩니다.** CI에서 메타 DB를 SQLite로 쓰는데, SQLite는 `SequentialExecutor`만 지원합니다. DAG는 5개 Task를 병렬로 선언했지만 한 번에 하나씩 돕니다
+- **`scraper_pool`을 만드는 코드가 없습니다.** 5개 Task가 모두 이 pool을 참조하는데 pool을 생성하는 호출이 어디에도 없어서, 의도한 동시성 제한이 실제로 걸리는지 불확실합니다
+- **스크래퍼 목록이 두 곳에 있습니다.** `main.py`의 리스트와 DAG의 하드코딩된 함수 목록입니다. 하나만 고치면 로컬 실행과 CI 실행이 갈라집니다
+- **인덱스를 적용하지 않았습니다.** 현재 데이터량에서는 문제가 없지만 조회 패턴은 이미 정해져 있습니다
