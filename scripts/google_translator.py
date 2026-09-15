@@ -318,7 +318,3 @@ class GeminiTranslator:
         # 규칙 6 — 저장 포맷이 plain text이므로 마크다운 기호가 그대로 노출됨
         # 규칙 7 — 웹 스크래핑 특성상 광고·구독 유도 문구가 본문에 섞여 들어옴
         return self._generate(prompt).strip()
-
-def main():
-    translator = GeminiTranslator()
-    result = translator.translate_article()

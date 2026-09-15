@@ -174,10 +174,3 @@ class SupabaseLoader:
                 print(f"{title[:40]} - {artist[:20]} 저장합니다.")
                 new_albums.append(album)
         return new_albums
-
-
-def main():
-    SupabaseLoader()
-
-if __name__ == "__main__":
-    main()

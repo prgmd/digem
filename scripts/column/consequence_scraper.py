@@ -6,7 +6,6 @@ from .base_scraper import BaseScraper
 
 
 class ConsequenceScraper(BaseScraper):
-    FEATURES_URL = "https://consequence.net/category/music/music-features/?feed=rss2"
     EDITORIALS_URL = "https://consequence.net/category/music/music-editorials/?feed=rss2"
 
     def fetch_articles(self, limit: int = 10) -> List[Dict]:
