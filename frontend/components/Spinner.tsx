@@ -1,12 +1,8 @@
 'use client'
-import { type CSSProperties } from 'react'
 
-interface SpinnerProps {
-  size?: number
-  style?: CSSProperties
-}
+const SIZE = 40
 
-export default function Spinner({ size = 40, style }: SpinnerProps) {
+export default function Spinner() {
   return (
     <div
       style={{
@@ -16,17 +12,16 @@ export default function Spinner({ size = 40, style }: SpinnerProps) {
         gap: '0.85rem',
         fontFamily: 'var(--mono)',
         color: 'var(--text-color)',
-        ...style,
       }}
     >
       {/* dot wave (3 amber blocks bouncing) */}
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', height: size * 0.55 }}>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', height: SIZE * 0.55 }}>
         {[0, 1, 2].map(i => (
           <span
             key={i}
             style={{
-              width: size * 0.22,
-              height: size * 0.22,
+              width: SIZE * 0.22,
+              height: SIZE * 0.22,
               background: 'var(--text-color)',
               display: 'inline-block',
               animation: `dotWave 1s steps(8, end) ${i * 0.15}s infinite`,
