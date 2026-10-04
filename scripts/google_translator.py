@@ -66,6 +66,87 @@ def _failure(stage: str, exc: Exception) -> dict:
     return {'title_ko': None, 'content_ko': None, 'status': 'failed', 'error': reason}
 
 
+def request_error(exc: Exception) -> TranslationError:
+    if isinstance(exc, requests.Timeout):
+        return TranslationError(f'timeout: {REQUEST_TIMEOUT}초 내 응답 없음')
+    return TranslationError(f'network: {_redact(str(exc))}')
+
+
+def parse_response(status_code: int, payload: Optional[dict], error_detail: str = '') -> str:
+    if status_code != 200:
+        raise TranslationError(f'http_{status_code}: {error_detail}')
+    if payload is None:
+        raise TranslationError('bad_response: JSON 파싱 실패')
+
+    # 프롬프트 자체가 차단되면 candidates가 아예 오지 않는다.
+    blocked = (payload.get('promptFeedback') or {}).get('blockReason')
+    if blocked:
+        raise TranslationError(f'prompt_blocked: {blocked}')
+
+    candidates = payload.get('candidates') or []
+    if not candidates:
+        raise TranslationError('empty_response: candidates 없음')
+
+    candidate = candidates[0]
+    reason = candidate.get('finishReason', 'STOP')
+    parts = (candidate.get('content') or {}).get('parts') or []
+    if not parts:
+        # SAFETY·RECITATION 등으로 본문 없이 종료된 경우
+        raise TranslationError(f'no_content: finishReason={reason}')
+
+    text = ''.join(p.get('text', '') for p in parts)
+    # 아래 둘 다 부분 응답이지만 원인이 정반대라 이름을 나눈다.
+    # 부분 응답을 성공으로 저장하면 본문이 중간에서 끊긴 채 사이트에 노출된다.
+    if reason == 'MAX_TOKENS':
+        # 길이 문제. 실측상 최장 기사도 출력 한도의 14%만 쓰므로 나오지 않아야 정상이다.
+        # 찍힌다면 chunk_size 전제가 깨졌다는 신호다.
+        raise TranslationError(f'truncated: 출력 한도 초과 ({len(text)}자까지 생성)')
+    if reason != 'STOP':
+        # 길이와 무관한 중단. RECITATION(학습 데이터 재현 차단)이 대표적이며,
+        # 가사 인용이 잦은 음악 평론에서는 실제로 나올 수 있다. 청크를 줄여도 해결되지 않는다.
+        raise TranslationError(f'incomplete: finishReason={reason} ({len(text)}자까지 생성)')
+    return text
+
+
+RETRY, WAIT, SPLIT, HUMAN = 'retry', 'wait', 'split', 'human'
+
+_ACTION_BY_TYPE = {
+    'timeout': RETRY,
+    'network': RETRY,
+    'bad_response': RETRY,
+    'empty_response': RETRY,
+    'http_429': WAIT,
+    'truncated': SPLIT,
+    'prompt_blocked': HUMAN,
+    'no_content': HUMAN,
+    'incomplete': HUMAN,
+}
+
+_HTTP_TYPE = re.compile(r'http_\d{3}')
+
+
+def error_type(reason: Optional[str]) -> str:
+    if not reason:
+        return 'unknown'
+    for token in reason.split(': ')[:2]:
+        if token in _ACTION_BY_TYPE or _HTTP_TYPE.fullmatch(token):
+            return token
+    return 'unknown'
+
+
+def next_action(reason: Optional[str]) -> str:
+    kind = error_type(reason)
+    if kind in _ACTION_BY_TYPE:
+        return _ACTION_BY_TYPE[kind]
+    if kind.startswith('http_5'):
+        return RETRY
+    return HUMAN
+
+
+def is_retryable(reason: Optional[str]) -> bool:
+    return next_action(reason) in (RETRY, WAIT)
+
+
 # ==================== 번역 후처리 ====================
 # AI를 쓰지 않는 결정론적 정리. 프롬프트만으로는 100% 보장되지 않는 두 가지를 처리한다.
 #   1) 중복 병기 — "첫 언급 시에만 병기"(규칙 1). 문자열 대조라 규칙으로 확실히 해결된다.
@@ -191,47 +272,15 @@ class GeminiTranslator:
             response = self.session.post(
                 API_URL, params={'key': self.api_key}, json=body, timeout=REQUEST_TIMEOUT
             )
-        except requests.Timeout:
-            raise TranslationError(f'timeout: {REQUEST_TIMEOUT}초 내 응답 없음')
         except requests.RequestException as e:
-            raise TranslationError(f'network: {_redact(str(e))}')
+            raise request_error(e) from e
 
-        if response.status_code != 200:
-            raise TranslationError(f'http_{response.status_code}: {_api_error_message(response)}')
-
+        detail = _api_error_message(response) if response.status_code != 200 else ''
         try:
             payload = response.json()
         except ValueError:
-            raise TranslationError('bad_response: JSON 파싱 실패')
-
-        # 프롬프트 자체가 차단되면 candidates가 아예 오지 않는다.
-        blocked = (payload.get('promptFeedback') or {}).get('blockReason')
-        if blocked:
-            raise TranslationError(f'prompt_blocked: {blocked}')
-
-        candidates = payload.get('candidates') or []
-        if not candidates:
-            raise TranslationError('empty_response: candidates 없음')
-
-        candidate = candidates[0]
-        reason = candidate.get('finishReason', 'STOP')
-        parts = (candidate.get('content') or {}).get('parts') or []
-        if not parts:
-            # SAFETY·RECITATION 등으로 본문 없이 종료된 경우
-            raise TranslationError(f'no_content: finishReason={reason}')
-
-        text = ''.join(p.get('text', '') for p in parts)
-        # 아래 둘 다 부분 응답이지만 원인이 정반대라 이름을 나눈다.
-        # 부분 응답을 성공으로 저장하면 본문이 중간에서 끊긴 채 사이트에 노출된다.
-        if reason == 'MAX_TOKENS':
-            # 길이 문제. 실측상 최장 기사도 출력 한도의 14%만 쓰므로 나오지 않아야 정상이다.
-            # 찍힌다면 chunk_size 전제가 깨졌다는 신호다.
-            raise TranslationError(f'truncated: 출력 한도 초과 ({len(text)}자까지 생성)')
-        if reason != 'STOP':
-            # 길이와 무관한 중단. RECITATION(학습 데이터 재현 차단)이 대표적이며,
-            # 가사 인용이 잦은 음악 평론에서는 실제로 나올 수 있다. 청크를 줄여도 해결되지 않는다.
-            raise TranslationError(f'incomplete: finishReason={reason} ({len(text)}자까지 생성)')
-        return text
+            payload = None
+        return parse_response(response.status_code, payload, detail)
 
     def translate_article(self, title: str, content: str) -> dict:
         """기사 제목과 본문을 한국어로 번역해 반환한다.
