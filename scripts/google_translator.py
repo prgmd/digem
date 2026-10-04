@@ -337,8 +337,8 @@ class GeminiTranslator:
             print(f'본문이 {len(content)}자로 길어 분할 번역합니다.')
             chunks = self._split_content(content)
             translated = [self._translate_chunk(chunk) for chunk in chunks]
-            return '\n\n'.join(translated)
-        return self._translate_chunk(content)
+            return postprocess('\n\n'.join(translated))
+        return postprocess(self._translate_chunk(content))
 
     def _translate_chunk(self, content: str) -> str:
         """본문 청크 하나를 Gemini API로 번역한다."""
