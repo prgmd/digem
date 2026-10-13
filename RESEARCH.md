@@ -21,11 +21,10 @@
 ## 1. 현재 상태 스냅샷
 
 ### 이미 확보 (코드로 증명됨)
-Python 파이프라인, Airflow 기초(DAG, PythonOperator, 병렬, 재시도), 배치 ETL, 관계형 모델링(다대다), GitHub Actions CI, 정적/동적 스크래핑, 외부 API 연동(Gemini), 멱등 수집(중복/실패 상태 관리).
+Python 파이프라인, GitHub Actions cron 스케줄링, 배치 ETL, 관계형 모델링(다대다), GitHub Actions CI, 정적/동적 스크래핑, 외부 API 연동(Gemini), 멱등 수집(중복/실패 상태 관리).
 
 ### 부분 확보 (기초만, 심화 필요)
 - **SQL**: 단순 CRUD 위주. 윈도우 함수, CTE, 인덱스 튜닝 경험 얕음.
-- **Airflow**: Sensor, XCom, 동적 태스크 매핑, 백필, pool 실사용 경험 없음.
 
 ### 공백 (아직 없음)
 ELT/dbt, 데이터 웨어하우스(BigQuery), 데이터 품질 검증(GE/dbt tests), 스트리밍(Kafka), 컨테이너(Docker), IaC(Terraform), 클라우드 코어(GCS/IAM), 관측성(신선도/알림/lineage), 분산 처리(Spark).
@@ -94,13 +93,10 @@ ELT/dbt, 데이터 웨어하우스(BigQuery), 데이터 품질 검증(GE/dbt tes
 | Landing Zone (데이터 레이크) | F2 | 스크래핑 원본을 Parquet로 보존, 변환 재실행 기반 |
 | 컬럼형 DWH (BigQuery) | F2 | 대량 차트 히스토리 + 집계 쿼리를 OLTP와 분리 |
 | 데이터 품질 (GE / dbt tests) | F3 | 번역 성공률 임계값, 차트 신선도, 스키마 검증 |
-| Airflow 심화 (동적 태스크) | F2 | 하드코딩된 5개 스크래퍼 태스크를 소스 리스트 기반 동적 생성 |
-| Airflow 심화 (Sensor) | F1 | 차트 페이지 갱신 감지 후 스냅샷 태스크 트리거 |
-| Airflow 심화 (XCom, pool, 백필) | F1~F3 | 수집 건수 전달, 동시 요청 제한, 과거 날짜 재처리 |
 | Redis | F1 | 최근 차트 순위 캐시 |
 | Kafka (스트리밍) | F1 | 순위 변동을 이벤트로 발행 → 실시간 소비자/알림 |
-| 관측성 (신선도, 알림, lineage) | F3 | Airflow SLA, 신선도 체크, Slack 알림, dbt lineage 뷰 |
-| Docker (컨테이너) | F4 | Airflow + 스크래퍼 + Kafka + Redis 로컬 스택을 compose로 |
+| 관측성 (신선도, 알림, lineage) | F3 | 신선도 체크, Slack 알림, dbt lineage 뷰 |
+| Docker (컨테이너) | F4 | 스크래퍼 + Kafka + Redis 로컬 스택을 compose로 |
 | Terraform (IaC) | F4 | GCS 버킷, BigQuery 데이터셋, 서비스 계정, IAM 코드화 |
 | 클라우드 코어 (GCS, IAM) | F4 | Landing Zone을 로컬 → 클라우드 스토리지로 이관 |
 | Spark / 분산 처리 | (보류) | 현 규모상 억지 |
@@ -128,7 +124,6 @@ ELT/dbt, 데이터 웨어하우스(BigQuery), 데이터 품질 검증(GE/dbt tes
 3. Redis 캐시 — 최근 스냅샷 순위 캐시, DB 풀스캔 없이 O(1) 조회.
 4. 이벤트 발행 — 임계값(예: 10계단 이상 상승, 신규 진입) 넘으면 Kafka `chart_rank_change` 토픽 발행.
 5. 소비자/알림 — 토픽 구독해 Slack/웹 알림, 프론트 "급상승" 섹션.
-6. 오케스트레이션 — Airflow Sensor로 차트 갱신 감지, XCom으로 변동 건수 전달.
 
 **선행조건**: 없음(독립 기능). **난이도**: ●●● (Kafka 처음이면 높음)
 
@@ -138,24 +133,23 @@ ELT/dbt, 데이터 웨어하우스(BigQuery), 데이터 품질 검증(GE/dbt tes
 2. dbt 변환 — raw → staging(정제) → mart(집계). `mart_publish_trend`, `mart_translation_rate`, `mart_top_artists`.
 3. dbt tests — not_null, unique, relationships로 모델 검증.
 4. 웨어하우스 이관 — 로컬 dbt-duckdb로 시작, 이후 BigQuery 무료 티어로 타깃 전환.
-5. Airflow 동적 태스크 — 하드코딩 5개 스크래퍼 태스크를 dynamic task mapping으로 리팩토링.
-6. BI 대시보드 — Looker Studio 또는 Metabase 연결.
+5. BI 대시보드 — Looker Studio 또는 Metabase 연결.
 
 **선행조건**: Landing Zone(F2-1)이 dbt(F2-2) 입력. **난이도**: ●●○
 
 ### F3. 품질/신선도 모니터링 & 알림
 
 1. 품질 규칙 — GE/dbt tests: 번역 성공률 90% 미만 감지, `source_url` 유일성, not_null, 차트 신선도.
-2. 게이트 — 기준 미달 시 Airflow DAG 중단/다운스트림 차단.
+2. 게이트 — 기준 미달 시 실행을 실패로 끝내 다운스트림 차단.
 3. 알림 — Slack Webhook.
 4. lineage — dbt docs.
-5. SLA/신선도 — Airflow SLA, "마지막 성공 실행 이후 경과 시간" 체크.
+5. 신선도 — "마지막 성공 실행 이후 경과 시간" 체크.
 
 **선행조건**: F2의 dbt/mart 있으면 검증 대상 풍부해짐. 일부 독립 적용 가능. **난이도**: ●●○
 
 ### F4. 재현 가능한 인프라 (기반)
 
-1. Docker Compose — Airflow(+메타DB), 스크래퍼, Redis, Kafka 컨테이너화.
+1. Docker Compose — 스크래퍼, Redis, Kafka 컨테이너화.
 2. 클라우드 스토리지 — Landing Zone Parquet 로컬 → GCS.
 3. Terraform — GCS 버킷, BigQuery 데이터셋, 서비스 계정, IAM 코드화.
 
@@ -278,7 +272,7 @@ ELT/dbt, 데이터 웨어하우스(BigQuery), 데이터 품질 검증(GE/dbt tes
 ## 8. 열린 결정사항
 
 - **Landing Zone raw 범위**: (A) 전체 응답 HTML/RSS raw — 재현성 최대, 용량 큼 / (B) 본문 컨테이너 HTML만 — 노이즈 적음, 컨테이너 선택자 오류엔 취약 / (C) 현재 `article_data`(추출 후) — 구현 쉬움, 재현성 문제 해결 안 됨. **미확정, 논의 필요.**
-- **파티션 키**: `date/source`(권장, Airflow 실행일과 자연스럽게 맞음, 시간범위 쿼리에 유리) vs `source/date`(소스 단위 백필에 유리). **미확정.**
+- **파티션 키**: `date/source`(권장, 일 단위 실행과 자연스럽게 맞음, 시간범위 쿼리에 유리) vs `source/date`(소스 단위 백필에 유리). **미확정.**
 - **트랙 실행 순서**: 6절 참고, 미확정.
 - **dbt 타깃**: 로컬 DuckDB로 시작 확정. BigQuery 전환 시점은 F2-4에서.
 - **Kafka 호스팅**: 로컬 Docker로 진행(비용 $0 유지 위해). 매니지드(Confluent Cloud 등)는 배제 방향.
@@ -307,5 +301,4 @@ ELT/dbt, 데이터 웨어하우스(BigQuery), 데이터 품질 검증(GE/dbt tes
 ## 관련 문서
 - 개발 일지: [README.md](README.md)
 - 구조/기술 스택: [structure.md](structure.md)
-- Airflow 도입 가이드: [AIRFLOW_SETUP.md](AIRFLOW_SETUP.md)
 - 단계별 상세 기록(포트폴리오): `../blog/digem/`

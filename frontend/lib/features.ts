@@ -32,7 +32,7 @@ export const ARTICLES_ENABLED = process.env.NEXT_PUBLIC_ARTICLES_ENABLED === 'tr
  *
  * 제외 이력
  *   'bandcamp' — 2026-08-18. Acceptable Use Policy가 스크래핑을 명시 금지.
- *                수집도 중단(scripts/main.py, Airflow DAG에서 제외).
+ *                수집도 중단(scripts/main.py에서 제외).
  *                기존 수집분은 DB에 그대로 보존. docs/09-copyright-review.md §2.4
  *
  * 화이트리스트(제외 목록이 아니라)로 둔 이유: 새 스크래퍼를 붙였을 때
