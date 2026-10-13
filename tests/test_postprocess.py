@@ -43,6 +43,16 @@ def test_dangling_header_at_the_end_is_removed():
     assert strip_noise(text) == '본문'
 
 
+def test_header_followed_by_content_is_kept():
+    text = '본문\n\n앙코르:\n\n"No Matter What"\n\n"Born For Loving You"'
+    assert strip_noise(text) == text
+
+
+def test_header_before_tail_noise_is_removed():
+    text = '본문\n\n제가 듣고 있는 것:\n\n뉴스레터를 구독하세요'
+    assert strip_noise(text) == '본문'
+
+
 def test_list_markers_are_removed_but_h3_is_kept():
     text = '### 소제목\n* 첫째\n- 둘째'
     assert strip_list_markers(text) == '### 소제목\n첫째\n둘째'

@@ -207,7 +207,7 @@ _DANGLING_HEADER = re.compile(r'^.{0,40}[:：]\s*$')
 def _strip_edge(lines, patterns, from_end=False):
     idx = range(len(lines) - 1, -1, -1) if from_end else range(len(lines))
     scan = _TAIL_SCAN if from_end else _HEAD_SCAN
-    drop, checked = set(), 0
+    drop, checked, kept_after = set(), 0, False
     for i in idx:
         if not lines[i].strip():
             continue
@@ -216,8 +216,10 @@ def _strip_edge(lines, patterns, from_end=False):
             break
         if any(re.search(p, lines[i]) for p in patterns):
             drop.add(i)
-        elif from_end and _DANGLING_HEADER.match(lines[i].strip()):
+        elif from_end and not kept_after and _DANGLING_HEADER.match(lines[i].strip()):
             drop.add(i)
+        else:
+            kept_after = True
     return drop
 
 
