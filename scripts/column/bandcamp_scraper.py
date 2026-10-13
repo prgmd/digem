@@ -9,7 +9,6 @@ Bandcamp Daily 스크래퍼 — 2026-08-18 부로 **비활성**.
 
 변경 사항:
   - scripts/main.py 의 COLUMN_SCRAPERS 에서 제외 (자동 실행 안 됨)
-  - Airflow DAG 에서 task 제거
   - 봇 탐지 우회 옵션(--disable-blink-features / excludeSwitches) 삭제
   - 기존 수집분은 DB에 보존하되 프론트 노출에서 제외
     (frontend/lib/features.ts 의 VISIBLE_SOURCES)

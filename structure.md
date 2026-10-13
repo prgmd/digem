@@ -16,7 +16,6 @@
 | 캐시/카운터 | Upstash Redis (미구현) |
 | 번역 AI | Google Gemini 2.5 Flash |
 | 데이터 수집 | Python 3.13, requests, BeautifulSoup4, feedparser, Selenium |
-| 워크플로우 자동화 | Apache Airflow 2.10 (DAG 기반 파이프라인) |
 | CI/CD | GitHub Actions (24h 스케줄 자동 실행) |
 | 배포 | Vercel (프론트엔드) |
 
@@ -49,11 +48,6 @@ digem/
 │   │   └── MeshBackground.tsx       # 자율 부유 blob 배경
 │   └── lib/supabase.ts
 │
-├── airflow/
-│   └── dags/
-│       ├── digem_scraper_pipeline.py # 실제 파이프라인 DAG
-│       └── hello_digem.py            # 학습용 테스트 DAG
-│
 ├── scripts/
 │   ├── column/
 │   │   ├── base_scraper.py          # 공통 추상 기반 클래스
@@ -67,7 +61,6 @@ digem/
 │   └── main.py                      # 전체 파이프라인 진입점
 │
 ├── tools/melon_seed.py              # 멜론 대량 시딩 (일회성)
-├── AIRFLOW_SETUP.md                 # Airflow 설정 가이드
 └── requirements.txt                 # Python 의존성
 ```
 
@@ -77,9 +70,9 @@ digem/
 
 ```mermaid
 graph TD
-    A[GitHub Actions 스케줄러] --> B[Airflow 초기화 및 DAG 검증]
-    B --> C[Airflow DAG 실행]
-    C --> D{병렬 실행}
+    A[GitHub Actions 스케줄러] --> B[의존성 설치]
+    B --> C[scripts/main.py 실행]
+    C --> D{매체별 순차 실행}
     D --> E[Pitchfork Scraper]
     D --> F[Stereogum Scraper]
     D --> G[Consequence Scraper]
@@ -90,7 +83,7 @@ graph TD
 ```
 
 1. **GitHub Actions (Cron)**: 매일 정해진 시간(09:00 KST)에 파이프라인 트리거
-2. **Apache Airflow (DAG)**: 5개 스크래퍼의 의존성 및 병렬 실행 관리 (`scraper_pool`을 통한 리소스 제어)
+2. **`scripts/main.py`**: 스크래퍼를 차례로 실행하고, 한 매체가 실패해도 나머지를 계속 돌린 뒤 실패가 있으면 종료 코드 1로 끝냄
 3. **데이터 수집 프로세스**: RSS 파싱 → 카테고리 필터 → 중복 체크 → 전문 크롤링 → Gemini 번역 → Supabase 저장
    - 기사 간 10초 대기 (IP 차단 방지)
    - 번역 실패 시 `translation_status = 'failed'` + `translation_error`(사유) 저장 → 재수집 차단, 프론트 노출 제외
@@ -103,19 +96,9 @@ graph TD
 - **실행 주기**: 매일 00:00 UTC (09:00 KST)
 - **주요 단계**:
   - `ubuntu-latest` 환경에서 Python 3.11 설정
-  - `apache-airflow` 및 프로젝트 의존성 설치
-  - Airflow DB 초기화 및 DAG 검증
-  - `airflow dags test digem_scraper_pipeline`을 통한 동기식 DAG 실행
+  - 프로젝트 의존성 설치
+  - `python -m scripts.main` 실행 (잡 30분 제한)
 - **보안**: GitHub Secrets를 통한 `SUPABASE_URL`, `GEMINI_API_KEY` 등 관리
-
-### 2. Apache Airflow (`airflow/dags/digem_scraper_pipeline.py`)
-- **DAG ID**: `digem_scraper_pipeline`
-- **구조**: 5개 독립 Task 병렬 실행 후 `pipeline_complete` Task로 종료
-- **특징**:
-  - `PythonOperator`를 사용하여 기존 스크래핑 로직 재사용
-  - `scraper_pool`을 설정하여 동시 실행 Task 수 제어 가능
-  - 실패 시 자동 재시도 (1회, 5분 대기)
-  - 실행 타임아웃 1시간 설정
 
 ---
 

@@ -134,7 +134,7 @@ export default function InfoPage() {
               어떠한 광고·구독·유료 기능도 운영하지 않습니다.
             </Row>
             <Row label="sources">Melon{ARTICLES_ENABLED && ' · Pitchfork · Stereogum · Consequence'}</Row>
-            <Row label="engine">Python pipeline · Apache Airflow · Supabase{ARTICLES_ENABLED && ' · Gemini 2.5 Flash'}</Row>
+            <Row label="engine">Python pipeline · GitHub Actions · Supabase{ARTICLES_ENABLED && ' · Gemini 2.5 Flash'}</Row>
           </Section>
 
           <Section title="copyright">
