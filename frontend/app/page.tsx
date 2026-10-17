@@ -47,13 +47,12 @@ export default function Home() {
             textTransform: 'uppercase',
           }}
         >
-          dig your uncut gems
+          dig your uncut gems<span className="caret" style={{ marginLeft: '0.4em' }} aria-hidden />
         </span>
       </div>
 
       {/* ASCII 디바이더 */}
       <div
-        className="hero-divider"
         style={{
           width: '48px',
           height: '1px',

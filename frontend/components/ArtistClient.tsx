@@ -18,7 +18,6 @@ export default function ArtistClient({ artist, albums }: Props) {
         minHeight: '100vh',
         background: 'transparent',
         padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
-        animation: 'pageFadeIn 0.4s steps(12, end) both',
       }}
     >
       <button
@@ -94,16 +93,12 @@ export default function ArtistClient({ artist, albums }: Props) {
             marginTop: '2rem',
           }}
         >
-          {albums.map((album, i) => (
+          {albums.map(album => (
             <div
               key={album.id}
               className="album-card"
               onMouseEnter={() => setHoveredAlbum(album.id)}
               onMouseLeave={() => setHoveredAlbum(null)}
-              style={{
-                opacity: 0,
-                animation: `pixelFadeIn 0.4s steps(10, end) ${i * 35}ms forwards`,
-              }}
             >
               <div className="album-artwork">
                 {album.artwork_url

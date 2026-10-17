@@ -91,7 +91,10 @@ html {
 }
 
 body {
-  background-color: var(--surface);
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(var(--ink-rgb), 0.045), transparent 70%),
+    var(--surface);
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-text);
   overflow: hidden;
@@ -156,32 +159,9 @@ body::after {
 ::-webkit-scrollbar-corner { background: transparent; }
 
 /* ── keyframes ─────────────────────────────────────────── */
-@keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dotWave {
   0%, 80%, 100% { transform: translateY(0);    opacity: 0.3; }
   40%           { transform: translateY(-10px); opacity: 1; }
-}
-@keyframes pageFadeIn   { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pageFadeOut  { from { opacity: 1; } to { opacity: 0; } }
-@keyframes heroSlideUp {
-  from { opacity: 0; transform: translateY(32px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes heroSlideInLeft {
-  from { opacity: 0; transform: translateX(-28px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes heroSlideInRight {
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes menuSlideInRight {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
-}
-@keyframes menuSlideOutRight {
-  from { transform: translateX(0); }
-  to   { transform: translateX(100%); }
 }
 
 @keyframes caretBlink {
@@ -200,18 +180,6 @@ body::after {
   92% { transform: translate(2px, 0)  skewX(2deg); }
   94% { transform: translate(-1px, 1px); }
 }
-
-@keyframes pixelFadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── home hero entrance (stepped → bit feel) ───────────── */
-.hero-logo     { animation: heroSlideUp 0.9s steps(22, end) both; }
-.hero-tagline  { animation: heroSlideUp 0.7s 0.25s steps(20, end) both; }
-.hero-divider  { animation: fadeIn 0.6s 0.45s steps(8, end) both; }
-.hero-nav-left  { animation: heroSlideInLeft  0.6s 0.55s steps(18, end) both; }
-.hero-nav-right { animation: heroSlideInRight 0.6s 0.70s steps(18, end) both; }
 
 @media (max-width: 768px) {
   .hero-logo    { font-size: 4.5rem !important; }
@@ -322,8 +290,8 @@ body::after {
 .glitch-on-hover:hover {
   animation: glitchShift 0.4s steps(8, end) infinite;
   text-shadow:
-    1px 0 rgba(255, 80, 80, 0.4),
-    -1px 0 rgba(80, 200, 255, 0.4);
+    2px 0 rgba(var(--ink-rgb), 0.35),
+    -2px 0 rgba(var(--ink-rgb), 0.15);
 }
 
 /* reading progress bar */

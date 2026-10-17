@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Article } from '@/lib/types'
-import Spinner from '@/components/Spinner'
 
 function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
   let result = raw
@@ -38,19 +37,9 @@ interface ArticleDetailProps {
 
 export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const [language, setLanguage] = useState<'ko' | 'en'>('ko')
-  const [ready, setReady] = useState(!article?.thumbnail_url)
   const [progress, setProgress] = useState(0)
   const [fullArticle, setFullArticle] = useState<Article | null>(article ?? null)
   const mainRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    if (!article?.thumbnail_url) { setReady(true); return }
-    setReady(false)
-    const img = new window.Image()
-    img.src = article.thumbnail_url
-    img.onload = () => setReady(true)
-    img.onerror = () => setReady(true)
-  }, [article?.thumbnail_url])
 
   // 본문(content_en, content_ko)을 동적으로 로드
   useEffect(() => {
@@ -83,7 +72,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
     el.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
     return () => el.removeEventListener('scroll', onScroll)
-  }, [article?.id, ready, language])
+  }, [article?.id, language])
 
   if (!article) {
     return (
@@ -117,16 +106,8 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const displayArticle = fullArticle || article
   const content = language === 'ko' ? (displayArticle?.content_ko || '') : (displayArticle?.content_en || '')
 
-  if (!ready) {
-    return (
-      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', animation: 'pageFadeIn 0.25s ease both' }}>
-        <Spinner />
-      </main>
-    )
-  }
-
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', position: 'relative', animation: 'pageFadeIn 0.25s steps(12, end) both' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', position: 'relative' }}>
       {/* 진행 바 */}
       <div className="reading-progress" style={{ width: `${progress}%` }} />
 
@@ -171,7 +152,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         flex: 1,
         padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
         overflowY: 'auto',
-        animation: 'fadeIn 0.5s steps(14, end) both',
       }}
     >
       <div style={{ maxWidth: '760px', margin: '0 auto' }}>

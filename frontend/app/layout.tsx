@@ -1,7 +1,6 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Mono } from 'next/font/google'
-import MeshBackground from '@/components/MeshBackground'
 
 const plexMono = IBM_Plex_Mono({
   subsets: ['latin'],
@@ -33,7 +32,6 @@ export default function RootLayout({
         <link rel="preload" href="/fonts/Pretendard-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
       </head>
       <body>
-        <MeshBackground />
         {children}
       </body>
     </html>

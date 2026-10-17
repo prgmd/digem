@@ -22,21 +22,16 @@ const PAGE_SIZE_CLIENT = 30
 
 interface AlbumCardProps {
   album: Album
-  index: number
   onArtistClick: (artist: string) => void
 }
 
-function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
+function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
     <div
       className={`album-card ${album.is_featured ? 'is-featured' : ''}`}
-      style={{
-        opacity: 0,
-        animation: `pixelFadeIn 0.5s steps(10, end) ${index * 30}ms forwards`,
-        minWidth: 0,
-      }}
+      style={{ minWidth: 0 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -130,23 +125,11 @@ interface Props {
 
 export default function AlbumsClient({ albums, totalCount, availableYears, monthFilter }: Props) {
   const router = useRouter()
-  const [isExiting, setIsExiting] = useState(false)
   const [navigating, setNavigating] = useState(false)
-  const [fadeIn] = useState(() => {
-    if (typeof sessionStorage === 'undefined') return true
-    const skip = sessionStorage.getItem('nofade')
-    if (skip) { sessionStorage.removeItem('nofade'); return false }
-    return true
-  })
 
   const { filters, actions } = useAlbumFilters()
   const { selectedRegion, selectedType, selectedYear, selectedMonth, featuredOnly, page } = filters
   const { setSelectedRegion, setSelectedType, setSelectedYear, setSelectedMonth, setFeaturedOnly, setPage } = actions
-
-  const handleExitToHome = () => {
-    setIsExiting(true)
-    setTimeout(() => router.push('/'), 350)
-  }
 
   const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
 
@@ -170,9 +153,8 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : (fadeIn ? 'pageFadeIn 0.4s steps(12, end) both' : undefined),
     }}>
-      <CategoryHeader onLogoClick={handleExitToHome} currentCategory="albums" />
+      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="albums" />
 
       {/* 필터 바 */}
       <div className="album-filter-bar" style={{
@@ -242,11 +224,10 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           </p>
         )}
         <div className="album-grid">
-          {paginated.map((album, index) => (
+          {paginated.map(album => (
             <AlbumCard
               key={album.id}
               album={album}
-              index={index}
               onArtistClick={(artist) => {
                 setNavigating(true)
                 router.push(`/artists/${encodeURIComponent(artist)}`)

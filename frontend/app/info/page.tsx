@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 import { ARTICLES_ENABLED } from '@/lib/features'
@@ -81,13 +80,6 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
 
 export default function InfoPage() {
   const router = useRouter()
-  const [isExiting, setIsExiting] = useState(false)
-
-  const handleExitToHome = () => {
-    setIsExiting(true)
-    setTimeout(() => router.push('/'), 350)
-  }
-
   return (
     <div style={{
       height: '100vh',
@@ -95,9 +87,8 @@ export default function InfoPage() {
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : 'pageFadeIn 0.4s steps(12, end) both',
     }}>
-      <CategoryHeader onLogoClick={handleExitToHome} currentCategory="info" />
+      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="info" />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 6vw, 5rem)' }}>
         <div style={{ maxWidth: '720px' }}>
