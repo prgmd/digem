@@ -189,10 +189,6 @@ export default function Sidebar({
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage <= 1}
               className="bracket-btn"
-              style={{
-                opacity: currentPage <= 1 ? 0.3 : 1,
-                cursor: currentPage <= 1 ? 'default' : 'pointer',
-              }}
             >
               prev
             </button>
@@ -211,10 +207,6 @@ export default function Sidebar({
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages}
               className="bracket-btn"
-              style={{
-                opacity: currentPage >= totalPages ? 0.3 : 1,
-                cursor: currentPage >= totalPages ? 'default' : 'pointer',
-              }}
             >
               next
             </button>

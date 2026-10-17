@@ -210,18 +210,10 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       {/* 앨범 그리드 */}
       <div className="album-grid-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
         {paginated.length === 0 && (
-          <p
-            className="mono"
-            style={{
-              color: 'var(--ink-muted)',
-              fontSize: '0.9rem',
-              textAlign: 'center',
-              padding: '4rem 0',
-              letterSpacing: '0.05em',
-            }}
-          >
-            &gt; no records match the filter.
-          </p>
+          <div className="terminal-block" style={{ padding: 'var(--sp-8) 0', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
+            <div>&gt; no records match the filter.</div>
+            <button onClick={() => router.replace('/albums')} className="bracket-btn">clear filters</button>
+          </div>
         )}
         <div className="album-grid">
           {paginated.map(album => (
@@ -252,7 +244,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page <= 1}
               className="bracket-btn"
-              style={{ opacity: page <= 1 ? 0.3 : 1 }}
             >
               prev
             </button>
@@ -273,7 +264,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page >= totalPages}
               className="bracket-btn"
-              style={{ opacity: page >= totalPages ? 0.3 : 1 }}
             >
               next
             </button>

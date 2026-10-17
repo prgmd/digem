@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'digem — access',
+  title: 'digem / access',
   robots: { index: false, follow: false },
 }
 
@@ -87,7 +87,7 @@ export default async function GatePage({
             width: '100%',
           }}
         />
-        <button type="submit" className="bracket-btn" style={{ fontSize: '0.85rem', padding: '0.6rem' }}>
+        <button type="submit" className="bracket-btn" style={{ padding: 'var(--sp-2)' }}>
           enter
         </button>
       </form>

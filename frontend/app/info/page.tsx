@@ -138,7 +138,16 @@ export default function InfoPage() {
               게재된 내용에 대해 삭제 또는 수정을 요청하시려면 아래 연락처로 알려주시기 바랍니다.
               확인 후 신속히 조치하겠습니다.
             </Row>
-            <Row label="contact">{/* TODO: 공개용 연락처 기입 */}—</Row>
+            <Row label="contact">
+              <a
+                href="https://github.com/prgmd/digem/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--ink)', textDecorationStyle: 'dotted', textUnderlineOffset: '3px' }}
+              >
+                github.com/prgmd/digem/issues
+              </a>
+            </Row>
             {ARTICLES_ENABLED && (
               <Row label="translations">
                 자동 번역된 텍스트는 참고 목적으로만 제공됩니다.

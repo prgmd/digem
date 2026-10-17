@@ -125,7 +125,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
           <button
             onClick={onBack}
             className="bracket-btn"
-            style={{ fontSize: '0.72rem' }}
           >
             ← list
           </button>
@@ -179,7 +178,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
           <span className="terminal-key">src</span>{article.source}
         </div>
         <div className="terminal-line">
-          <span className="terminal-key">by</span>{article.author || '—'}
+          <span className="terminal-key">by</span>{article.author || 'unknown'}
         </div>
         <div className="terminal-line">
           <span className="terminal-key">date</span>{fmtDate(article.published_at)}

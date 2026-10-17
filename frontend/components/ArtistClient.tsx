@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Album, Artist } from '@/lib/types'
+import CategoryHeader from '@/components/CategoryHeader'
 
 interface Props {
   artist: Artist
@@ -13,31 +14,33 @@ export default function ArtistClient({ artist, albums }: Props) {
   const [hoveredAlbum, setHoveredAlbum] = useState<string | null>(null)
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'transparent',
-        padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
-      }}
-    >
+    <div className="page-shell">
+      <CategoryHeader currentCategory="albums" />
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
+        }}
+      >
       <button
         onClick={() => router.back()}
         className="bracket-btn"
-        style={{ marginBottom: '2.5rem' }}
+        style={{ marginBottom: 'var(--sp-8)' }}
       >
         ← back
       </button>
 
       <div
+        className="mono"
         style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.5rem',
+          fontSize: 'var(--fs-xs)',
           color: 'var(--ink-muted)',
-          letterSpacing: '0.04em',
-          marginBottom: '0.35rem',
+          letterSpacing: '0.06em',
+          marginBottom: 'var(--sp-2)',
         }}
       >
-        artist
+        &gt; artist
       </div>
 
       <h1
@@ -79,20 +82,12 @@ export default function ArtistClient({ artist, albums }: Props) {
       {albums.length === 0 ? (
         <p
           className="mono"
-          style={{ color: 'var(--ink-muted)', marginTop: '2rem', fontSize: '0.85rem' }}
+          style={{ color: 'var(--ink-muted)', marginTop: 'var(--sp-8)', fontSize: 'var(--fs-sm)' }}
         >
           &gt; no records on file.
         </p>
       ) : (
-        <div
-          className="album-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-            gap: '1.6rem',
-            marginTop: '2rem',
-          }}
-        >
+        <div className="album-grid" style={{ marginTop: 'var(--sp-8)' }}>
           {albums.map(album => (
             <div
               key={album.id}
@@ -148,6 +143,7 @@ export default function ArtistClient({ artist, albums }: Props) {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

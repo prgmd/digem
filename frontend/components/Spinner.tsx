@@ -36,7 +36,7 @@ export default function Spinner() {
           fontSize: '0.66rem',
           color: 'var(--ink-muted)',
           letterSpacing: '0.16em',
-          textTransform: 'uppercase',
+          textTransform: 'lowercase',
         }}
       >
         loading
