@@ -35,7 +35,7 @@ function SourceBadge({ source, active }: { source: string; active?: boolean }) {
     <span
       className="mono"
       style={{
-        fontSize: '0.65rem',
+        fontSize: 'var(--fs-2xs)',
         opacity: 0.7,
         flexShrink: 0,
         letterSpacing: '0.05em',
@@ -126,7 +126,7 @@ export default function Sidebar({
             className="mono"
             style={{
               color: 'var(--ink-muted)',
-              fontSize: '0.85rem',
+              fontSize: 'var(--fs-sm)',
               padding: '1rem 0.5rem',
             }}
           >
@@ -168,7 +168,7 @@ export default function Sidebar({
             style={{
               color: 'var(--line-strong)',
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.7rem',
+              fontSize: 'var(--fs-2xs)',
               margin: '1rem 0 0.75rem',
               letterSpacing: '0.05em',
               textAlign: 'center',
@@ -195,7 +195,7 @@ export default function Sidebar({
             <span
               className="mono"
               style={{
-                fontSize: '0.85rem',
+                fontSize: 'var(--fs-sm)',
                 color: 'var(--ink-muted)',
                 letterSpacing: '0.08em',
                 padding: '0 0.5rem',

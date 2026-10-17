@@ -11,7 +11,7 @@ export const selectStyle: CSSProperties = {
   backgroundPosition: 'right 0.6rem center',
   border: '1px solid var(--line-strong)',
   color: 'var(--ink)',
-  fontSize: '0.78rem',
+  fontSize: 'var(--fs-xs)',
   letterSpacing: '0.05em',
   padding: '0.4rem 1.7rem 0.4rem 0.7rem',
   cursor: 'pointer',

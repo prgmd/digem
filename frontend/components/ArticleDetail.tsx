@@ -225,7 +225,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
             <p
               className="mono"
               style={{
-                fontSize: '0.7rem',
+                fontSize: 'var(--fs-2xs)',
                 color: 'var(--ink-muted)',
                 marginTop: '0.5rem',
                 letterSpacing: '0.04em',

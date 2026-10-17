@@ -31,22 +31,10 @@ export default function ArtistClient({ artist, albums }: Props) {
         ← back
       </button>
 
-      <div
-        className="mono"
-        style={{
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--ink-muted)',
-          letterSpacing: '0.06em',
-          marginBottom: 'var(--sp-2)',
-        }}
-      >
-        &gt; artist
-      </div>
-
       <h1
         style={{
           fontFamily: 'var(--font-text)',
-          fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+          fontSize: 'var(--fs-2xl)',
           fontWeight: 700,
           marginBottom: '0.4rem',
           lineHeight: 1.1,
@@ -58,7 +46,7 @@ export default function ArtistClient({ artist, albums }: Props) {
       {artist.name_ko && (
         <p
           className="mono"
-          style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', letterSpacing: '0.06em' }}
+          style={{ fontSize: 'var(--fs-xs)', color: 'var(--ink-muted)', letterSpacing: '0.06em' }}
         >
           {artist.name}
         </p>
@@ -69,7 +57,7 @@ export default function ArtistClient({ artist, albums }: Props) {
         style={{
           marginTop: '1.5rem',
           paddingBottom: '0.5rem',
-          fontSize: '0.72rem',
+          fontSize: 'var(--fs-2xs)',
           color: 'var(--ink-muted)',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
@@ -114,7 +102,7 @@ export default function ArtistClient({ artist, albums }: Props) {
               <p
                 style={{
                   fontFamily: 'var(--font-text)',
-                  fontSize: '0.95rem',
+                  fontSize: 'var(--fs-sm)',
                   fontWeight: 400,
                   color: 'var(--ink)',
                   overflow: 'hidden',
@@ -130,7 +118,7 @@ export default function ArtistClient({ artist, albums }: Props) {
               <p
                 className="mono"
                 style={{
-                  fontSize: '0.68rem',
+                  fontSize: 'var(--fs-2xs)',
                   color: 'var(--ink-muted)',
                   letterSpacing: '0.06em',
                   textTransform: 'lowercase',

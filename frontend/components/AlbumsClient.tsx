@@ -84,7 +84,7 @@ function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
         style={{
           fontFamily: 'var(--font-text)',
           fontWeight: 400,
-          fontSize: '0.95rem',
+          fontSize: 'var(--fs-sm)',
           color: 'var(--ink-muted)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -102,7 +102,7 @@ function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
       <p
         className="mono"
         style={{
-          fontSize: '0.7rem',
+          fontSize: 'var(--fs-2xs)',
           color: 'var(--ink-muted)',
           letterSpacing: '0.05em',
           textTransform: 'lowercase',
@@ -192,7 +192,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           className="mono"
           style={{
             marginLeft: 'auto',
-            fontSize: '0.7rem',
+            fontSize: 'var(--fs-2xs)',
             color: 'var(--ink-muted)',
             letterSpacing: '0.06em',
           }}
@@ -250,7 +250,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
             <span
               className="mono"
               style={{
-                fontSize: '0.85rem',
+                fontSize: 'var(--fs-sm)',
                 color: 'var(--ink-muted)',
                 letterSpacing: '0.08em',
                 padding: '0 0.5rem',

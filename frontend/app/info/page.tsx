@@ -6,7 +6,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
     <h2
       className="mono info-section-title"
       style={{
-        fontSize: '0.72rem',
+        fontSize: 'var(--fs-2xs)',
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
         color: 'var(--ink)',
@@ -51,7 +51,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     <span
       className="mono info-row-label"
       style={{
-        fontSize: '0.7rem',
+        fontSize: 'var(--fs-2xs)',
         color: 'var(--ink-muted)',
         minWidth: '120px',
         flexShrink: 0,
@@ -64,7 +64,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     <span
       style={{
         fontFamily: 'var(--font-text)',
-        fontSize: '0.92rem',
+        fontSize: 'var(--fs-sm)',
         fontWeight: 400,
         color: 'var(--ink)',
         lineHeight: 1.75,
@@ -94,7 +94,7 @@ export default function InfoPage() {
             style={{
               fontFamily: 'var(--font-text)',
               fontWeight: 700,
-              fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
+              fontSize: 'var(--fs-2xl)',
               lineHeight: 1,
               marginBottom: '2.5rem',
               letterSpacing: '0.02em',

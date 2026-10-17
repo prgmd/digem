@@ -149,6 +149,8 @@ body::after {
 
 /* ── selection (inversion) ─────────────────────────────── */
 ::selection { background: var(--ink); color: var(--surface); }
+input { caret-color: var(--ink); }
+select option { background: var(--surface-raised); color: var(--ink); }
 ::-moz-selection { background: var(--ink); color: var(--surface); }
 
 /* ── scrollbar (hard amber block) ──────────────────────── */

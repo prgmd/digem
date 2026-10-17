@@ -44,7 +44,7 @@ export default async function GatePage({
       <div
         className="mono"
         style={{
-          fontSize: '0.8rem',
+          fontSize: 'var(--fs-xs)',
           color: 'var(--ink-muted)',
           letterSpacing: '0.06em',
           lineHeight: 1.9,
@@ -81,7 +81,7 @@ export default async function GatePage({
             background: 'var(--surface-raised)',
             border: '1px solid var(--line-strong)',
             color: 'var(--ink)',
-            fontSize: '0.9rem',
+            fontSize: 'var(--fs-sm)',
             letterSpacing: '0.12em',
             padding: '0.7rem 0.9rem',
             width: '100%',
@@ -96,7 +96,7 @@ export default async function GatePage({
         <p
           className="mono"
           style={{
-            fontSize: '0.78rem',
+            fontSize: 'var(--fs-xs)',
             color: 'var(--ink)',
             letterSpacing: '0.05em',
             margin: 0,

@@ -33,7 +33,7 @@ export default function Spinner() {
       {/* single static caption */}
       <div
         style={{
-          fontSize: '0.66rem',
+          fontSize: 'var(--fs-2xs)',
           color: 'var(--ink-muted)',
           letterSpacing: '0.16em',
           textTransform: 'lowercase',

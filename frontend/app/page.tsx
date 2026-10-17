@@ -40,7 +40,7 @@ export default function Home() {
         <span
           className="hero-tagline mono"
           style={{
-            fontSize: '0.78rem',
+            fontSize: 'var(--fs-xs)',
             color: 'var(--ink-muted)',
             opacity: 0.85,
             letterSpacing: '0.18em',
