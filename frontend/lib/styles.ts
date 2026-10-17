@@ -15,7 +15,6 @@ export const selectStyle: CSSProperties = {
   letterSpacing: '0.05em',
   padding: '0.4rem 1.7rem 0.4rem 0.7rem',
   cursor: 'pointer',
-  outline: 'none',
   textTransform: 'lowercase',
   appearance: 'none',
 }

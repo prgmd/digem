@@ -368,6 +368,60 @@ body::after {
   color: var(--surface);
 }
 
+/* ── header ────────────────────────────────────────────── */
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  height: 60px;
+  padding: 0 var(--sp-8);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.header-logo {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  line-height: 1;
+  color: var(--ink);
+  text-decoration: none;
+  padding: var(--sp-2) var(--sp-6) var(--sp-2) 0;
+  transition: color var(--t-hover);
+}
+.header-logo:hover { color: var(--ink-bright); }
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+.header-nav a {
+  color: var(--ink-muted);
+  text-decoration: none;
+  padding: var(--sp-1) var(--sp-2);
+  transition: color var(--t-hover), background var(--t-hover);
+}
+.header-nav a:hover {
+  color: var(--surface);
+  background: var(--ink);
+}
+.header-nav a[aria-current="page"] { color: var(--ink); }
+.header-nav a[aria-current="page"]::before { content: '▶ '; font-size: 0.75em; }
+.header-nav a[aria-current="page"]:hover { color: var(--surface); }
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
 /* ── albums ────────────────────────────────────────────── */
 .album-grid-wrapper { padding: 2rem; }
 .album-filter-bar { padding: 1.25rem 2rem; }
@@ -450,14 +504,12 @@ body::after {
   .album-filter-bar  { padding: 0.75rem 1rem; }
   .album-grid-wrapper { padding: 1rem; }
   html { font-size: 14px; }
-  .category-header { padding: 0 1rem !important; height: 52px !important; }
-  .header-tag { font-size: 1rem !important; letter-spacing: 0.03em !important; }
+  .category-header { padding: 0 var(--sp-4); height: 52px; }
 }
 @media (max-width: 480px) {
   .album-grid { gap: 0.6rem; }
   .album-grid-wrapper { padding: 0.6rem; }
   .album-filter-bar { padding: 0.6rem 0.75rem; }
-  .header-tag { display: none !important; }
   .album-featured-mark { font-size: 0.55rem; padding: 0.15rem 0.3rem; }
 }
 

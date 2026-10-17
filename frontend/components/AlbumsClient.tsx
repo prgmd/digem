@@ -154,7 +154,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       flexDirection: 'column',
       overflow: 'hidden',
     }}>
-      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="albums" />
+      <CategoryHeader currentCategory="albums" />
 
       {/* 필터 바 */}
       <div className="album-filter-bar" style={{

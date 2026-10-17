@@ -1,5 +1,3 @@
-'use client'
-import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 import { ARTICLES_ENABLED } from '@/lib/features'
 
@@ -79,7 +77,6 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
 )
 
 export default function InfoPage() {
-  const router = useRouter()
   return (
     <div style={{
       height: '100vh',
@@ -88,7 +85,7 @@ export default function InfoPage() {
       flexDirection: 'column',
       overflow: 'hidden',
     }}>
-      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="info" />
+      <CategoryHeader currentCategory="info" />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 6vw, 5rem)' }}>
         <div style={{ maxWidth: '720px' }}>

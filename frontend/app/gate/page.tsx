@@ -84,7 +84,6 @@ export default async function GatePage({
             fontSize: '0.9rem',
             letterSpacing: '0.12em',
             padding: '0.7rem 0.9rem',
-            outline: 'none',
             width: '100%',
           }}
         />

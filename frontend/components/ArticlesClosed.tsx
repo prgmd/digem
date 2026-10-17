@@ -11,7 +11,7 @@ export default function ArticlesClosed() {
 
   return (
     <div style={{ height: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
-      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="articles" />
+      <CategoryHeader currentCategory="articles" />
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: '1.75rem', padding: '2rem',

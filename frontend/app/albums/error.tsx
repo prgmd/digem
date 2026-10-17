@@ -1,12 +1,10 @@
 'use client'
-import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 
 export default function AlbumsError({ reset }: { error: Error; reset: () => void }) {
-  const router = useRouter()
   return (
     <div style={{ height: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
-      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="albums" />
+      <CategoryHeader currentCategory="albums" />
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: '1rem',

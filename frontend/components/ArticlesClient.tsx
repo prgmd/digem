@@ -50,7 +50,7 @@ export default function ArticlesClient({ articles, currentPage, totalPages, sele
       display: 'flex',
       flexDirection: 'column',
     }}>
-      <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="articles" />
+      <CategoryHeader currentCategory="articles" />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {showSidebar && (
           <Sidebar
