@@ -476,7 +476,7 @@ input:focus-visible {
 
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: var(--sp-6);
 }
 
