@@ -43,7 +43,7 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
       <div
         className="album-artwork"
         style={{
-          outline: album.is_featured ? '2px solid var(--accent-green)' : 'none',
+          outline: album.is_featured ? '1px solid var(--ink)' : 'none',
           outlineOffset: '2px',
         }}
       >
@@ -57,7 +57,7 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
             className="mono"
             style={{
               fontSize: '2rem',
-              color: 'var(--border-bright)',
+              color: 'var(--line-strong)',
               userSelect: 'none',
               letterSpacing: '0.2em',
               fontWeight: 700,
@@ -71,10 +71,10 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
       <MarqueeText
         active={isHovered}
         style={{
-          fontFamily: 'Pretendard, sans-serif',
+          fontFamily: 'var(--font-text)',
           fontWeight: 600,
           fontSize: '1.1rem',
-          color: 'var(--text-color)',
+          color: 'var(--ink)',
           marginBottom: '0.25rem',
         }}
       >
@@ -87,10 +87,10 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
           onArtistClick(album.artist)
         }}
         style={{
-          fontFamily: 'Pretendard, sans-serif',
-          fontWeight: 300,
+          fontFamily: 'var(--font-text)',
+          fontWeight: 400,
           fontSize: '0.95rem',
-          color: 'var(--meta-color)',
+          color: 'var(--ink-muted)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -98,8 +98,8 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
           cursor: 'pointer',
           transition: 'color 0.08s steps(2, end)',
         }}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
+        onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-muted)')}
       >
         {album.artist}
       </p>
@@ -108,7 +108,7 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
         className="mono"
         style={{
           fontSize: '0.7rem',
-          color: 'var(--meta-dim)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.05em',
           textTransform: 'lowercase',
         }}
@@ -166,7 +166,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
   return (
     <div style={{
       height: '100vh',
-      background: '#000',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
@@ -180,7 +180,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
         flexWrap: 'wrap',
         alignItems: 'center',
         gap: '0.4rem 0.6rem',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--line)',
         flexShrink: 0,
       }}>
         <button
@@ -211,7 +211,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           style={{
             marginLeft: 'auto',
             fontSize: '0.7rem',
-            color: 'var(--meta-color)',
+            color: 'var(--ink-muted)',
             letterSpacing: '0.06em',
           }}
         >
@@ -231,7 +231,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           <p
             className="mono"
             style={{
-              color: 'var(--meta-color)',
+              color: 'var(--ink-muted)',
               fontSize: '0.9rem',
               textAlign: 'center',
               padding: '4rem 0',
@@ -279,7 +279,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
               className="mono"
               style={{
                 fontSize: '0.85rem',
-                color: 'var(--meta-color)',
+                color: 'var(--ink-muted)',
                 letterSpacing: '0.08em',
                 padding: '0 0.5rem',
                 minWidth: '4.5rem',

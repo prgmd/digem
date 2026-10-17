@@ -44,7 +44,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
         justifyContent: 'space-between',
         padding: '0 2rem',
         height: '60px',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--line)',
         flexShrink: 0,
         position: 'relative',
         gap: '1rem',
@@ -66,9 +66,9 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
           <span
             className="glitch-on-hover"
             style={{
-              fontFamily: 'bjorkfont, sans-serif',
+              fontFamily: 'var(--font-display)',
               fontSize: '1.85rem',
-              color: logoHover ? 'var(--text-bright)' : 'var(--text-color)',
+              color: logoHover ? 'var(--ink-bright)' : 'var(--ink)',
               lineHeight: 1,
               transition: 'color 0.08s steps(2, end)',
             }}
@@ -95,9 +95,9 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
           }}
           aria-label="메뉴"
         >
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
+          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--ink)' }} />
+          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--ink)' }} />
+          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--ink)' }} />
         </button>
       </header>
 
@@ -111,8 +111,8 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
             height: '100vh',
             width: 'fit-content',
             minWidth: '240px',
-            backgroundColor: '#0a0a0a',
-            borderLeft: '1px solid var(--border)',
+            backgroundColor: 'var(--surface-raised)',
+            borderLeft: '1px solid var(--line)',
             zIndex: 26,
             display: 'flex',
             flexDirection: 'column',
@@ -133,7 +133,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                   className="mono"
                   style={{
                     fontSize: '1.15rem',
-                    color: isCurrent ? 'var(--text-color)' : 'var(--meta-color)',
+                    color: isCurrent ? 'var(--ink)' : 'var(--ink-muted)',
                     cursor: !isCurrent ? 'pointer' : 'default',
                     transition: 'color 0.08s steps(2, end), background 0.08s steps(2, end)',
                     padding: '0.4rem 0.8rem 0.4rem 1.4rem',
@@ -143,13 +143,13 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                   }}
                   onMouseEnter={e => {
                     if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--bg-color)'
-                      ;(e.currentTarget as HTMLElement).style.background = 'var(--text-color)'
+                      (e.currentTarget as HTMLElement).style.color = 'var(--surface)'
+                      ;(e.currentTarget as HTMLElement).style.background = 'var(--ink)'
                     }
                   }}
                   onMouseLeave={e => {
                     if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--meta-color)'
+                      (e.currentTarget as HTMLElement).style.color = 'var(--ink-muted)'
                       ;(e.currentTarget as HTMLElement).style.background = 'transparent'
                     }
                   }}
@@ -164,8 +164,8 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
 
             <div
               style={{
-                color: 'var(--meta-dim)',
-                fontFamily: 'var(--mono)',
+                color: 'var(--ink-muted)',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '0.7rem',
                 margin: '1.1rem 0 0.5rem',
                 letterSpacing: '0.06em',
@@ -183,7 +183,7 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                   className="mono"
                   style={{
                     fontSize: '1.15rem',
-                    color: isCurrent ? 'var(--text-color)' : 'var(--meta-color)',
+                    color: isCurrent ? 'var(--ink)' : 'var(--ink-muted)',
                     cursor: !isCurrent ? 'pointer' : 'default',
                     transition: 'color 0.08s steps(2, end), background 0.08s steps(2, end)',
                     padding: '0.4rem 0.8rem 0.4rem 1.4rem',
@@ -193,13 +193,13 @@ export default function CategoryHeader({ onLogoClick, currentCategory }: Categor
                   }}
                   onMouseEnter={e => {
                     if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--bg-color)'
-                      ;(e.currentTarget as HTMLElement).style.background = 'var(--text-color)'
+                      (e.currentTarget as HTMLElement).style.color = 'var(--surface)'
+                      ;(e.currentTarget as HTMLElement).style.background = 'var(--ink)'
                     }
                   }}
                   onMouseLeave={e => {
                     if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--meta-color)'
+                      (e.currentTarget as HTMLElement).style.color = 'var(--ink-muted)'
                       ;(e.currentTarget as HTMLElement).style.background = 'transparent'
                     }
                   }}

@@ -16,7 +16,7 @@ export default function ArtistClient({ artist, albums }: Props) {
     <div
       style={{
         minHeight: '100vh',
-        background: '#000',
+        background: 'transparent',
         padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
         animation: 'pageFadeIn 0.4s steps(12, end) both',
       }}
@@ -31,9 +31,9 @@ export default function ArtistClient({ artist, albums }: Props) {
 
       <div
         style={{
-          fontFamily: 'bjorkfont, sans-serif',
+          fontFamily: 'var(--font-display)',
           fontSize: '1.5rem',
-          color: 'var(--meta-color)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.04em',
           marginBottom: '0.35rem',
         }}
@@ -43,7 +43,7 @@ export default function ArtistClient({ artist, albums }: Props) {
 
       <h1
         style={{
-          fontFamily: 'Pretendard, sans-serif',
+          fontFamily: 'var(--font-text)',
           fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
           fontWeight: 700,
           marginBottom: '0.4rem',
@@ -56,7 +56,7 @@ export default function ArtistClient({ artist, albums }: Props) {
       {artist.name_ko && (
         <p
           className="mono"
-          style={{ fontSize: '0.8rem', color: 'var(--meta-color)', letterSpacing: '0.06em' }}
+          style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', letterSpacing: '0.06em' }}
         >
           {artist.name}
         </p>
@@ -68,10 +68,10 @@ export default function ArtistClient({ artist, albums }: Props) {
           marginTop: '1.5rem',
           paddingBottom: '0.5rem',
           fontSize: '0.72rem',
-          color: 'var(--meta-color)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: '1px solid var(--line)',
         }}
       >
         discography · {String(albums.length).padStart(2, '0')} records
@@ -80,7 +80,7 @@ export default function ArtistClient({ artist, albums }: Props) {
       {albums.length === 0 ? (
         <p
           className="mono"
-          style={{ color: 'var(--meta-color)', marginTop: '2rem', fontSize: '0.85rem' }}
+          style={{ color: 'var(--ink-muted)', marginTop: '2rem', fontSize: '0.85rem' }}
         >
           &gt; no records on file.
         </p>
@@ -113,7 +113,7 @@ export default function ArtistClient({ artist, albums }: Props) {
                       style={{
                         fontSize: '1.8rem',
                         fontWeight: 700,
-                        color: 'var(--border-bright)',
+                        color: 'var(--line-strong)',
                         letterSpacing: '0.18em',
                       }}
                     >
@@ -123,10 +123,10 @@ export default function ArtistClient({ artist, albums }: Props) {
               </div>
               <p
                 style={{
-                  fontFamily: 'Pretendard, sans-serif',
+                  fontFamily: 'var(--font-text)',
                   fontSize: '0.95rem',
-                  fontWeight: 500,
-                  color: 'var(--text-color)',
+                  fontWeight: 400,
+                  color: 'var(--ink)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -141,7 +141,7 @@ export default function ArtistClient({ artist, albums }: Props) {
                 className="mono"
                 style={{
                   fontSize: '0.68rem',
-                  color: 'var(--meta-dim)',
+                  color: 'var(--ink-muted)',
                   letterSpacing: '0.06em',
                   textTransform: 'lowercase',
                 }}

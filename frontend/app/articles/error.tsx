@@ -5,7 +5,7 @@ import CategoryHeader from '@/components/CategoryHeader'
 export default function ArticlesError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter()
   return (
-    <div style={{ height: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
       <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="articles" />
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
@@ -14,7 +14,7 @@ export default function ArticlesError({ reset }: { error: Error; reset: () => vo
         <div
           className="mono"
           style={{
-            color: 'var(--text-color)',
+            color: 'var(--ink)',
             fontSize: '0.85rem',
             letterSpacing: '0.06em',
             textAlign: 'left',
@@ -22,8 +22,8 @@ export default function ArticlesError({ reset }: { error: Error; reset: () => vo
           }}
         >
           <div>&gt; error: failed to load articles</div>
-          <div style={{ color: 'var(--meta-color)' }}>&gt; status: 500 · connection refused</div>
-          <div style={{ color: 'var(--meta-dim)' }}>&gt; hint: retry?</div>
+          <div style={{ color: 'var(--ink-muted)' }}>&gt; status: 500 · connection refused</div>
+          <div style={{ color: 'var(--ink-muted)' }}>&gt; hint: retry?</div>
         </div>
         <button onClick={reset} className="bracket-btn" style={{ fontSize: '0.85rem' }}>
           retry

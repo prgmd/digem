@@ -10,7 +10,7 @@ export default function ArticlesClosed() {
   const router = useRouter()
 
   return (
-    <div style={{ height: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
       <CategoryHeader onLogoClick={() => router.push('/')} currentCategory="articles" />
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
@@ -19,7 +19,7 @@ export default function ArticlesClosed() {
         <div
           className="mono"
           style={{
-            color: 'var(--text-color)',
+            color: 'var(--ink)',
             fontSize: '0.85rem',
             lineHeight: 1.9,
             letterSpacing: '0.06em',
@@ -29,16 +29,16 @@ export default function ArticlesClosed() {
           }}
         >
           <div>&gt; status: 503 · section temporarily closed</div>
-          <div style={{ color: 'var(--meta-color)' }}>&gt; reason: copyright review in progress</div>
-          <div style={{ color: 'var(--meta-dim)' }}>&gt; eta: undetermined</div>
+          <div style={{ color: 'var(--ink-muted)' }}>&gt; reason: copyright review in progress</div>
+          <div style={{ color: 'var(--ink-muted)' }}>&gt; eta: undetermined</div>
         </div>
 
         <p
           style={{
-            fontFamily: 'Pretendard, sans-serif',
+            fontFamily: 'var(--font-text)',
             fontSize: '0.92rem',
-            fontWeight: 300,
-            color: 'var(--meta-color)',
+            fontWeight: 400,
+            color: 'var(--ink-muted)',
             lineHeight: 1.8,
             maxWidth: '520px',
             wordBreak: 'keep-all',

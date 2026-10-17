@@ -27,9 +27,9 @@ export default function Home() {
           <span
             className="hero-logo"
             style={{
-              fontFamily: 'bjorkfont, sans-serif',
+              fontFamily: 'var(--font-display)',
               fontSize: '8rem',
-              color: 'var(--text-color)',
+              color: 'var(--ink)',
               lineHeight: 1,
               display: 'inline-block',
             }}
@@ -41,7 +41,7 @@ export default function Home() {
           className="hero-tagline mono"
           style={{
             fontSize: '0.78rem',
-            color: 'var(--meta-color)',
+            color: 'var(--ink-muted)',
             opacity: 0.85,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
@@ -57,7 +57,7 @@ export default function Home() {
         style={{
           width: '48px',
           height: '1px',
-          background: 'var(--border-bright)',
+          background: 'var(--line-strong)',
           flexShrink: 0,
         }}
       />

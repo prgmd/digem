@@ -58,7 +58,7 @@ export default function ArticlesClient({ articles, currentPage, totalPages, sele
   return (
     <div style={{
       height: '100vh',
-      background: '#000',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : (fadeIn ? 'pageFadeIn 0.4s ease both' : undefined),

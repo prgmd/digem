@@ -102,7 +102,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
             fontSize: 'clamp(3.5rem, 12vw, 6rem)',
             opacity: 0.22,
             fontWeight: 'normal',
-            fontFamily: 'bjorkfont, sans-serif',
+            fontFamily: 'var(--font-display)',
             userSelect: 'none',
             cursor: 'default',
             lineHeight: 1,
@@ -137,7 +137,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         alignItems: 'center',
         padding: '0 1.25rem',
         height: '46px',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--line)',
         flexShrink: 0,
       }}>
         {onBack && (
@@ -192,9 +192,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         style={{
           marginBottom: '2.5rem',
           padding: '0.85rem 1rem',
-          border: '1px solid var(--border)',
-          borderLeft: '2px solid var(--accent-green)',
-          background: 'rgba(232, 213, 160, 0.015)',
+          border: '1px solid var(--line)',
         }}
       >
         <div className="terminal-line">
@@ -214,7 +212,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: 'var(--text-color)',
+                color: 'var(--ink)',
                 textDecoration: 'underline',
                 textDecorationStyle: 'dotted',
                 textUnderlineOffset: '3px',
@@ -232,7 +230,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       {/* 썸네일 */}
       {article.thumbnail_url && (
         <div style={{ marginBottom: '2.5rem' }}>
-          <div className="dither" style={{ overflow: 'hidden', border: '1px solid var(--border)' }}>
+          <div className="dither" style={{ overflow: 'hidden', border: '1px solid var(--line)' }}>
             <img
               src={article.thumbnail_url}
               alt={article.title}
@@ -249,7 +247,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
               className="mono"
               style={{
                 fontSize: '0.7rem',
-                color: 'var(--meta-dim)',
+                color: 'var(--ink-muted)',
                 marginTop: '0.5rem',
                 letterSpacing: '0.04em',
                 textAlign: 'left',
@@ -263,7 +261,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'var(--font-text)', fontWeight: 400, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content, language) }}
       />
 

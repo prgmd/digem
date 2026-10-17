@@ -84,7 +84,7 @@ export default function Sidebar({
     <aside style={{
       width: fullWidth ? '100%' : '480px',
       height: '100%',
-      borderRight: fullWidth ? 'none' : '1px solid var(--border)',
+      borderRight: fullWidth ? 'none' : '1px solid var(--line)',
       padding: fullWidth ? '1rem' : '1.5rem 1.25rem',
       overflowY: 'auto',
       flexShrink: 0,
@@ -99,7 +99,7 @@ export default function Sidebar({
           gap: '0.2rem 0.4rem',
           marginBottom: '1.25rem',
           paddingBottom: '1rem',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: '1px solid var(--line)',
         }}
       >
         <button
@@ -125,7 +125,7 @@ export default function Sidebar({
           <li
             className="mono"
             style={{
-              color: 'var(--meta-color)',
+              color: 'var(--ink-muted)',
               fontSize: '0.85rem',
               padding: '1rem 0.5rem',
             }}
@@ -146,7 +146,7 @@ export default function Sidebar({
               </span>
               <span
                 style={{
-                  fontFamily: 'Pretendard, sans-serif',
+                  fontFamily: 'var(--font-text)',
                   fontWeight: 400,
                   fontSize: '1.05rem',
                   lineHeight: 1.35,
@@ -166,8 +166,8 @@ export default function Sidebar({
         <>
           <div
             style={{
-              color: 'var(--border-bright)',
-              fontFamily: 'var(--mono)',
+              color: 'var(--line-strong)',
+              fontFamily: 'var(--font-mono)',
               fontSize: '0.7rem',
               margin: '1rem 0 0.75rem',
               letterSpacing: '0.05em',
@@ -200,7 +200,7 @@ export default function Sidebar({
               className="mono"
               style={{
                 fontSize: '0.85rem',
-                color: 'var(--meta-color)',
+                color: 'var(--ink-muted)',
                 letterSpacing: '0.08em',
                 padding: '0 0.5rem',
               }}

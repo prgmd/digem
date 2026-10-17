@@ -31,9 +31,9 @@ export default async function GatePage({
     }}>
       <span
         style={{
-          fontFamily: 'bjorkfont, sans-serif',
+          fontFamily: 'var(--font-display)',
           fontSize: 'clamp(3.5rem, 12vw, 5.5rem)',
-          color: 'var(--text-color)',
+          color: 'var(--ink)',
           lineHeight: 1,
           userSelect: 'none',
         }}
@@ -45,7 +45,7 @@ export default async function GatePage({
         className="mono"
         style={{
           fontSize: '0.8rem',
-          color: 'var(--meta-color)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.06em',
           lineHeight: 1.9,
           textAlign: 'left',
@@ -54,7 +54,7 @@ export default async function GatePage({
         }}
       >
         <div>&gt; private deployment</div>
-        <div style={{ color: 'var(--meta-dim)' }}>&gt; enter passphrase to continue</div>
+        <div style={{ color: 'var(--ink-muted)' }}>&gt; enter passphrase to continue</div>
       </div>
 
       <form
@@ -78,9 +78,9 @@ export default async function GatePage({
           aria-label="passphrase"
           className="mono"
           style={{
-            background: '#0a0a0a',
-            border: '1px solid var(--border-bright)',
-            color: 'var(--text-color)',
+            background: 'var(--surface-raised)',
+            border: '1px solid var(--line-strong)',
+            color: 'var(--ink)',
             fontSize: '0.9rem',
             letterSpacing: '0.12em',
             padding: '0.7rem 0.9rem',
@@ -98,7 +98,7 @@ export default async function GatePage({
           className="mono"
           style={{
             fontSize: '0.78rem',
-            color: 'var(--text-color)',
+            color: 'var(--ink)',
             letterSpacing: '0.05em',
             margin: 0,
           }}

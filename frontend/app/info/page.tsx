@@ -12,10 +12,10 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
         fontSize: '0.72rem',
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
-        color: 'var(--text-color)',
+        color: 'var(--ink)',
         marginBottom: '1.25rem',
         paddingBottom: '0.5rem',
-        borderBottom: '1px solid var(--border-bright)',
+        borderBottom: '1px solid var(--line-strong)',
         display: 'flex',
         alignItems: 'center',
         gap: '0.5rem',
@@ -27,7 +27,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
         aria-hidden
         style={{
           flex: 1,
-          color: 'var(--border-bright)',
+          color: 'var(--line-strong)',
           overflow: 'hidden',
           whiteSpace: 'nowrap',
         }}
@@ -46,7 +46,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
       display: 'flex',
       gap: '1.5rem',
       paddingBottom: '0.9rem',
-      borderBottom: '1px solid var(--border)',
+      borderBottom: '1px solid var(--line)',
       marginBottom: '0.9rem',
       alignItems: 'baseline',
     }}
@@ -55,7 +55,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
       className="mono info-row-label"
       style={{
         fontSize: '0.7rem',
-        color: 'var(--meta-color)',
+        color: 'var(--ink-muted)',
         minWidth: '120px',
         flexShrink: 0,
         letterSpacing: '0.08em',
@@ -66,10 +66,10 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     </span>
     <span
       style={{
-        fontFamily: 'Pretendard, sans-serif',
+        fontFamily: 'var(--font-text)',
         fontSize: '0.92rem',
         fontWeight: 400,
-        color: 'var(--text-color)',
+        color: 'var(--ink)',
         lineHeight: 1.75,
         wordBreak: 'keep-all',
       }}
@@ -91,7 +91,7 @@ export default function InfoPage() {
   return (
     <div style={{
       height: '100vh',
-      background: '#000',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
@@ -104,7 +104,7 @@ export default function InfoPage() {
 
           <h1
             style={{
-              fontFamily: 'Pretendard, sans-serif',
+              fontFamily: 'var(--font-text)',
               fontWeight: 700,
               fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
               lineHeight: 1,
@@ -166,8 +166,8 @@ export default function InfoPage() {
             <Row label="Pretendard">
               본문, UI 텍스트 전반에 사용. orioncactus에서 제공하는 Pretendard 서체입니다.
             </Row>
-            <Row label="mono">
-              메타 / 터미널 표기에 사용. 시스템 monospace 스택 (Cascadia Mono · SF Mono · Consolas).
+            <Row label="IBM Plex Mono">
+              메타 / 터미널 표기에 사용. IBM이 공개한 IBM Plex Mono 서체입니다.
             </Row>
           </Section>
 
