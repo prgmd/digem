@@ -55,7 +55,7 @@ function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
               color: 'var(--line-strong)',
               userSelect: 'none',
               letterSpacing: '0.2em',
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           >
             {album.title[0].toUpperCase()}
@@ -91,7 +91,7 @@ function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
           textOverflow: 'ellipsis',
           marginBottom: '0.35rem',
           cursor: 'pointer',
-          transition: 'color 0.08s steps(2, end)',
+          transition: 'color var(--t-hover)',
         }}
         onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
         onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-muted)')}
@@ -132,6 +132,8 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
   const { setSelectedRegion, setSelectedType, setSelectedYear, setSelectedMonth, setFeaturedOnly, setPage } = actions
 
   const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
+
+  const hasFilters = featuredOnly || [selectedRegion, selectedType, selectedYear, selectedMonth].some(v => v !== 'all')
 
   const isMonthOnly = monthFilter !== 'all' && selectedYear === 'all'
   const displayAlbums = isMonthOnly
@@ -202,7 +204,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       </div>
 
       {navigating && (
-        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'rgba(0,0,0,0.65)' }}>
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'var(--overlay)' }}>
           <Spinner />
         </div>
       )}
@@ -212,7 +214,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
         {paginated.length === 0 && (
           <div className="terminal-block" style={{ padding: 'var(--sp-8) 0', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
             <div>&gt; no records match the filter.</div>
-            <button onClick={() => router.replace('/albums')} className="bracket-btn">clear filters</button>
+            {hasFilters && <button onClick={() => router.replace('/albums')} className="bracket-btn">clear filters</button>}
           </div>
         )}
         <div className="album-grid">

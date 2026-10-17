@@ -21,7 +21,7 @@ export default function CategoryHeader({ currentCategory }: CategoryHeaderProps)
         <span className="glitch-on-hover">d</span>
       </Link>
 
-      <nav className="header-nav">
+      <nav className="header-nav" aria-label="메뉴">
         {CATEGORIES.map(cat => (
           <Link
             key={cat.key}

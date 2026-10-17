@@ -90,7 +90,7 @@ export default function ArtistClient({ artist, albums }: Props) {
                       className="mono"
                       style={{
                         fontSize: '1.8rem',
-                        fontWeight: 700,
+                        fontWeight: 600,
                         color: 'var(--line-strong)',
                         letterSpacing: '0.18em',
                       }}
@@ -110,7 +110,7 @@ export default function ArtistClient({ artist, albums }: Props) {
                   whiteSpace: 'nowrap',
                   marginBottom: '0.25rem',
                   opacity: hoveredAlbum === album.id ? 1 : 0.92,
-                  transition: 'opacity 0.1s steps(3, end)',
+                  transition: 'opacity var(--t-hover)',
                 }}
               >
                 {album.title}

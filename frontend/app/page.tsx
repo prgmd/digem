@@ -42,7 +42,6 @@ export default function Home() {
           style={{
             fontSize: 'var(--fs-xs)',
             color: 'var(--ink-muted)',
-            opacity: 0.85,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
           }}

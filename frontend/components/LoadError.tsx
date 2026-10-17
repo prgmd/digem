@@ -14,7 +14,9 @@ export default function LoadError({ section, error, reset }: Props) {
       <div className="terminal-screen">
         <div className="terminal-block">
           <div>&gt; error: failed to load {section}</div>
-          <div className="is-muted">&gt; detail: {error.message || 'unknown'}</div>
+          {process.env.NODE_ENV === 'development' && (
+            <div className="is-muted">&gt; detail: {error.message || 'unknown'}</div>
+          )}
           {error.digest && <div className="is-muted">&gt; digest: {error.digest}</div>}
         </div>
         <button onClick={reset} className="bracket-btn">retry</button>

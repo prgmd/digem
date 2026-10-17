@@ -60,6 +60,7 @@ html {
   --ink-muted: #8a7a5a;
   --ink-faint: #5b5036;
   --ink-rgb: 232, 213, 160;
+  --overlay: rgba(0, 0, 0, 0.65);
 
   --font-display: 'bjorkfont', sans-serif;
   --font-text: 'Pretendard', sans-serif;
@@ -232,7 +233,7 @@ select option { background: var(--surface-raised); color: var(--ink); }
   filter: var(--dither);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  transition: filter 0.35s steps(7, end);
+  transition: filter var(--t-image);
 }
 .dither:hover {
   filter: none;
@@ -304,8 +305,7 @@ select option { background: var(--surface-raised); color: var(--ink); }
   height: 2px;
   background: var(--ink);
   z-index: 10;
-  transition: width 0.05s steps(8, end);
-  box-shadow: 0 0 8px rgba(var(--ink-rgb), 0.4);
+  transition: width var(--t-hover);
 }
 
 /* bracketed button — `[ label ]` */
@@ -349,7 +349,7 @@ select option { background: var(--surface-raised); color: var(--ink); }
 .bracket-btn[aria-disabled="true"] {
   cursor: default;
   pointer-events: none;
-  color: var(--ink-faint);
+  color: var(--ink-muted);
   border-color: var(--line);
 }
 
@@ -363,7 +363,7 @@ select option { background: var(--surface-raised); color: var(--ink); }
   background: var(--ink);
   color: var(--surface);
   padding: 0.6rem 1.6rem;
-  transition: background 0.1s steps(2, end), color 0.1s steps(2, end);
+  transition: background var(--t-hover), color var(--t-hover);
 }
 .home-nav-btn:hover {
   background: var(--ink-bright);
@@ -476,11 +476,11 @@ input:focus-visible {
 
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
   gap: var(--sp-6);
 }
 
-.album-card { transition: filter 0.18s steps(5, end); }
+.album-card { transition: filter var(--t-state); }
 
 .album-artwork {
   width: 100%;
@@ -501,7 +501,7 @@ input:focus-visible {
   object-fit: cover;
   filter: var(--dither);
   image-rendering: pixelated;
-  transition: filter 0.32s steps(7, end);
+  transition: filter var(--t-image);
 }
 
 /* featured: never dither, never dim */
@@ -511,7 +511,7 @@ input:focus-visible {
 @media (hover: hover) and (pointer: fine) {
   .album-grid:hover .album-card {
     filter: brightness(0.42) saturate(0.6);
-    transition: filter 0.18s steps(5, end);
+    transition: filter var(--t-state);
   }
   .album-grid:hover .album-card.is-featured {
     filter: none;
@@ -530,7 +530,7 @@ input:focus-visible {
   left: 0;
   font-family: var(--font-mono);
   font-size: 0.62rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.1em;
   color: var(--surface);
   background: var(--ink);
@@ -539,12 +539,6 @@ input:focus-visible {
   line-height: 1;
 }
 
-@media (max-width: 1200px) {
-  .album-grid { grid-template-columns: repeat(5, 1fr); }
-}
-@media (max-width: 900px) {
-  .album-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-}
 @media (max-width: 768px) {
   .album-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   .album-filter-bar  { padding: 0.75rem 1rem; }
@@ -579,7 +573,7 @@ input:focus-visible {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  transition: background 0.06s steps(2, end), color 0.06s steps(2, end);
+  transition: background var(--t-hover), color var(--t-hover);
   border-left: 2px solid transparent;
 }
 
