@@ -21,14 +21,7 @@ interface Props {
 export default function ArticlesClient({ articles, currentPage, totalPages, selectedSource }: Props) {
   const router = useRouter()
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [isExiting, setIsExiting] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [fadeIn] = useState(() => {
-    if (typeof sessionStorage === 'undefined') return true
-    const skip = sessionStorage.getItem('nofade')
-    if (skip) { sessionStorage.removeItem('nofade'); return false }
-    return true
-  })
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -36,11 +29,6 @@ export default function ArticlesClient({ articles, currentPage, totalPages, sele
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
-
-  const handleExitToHome = () => {
-    setIsExiting(true)
-    setTimeout(() => router.push('/'), 350)
-  }
 
   const navigate = (source: string | null, page: number) => {
     const params = new URLSearchParams()
@@ -58,12 +46,11 @@ export default function ArticlesClient({ articles, currentPage, totalPages, sele
   return (
     <div style={{
       height: '100vh',
-      background: '#000',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
-      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : (fadeIn ? 'pageFadeIn 0.4s ease both' : undefined),
     }}>
-      <CategoryHeader onLogoClick={handleExitToHome} currentCategory="articles" />
+      <CategoryHeader currentCategory="articles" />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {showSidebar && (
           <Sidebar

@@ -10,8 +10,8 @@ export default function Spinner() {
         flexDirection: 'column',
         alignItems: 'center',
         gap: '0.85rem',
-        fontFamily: 'var(--mono)',
-        color: 'var(--text-color)',
+        fontFamily: 'var(--font-mono)',
+        color: 'var(--ink)',
       }}
     >
       {/* dot wave (3 amber blocks bouncing) */}
@@ -22,7 +22,7 @@ export default function Spinner() {
             style={{
               width: SIZE * 0.22,
               height: SIZE * 0.22,
-              background: 'var(--text-color)',
+              background: 'var(--ink)',
               display: 'inline-block',
               animation: `dotWave 1s steps(8, end) ${i * 0.15}s infinite`,
             }}
@@ -33,10 +33,10 @@ export default function Spinner() {
       {/* single static caption */}
       <div
         style={{
-          fontSize: '0.66rem',
-          color: 'var(--meta-color)',
+          fontSize: 'var(--fs-2xs)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.16em',
-          textTransform: 'uppercase',
+          textTransform: 'lowercase',
         }}
       >
         loading

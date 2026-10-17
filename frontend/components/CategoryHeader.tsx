@@ -1,219 +1,37 @@
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { ARTICLES_ENABLED } from '@/lib/features'
 
 interface CategoryHeaderProps {
-  onLogoClick: () => void
   currentCategory: 'articles' | 'albums' | 'info'
 }
 
 const ALL_CATEGORIES = [
   { label: 'articles', path: '/articles', key: 'articles' },
   { label: 'albums',   path: '/albums',   key: 'albums'   },
+  { label: 'info',     path: '/info',     key: 'info'     },
 ] as const
 
 // 칼럼 섹션 비공개 중에는 메뉴에서 제외한다.
 const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_ENABLED)
 
-const INFO_ITEM = { label: 'info', path: '/info', key: 'info' } as const
-
-export default function CategoryHeader({ onLogoClick, currentCategory }: CategoryHeaderProps) {
-  const router = useRouter()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [menuClosing, setMenuClosing] = useState(false)
-  const [logoHover, setLogoHover] = useState(false)
-  const [burgerHover, setBurgerHover] = useState(false)
-
-  const closeMenu = () => {
-    setMenuClosing(true)
-    setTimeout(() => { setMenuOpen(false); setMenuClosing(false) }, 300)
-  }
-
-  const navigateTo = (path: string) => {
-    sessionStorage.setItem('nofade', '1')
-    closeMenu()
-    setTimeout(() => router.push(path), 300)
-  }
-
+export default function CategoryHeader({ currentCategory }: CategoryHeaderProps) {
   return (
-    <>
-      <header className="category-header" style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 2rem',
-        height: '60px',
-        borderBottom: '1px solid var(--border)',
-        flexShrink: 0,
-        position: 'relative',
-        gap: '1rem',
-      }}>
-        {/* 로고 */}
-        <div
-          onClick={onLogoClick}
-          onMouseEnter={() => setLogoHover(true)}
-          onMouseLeave={() => setLogoHover(false)}
-          style={{
-            cursor: 'pointer',
-            padding: '0.5rem 1.5rem 0.5rem 0',
-            margin: '-0.5rem 0',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.55rem',
-          }}
-        >
-          <span
-            className="glitch-on-hover"
-            style={{
-              fontFamily: 'bjorkfont, sans-serif',
-              fontSize: '1.85rem',
-              color: logoHover ? 'var(--text-bright)' : 'var(--text-color)',
-              lineHeight: 1,
-              transition: 'color 0.08s steps(2, end)',
-            }}
+    <header className="category-header">
+      <Link href="/" className="header-logo" aria-label="digem home">
+        <span className="glitch-on-hover">d</span>
+      </Link>
+
+      <nav className="header-nav" aria-label="메뉴">
+        {CATEGORIES.map(cat => (
+          <Link
+            key={cat.key}
+            href={cat.path}
+            aria-current={cat.key === currentCategory ? 'page' : undefined}
           >
-            d
-          </span>
-        </div>
-
-        {/* 햄버거 */}
-        <button
-          onClick={() => menuOpen ? closeMenu() : setMenuOpen(true)}
-          onMouseEnter={() => setBurgerHover(true)}
-          onMouseLeave={() => setBurgerHover(false)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '5px',
-            padding: '4px',
-            opacity: burgerHover ? 0.6 : 1,
-            transition: 'opacity 0.12s steps(3, end)',
-          }}
-          aria-label="메뉴"
-        >
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
-          <span style={{ display: 'block', width: '24px', height: '2px', backgroundColor: 'var(--text-color)' }} />
-        </button>
-      </header>
-
-      {/* 오른쪽 슬라이드 패널 */}
-      {menuOpen && (
-        <>
-          <div onClick={closeMenu} style={{ position: 'fixed', inset: 0, zIndex: 25 }} />
-          <nav style={{
-            position: 'fixed',
-            top: 0, right: 0,
-            height: '100vh',
-            width: 'fit-content',
-            minWidth: '240px',
-            backgroundColor: '#0a0a0a',
-            borderLeft: '1px solid var(--border)',
-            zIndex: 26,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: '0.4rem',
-            padding: '0 2.5rem',
-            animation: menuClosing
-              ? 'menuSlideOutRight 0.32s cubic-bezier(0.55, 0, 0.7, 0.2) forwards'
-              : 'menuSlideInRight 0.42s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}>
-            {CATEGORIES.map(cat => {
-              const isCurrent = cat.key === currentCategory
-              return (
-                <span
-                  key={cat.key}
-                  onClick={!isCurrent ? () => navigateTo(cat.path) : undefined}
-                  className="mono"
-                  style={{
-                    fontSize: '1.15rem',
-                    color: isCurrent ? 'var(--text-color)' : 'var(--meta-color)',
-                    cursor: !isCurrent ? 'pointer' : 'default',
-                    transition: 'color 0.08s steps(2, end), background 0.08s steps(2, end)',
-                    padding: '0.4rem 0.8rem 0.4rem 1.4rem',
-                    position: 'relative',
-                    width: '100%',
-                    letterSpacing: '0.06em',
-                  }}
-                  onMouseEnter={e => {
-                    if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--bg-color)'
-                      ;(e.currentTarget as HTMLElement).style.background = 'var(--text-color)'
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--meta-color)'
-                      ;(e.currentTarget as HTMLElement).style.background = 'transparent'
-                    }
-                  }}
-                >
-                  <span style={{ position: 'absolute', left: 0, opacity: isCurrent ? 1 : 0.4 }}>
-                    {isCurrent ? '▶' : '·'}
-                  </span>
-                  {cat.label}
-                </span>
-              )
-            })}
-
-            <div
-              style={{
-                color: 'var(--meta-dim)',
-                fontFamily: 'var(--mono)',
-                fontSize: '0.7rem',
-                margin: '1.1rem 0 0.5rem',
-                letterSpacing: '0.06em',
-                width: '100%',
-              }}
-            >
-              ─────────────────
-            </div>
-
-            {(() => {
-              const isCurrent = INFO_ITEM.key === currentCategory
-              return (
-                <span
-                  onClick={!isCurrent ? () => navigateTo(INFO_ITEM.path) : undefined}
-                  className="mono"
-                  style={{
-                    fontSize: '1.15rem',
-                    color: isCurrent ? 'var(--text-color)' : 'var(--meta-color)',
-                    cursor: !isCurrent ? 'pointer' : 'default',
-                    transition: 'color 0.08s steps(2, end), background 0.08s steps(2, end)',
-                    padding: '0.4rem 0.8rem 0.4rem 1.4rem',
-                    position: 'relative',
-                    width: '100%',
-                    letterSpacing: '0.06em',
-                  }}
-                  onMouseEnter={e => {
-                    if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--bg-color)'
-                      ;(e.currentTarget as HTMLElement).style.background = 'var(--text-color)'
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!isCurrent) {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--meta-color)'
-                      ;(e.currentTarget as HTMLElement).style.background = 'transparent'
-                    }
-                  }}
-                >
-                  <span style={{ position: 'absolute', left: 0, opacity: isCurrent ? 1 : 0.4 }}>
-                    {isCurrent ? '▶' : '·'}
-                  </span>
-                  {INFO_ITEM.label}
-                </span>
-              )
-            })()}
-          </nav>
-        </>
-      )}
-    </>
+            {cat.label}
+          </Link>
+        ))}
+      </nav>
+    </header>
   )
 }

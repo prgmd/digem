@@ -1,6 +1,13 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
-import MeshBackground from '@/components/MeshBackground'
+import { IBM_Plex_Mono } from 'next/font/google'
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-plex-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'dig-em',
@@ -18,14 +25,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={plexMono.variable}>
       <head>
         <link rel="preload" href="/fonts/bjorkfont.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/Pretendard-Regular.otf" as="font" type="font/otf" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/Pretendard-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
       </head>
       <body>
-        <MeshBackground />
         {children}
       </body>
     </html>

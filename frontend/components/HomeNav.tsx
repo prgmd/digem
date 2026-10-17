@@ -15,7 +15,7 @@ export default function HomeNav() {
         display: 'flex',
         gap: '1.2rem',
         alignItems: 'center',
-        fontFamily: 'var(--mono)',
+        fontFamily: 'var(--font-mono)',
       }}
     >
       {LINKS.map(({ href, label }) => (

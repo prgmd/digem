@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'digem — access',
+  title: 'digem / access',
   robots: { index: false, follow: false },
 }
 
@@ -31,9 +31,9 @@ export default async function GatePage({
     }}>
       <span
         style={{
-          fontFamily: 'bjorkfont, sans-serif',
+          fontFamily: 'var(--font-display)',
           fontSize: 'clamp(3.5rem, 12vw, 5.5rem)',
-          color: 'var(--text-color)',
+          color: 'var(--ink)',
           lineHeight: 1,
           userSelect: 'none',
         }}
@@ -44,8 +44,8 @@ export default async function GatePage({
       <div
         className="mono"
         style={{
-          fontSize: '0.8rem',
-          color: 'var(--meta-color)',
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.06em',
           lineHeight: 1.9,
           textAlign: 'left',
@@ -54,7 +54,7 @@ export default async function GatePage({
         }}
       >
         <div>&gt; private deployment</div>
-        <div style={{ color: 'var(--meta-dim)' }}>&gt; enter passphrase to continue</div>
+        <div style={{ color: 'var(--ink-muted)' }}>&gt; enter passphrase to continue</div>
       </div>
 
       <form
@@ -78,17 +78,16 @@ export default async function GatePage({
           aria-label="passphrase"
           className="mono"
           style={{
-            background: '#0a0a0a',
-            border: '1px solid var(--border-bright)',
-            color: 'var(--text-color)',
-            fontSize: '0.9rem',
+            background: 'var(--surface-raised)',
+            border: '1px solid var(--line-strong)',
+            color: 'var(--ink)',
+            fontSize: 'var(--fs-sm)',
             letterSpacing: '0.12em',
             padding: '0.7rem 0.9rem',
-            outline: 'none',
             width: '100%',
           }}
         />
-        <button type="submit" className="bracket-btn" style={{ fontSize: '0.85rem', padding: '0.6rem' }}>
+        <button type="submit" className="bracket-btn" style={{ padding: 'var(--sp-2)' }}>
           enter
         </button>
       </form>
@@ -97,8 +96,8 @@ export default async function GatePage({
         <p
           className="mono"
           style={{
-            fontSize: '0.78rem',
-            color: 'var(--text-color)',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--ink)',
             letterSpacing: '0.05em',
             margin: 0,
           }}

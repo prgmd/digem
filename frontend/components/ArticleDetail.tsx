@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Article } from '@/lib/types'
-import Spinner from '@/components/Spinner'
 
 function renderContent(raw: string, lang: 'ko' | 'en' = 'ko'): string {
   let result = raw
@@ -38,19 +37,9 @@ interface ArticleDetailProps {
 
 export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const [language, setLanguage] = useState<'ko' | 'en'>('ko')
-  const [ready, setReady] = useState(!article?.thumbnail_url)
   const [progress, setProgress] = useState(0)
   const [fullArticle, setFullArticle] = useState<Article | null>(article ?? null)
   const mainRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    if (!article?.thumbnail_url) { setReady(true); return }
-    setReady(false)
-    const img = new window.Image()
-    img.src = article.thumbnail_url
-    img.onload = () => setReady(true)
-    img.onerror = () => setReady(true)
-  }, [article?.thumbnail_url])
 
   // 본문(content_en, content_ko)을 동적으로 로드
   useEffect(() => {
@@ -83,7 +72,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
     el.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
     return () => el.removeEventListener('scroll', onScroll)
-  }, [article?.id, ready, language])
+  }, [article?.id, language])
 
   if (!article) {
     return (
@@ -102,7 +91,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
             fontSize: 'clamp(3.5rem, 12vw, 6rem)',
             opacity: 0.22,
             fontWeight: 'normal',
-            fontFamily: 'bjorkfont, sans-serif',
+            fontFamily: 'var(--font-display)',
             userSelect: 'none',
             cursor: 'default',
             lineHeight: 1,
@@ -117,16 +106,8 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   const displayArticle = fullArticle || article
   const content = language === 'ko' ? (displayArticle?.content_ko || '') : (displayArticle?.content_en || '')
 
-  if (!ready) {
-    return (
-      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', animation: 'pageFadeIn 0.25s ease both' }}>
-        <Spinner />
-      </main>
-    )
-  }
-
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', position: 'relative', animation: 'pageFadeIn 0.25s steps(12, end) both' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', position: 'relative' }}>
       {/* 진행 바 */}
       <div className="reading-progress" style={{ width: `${progress}%` }} />
 
@@ -137,14 +118,13 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         alignItems: 'center',
         padding: '0 1.25rem',
         height: '46px',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--line)',
         flexShrink: 0,
       }}>
         {onBack && (
           <button
             onClick={onBack}
             className="bracket-btn"
-            style={{ fontSize: '0.72rem' }}
           >
             ← list
           </button>
@@ -171,7 +151,6 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         flex: 1,
         padding: 'clamp(1.25rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem)',
         overflowY: 'auto',
-        animation: 'fadeIn 0.5s steps(14, end) both',
       }}
     >
       <div style={{ maxWidth: '760px', margin: '0 auto' }}>
@@ -192,16 +171,14 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         style={{
           marginBottom: '2.5rem',
           padding: '0.85rem 1rem',
-          border: '1px solid var(--border)',
-          borderLeft: '2px solid var(--accent-green)',
-          background: 'rgba(232, 213, 160, 0.015)',
+          border: '1px solid var(--line)',
         }}
       >
         <div className="terminal-line">
           <span className="terminal-key">src</span>{article.source}
         </div>
         <div className="terminal-line">
-          <span className="terminal-key">by</span>{article.author || '—'}
+          <span className="terminal-key">by</span>{article.author || 'unknown'}
         </div>
         <div className="terminal-line">
           <span className="terminal-key">date</span>{fmtDate(article.published_at)}
@@ -214,7 +191,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: 'var(--text-color)',
+                color: 'var(--ink)',
                 textDecoration: 'underline',
                 textDecorationStyle: 'dotted',
                 textUnderlineOffset: '3px',
@@ -232,7 +209,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
       {/* 썸네일 */}
       {article.thumbnail_url && (
         <div style={{ marginBottom: '2.5rem' }}>
-          <div className="dither" style={{ overflow: 'hidden', border: '1px solid var(--border)' }}>
+          <div className="dither" style={{ overflow: 'hidden', border: '1px solid var(--line)' }}>
             <img
               src={article.thumbnail_url}
               alt={article.title}
@@ -248,8 +225,8 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
             <p
               className="mono"
               style={{
-                fontSize: '0.7rem',
-                color: 'var(--meta-dim)',
+                fontSize: 'var(--fs-2xs)',
+                color: 'var(--ink-muted)',
                 marginTop: '0.5rem',
                 letterSpacing: '0.04em',
                 textAlign: 'left',
@@ -263,7 +240,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 본문 */}
       <div
-        style={{ fontFamily: 'Pretendard, sans-serif', fontWeight: 400, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
+        style={{ fontFamily: 'var(--font-text)', fontWeight: 400, fontSize: 'clamp(1rem, 2.6vw, 1.2rem)', lineHeight: 1.7, textAlign: 'left', wordBreak: 'keep-all' }}
         dangerouslySetInnerHTML={{ __html: renderContent(content, language) }}
       />
 

@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 import ArtistClient from '@/components/ArtistClient'
+import CategoryHeader from '@/components/CategoryHeader'
 
 interface Props {
   params: Promise<{ name: string }>
@@ -15,7 +17,19 @@ export default async function ArtistPage({ params }: Props) {
     .eq('name', decodedName)
     .single()
 
-  if (!artistData) return <div style={{ color: '#E8D5A0', padding: '4rem' }}>아티스트를 찾을 수 없습니다.</div>
+  if (!artistData) {
+    return (
+      <div className="page-shell">
+        <CategoryHeader currentCategory="albums" />
+        <div className="terminal-screen">
+          <div className="terminal-block">
+            <div>&gt; no artist on file: {decodedName}</div>
+          </div>
+          <Link href="/albums" className="bracket-btn">albums</Link>
+        </div>
+      </div>
+    )
+  }
 
   const { data: albumLinks } = await supabase
     .from('album_artists')

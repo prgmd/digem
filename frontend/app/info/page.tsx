@@ -1,6 +1,3 @@
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import CategoryHeader from '@/components/CategoryHeader'
 import { ARTICLES_ENABLED } from '@/lib/features'
 
@@ -9,13 +6,13 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
     <h2
       className="mono info-section-title"
       style={{
-        fontSize: '0.72rem',
+        fontSize: 'var(--fs-2xs)',
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
-        color: 'var(--text-color)',
+        color: 'var(--ink)',
         marginBottom: '1.25rem',
         paddingBottom: '0.5rem',
-        borderBottom: '1px solid var(--border-bright)',
+        borderBottom: '1px solid var(--line-strong)',
         display: 'flex',
         alignItems: 'center',
         gap: '0.5rem',
@@ -27,7 +24,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
         aria-hidden
         style={{
           flex: 1,
-          color: 'var(--border-bright)',
+          color: 'var(--line-strong)',
           overflow: 'hidden',
           whiteSpace: 'nowrap',
         }}
@@ -46,7 +43,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
       display: 'flex',
       gap: '1.5rem',
       paddingBottom: '0.9rem',
-      borderBottom: '1px solid var(--border)',
+      borderBottom: '1px solid var(--line)',
       marginBottom: '0.9rem',
       alignItems: 'baseline',
     }}
@@ -54,8 +51,8 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     <span
       className="mono info-row-label"
       style={{
-        fontSize: '0.7rem',
-        color: 'var(--meta-color)',
+        fontSize: 'var(--fs-2xs)',
+        color: 'var(--ink-muted)',
         minWidth: '120px',
         flexShrink: 0,
         letterSpacing: '0.08em',
@@ -66,10 +63,10 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     </span>
     <span
       style={{
-        fontFamily: 'Pretendard, sans-serif',
-        fontSize: '0.92rem',
+        fontFamily: 'var(--font-text)',
+        fontSize: 'var(--fs-sm)',
         fontWeight: 400,
-        color: 'var(--text-color)',
+        color: 'var(--ink)',
         lineHeight: 1.75,
         wordBreak: 'keep-all',
       }}
@@ -80,33 +77,24 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
 )
 
 export default function InfoPage() {
-  const router = useRouter()
-  const [isExiting, setIsExiting] = useState(false)
-
-  const handleExitToHome = () => {
-    setIsExiting(true)
-    setTimeout(() => router.push('/'), 350)
-  }
-
   return (
     <div style={{
       height: '100vh',
-      background: '#000',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : 'pageFadeIn 0.4s steps(12, end) both',
     }}>
-      <CategoryHeader onLogoClick={handleExitToHome} currentCategory="info" />
+      <CategoryHeader currentCategory="info" />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 6vw, 5rem)' }}>
         <div style={{ maxWidth: '720px' }}>
 
           <h1
             style={{
-              fontFamily: 'Pretendard, sans-serif',
+              fontFamily: 'var(--font-text)',
               fontWeight: 700,
-              fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
+              fontSize: 'var(--fs-2xl)',
               lineHeight: 1,
               marginBottom: '2.5rem',
               letterSpacing: '0.02em',
@@ -150,7 +138,16 @@ export default function InfoPage() {
               게재된 내용에 대해 삭제 또는 수정을 요청하시려면 아래 연락처로 알려주시기 바랍니다.
               확인 후 신속히 조치하겠습니다.
             </Row>
-            <Row label="contact">{/* TODO: 공개용 연락처 기입 */}—</Row>
+            <Row label="contact">
+              <a
+                href="https://github.com/prgmd/digem/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--ink)', textDecorationStyle: 'dotted', textUnderlineOffset: '3px' }}
+              >
+                github.com/prgmd/digem/issues
+              </a>
+            </Row>
             {ARTICLES_ENABLED && (
               <Row label="translations">
                 자동 번역된 텍스트는 참고 목적으로만 제공됩니다.
@@ -166,8 +163,8 @@ export default function InfoPage() {
             <Row label="Pretendard">
               본문, UI 텍스트 전반에 사용. orioncactus에서 제공하는 Pretendard 서체입니다.
             </Row>
-            <Row label="mono">
-              메타 / 터미널 표기에 사용. 시스템 monospace 스택 (Cascadia Mono · SF Mono · Consolas).
+            <Row label="IBM Plex Mono">
+              메타 / 터미널 표기에 사용. IBM이 공개한 IBM Plex Mono 서체입니다.
             </Row>
           </Section>
 

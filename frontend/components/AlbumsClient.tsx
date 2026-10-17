@@ -22,28 +22,23 @@ const PAGE_SIZE_CLIENT = 30
 
 interface AlbumCardProps {
   album: Album
-  index: number
   onArtistClick: (artist: string) => void
 }
 
-function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
+function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
     <div
       className={`album-card ${album.is_featured ? 'is-featured' : ''}`}
-      style={{
-        opacity: 0,
-        animation: `pixelFadeIn 0.5s steps(10, end) ${index * 30}ms forwards`,
-        minWidth: 0,
-      }}
+      style={{ minWidth: 0 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className="album-artwork"
         style={{
-          outline: album.is_featured ? '2px solid var(--accent-green)' : 'none',
+          outline: album.is_featured ? '1px solid var(--ink)' : 'none',
           outlineOffset: '2px',
         }}
       >
@@ -57,10 +52,10 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
             className="mono"
             style={{
               fontSize: '2rem',
-              color: 'var(--border-bright)',
+              color: 'var(--line-strong)',
               userSelect: 'none',
               letterSpacing: '0.2em',
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           >
             {album.title[0].toUpperCase()}
@@ -71,10 +66,10 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
       <MarqueeText
         active={isHovered}
         style={{
-          fontFamily: 'Pretendard, sans-serif',
+          fontFamily: 'var(--font-text)',
           fontWeight: 600,
           fontSize: '1.1rem',
-          color: 'var(--text-color)',
+          color: 'var(--ink)',
           marginBottom: '0.25rem',
         }}
       >
@@ -87,19 +82,19 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
           onArtistClick(album.artist)
         }}
         style={{
-          fontFamily: 'Pretendard, sans-serif',
-          fontWeight: 300,
-          fontSize: '0.95rem',
-          color: 'var(--meta-color)',
+          fontFamily: 'var(--font-text)',
+          fontWeight: 400,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--ink-muted)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           marginBottom: '0.35rem',
           cursor: 'pointer',
-          transition: 'color 0.08s steps(2, end)',
+          transition: 'color var(--t-hover)',
         }}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-color)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--meta-color)')}
+        onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-muted)')}
       >
         {album.artist}
       </p>
@@ -107,8 +102,8 @@ function AlbumCard({ album, index, onArtistClick }: AlbumCardProps) {
       <p
         className="mono"
         style={{
-          fontSize: '0.7rem',
-          color: 'var(--meta-dim)',
+          fontSize: 'var(--fs-2xs)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.05em',
           textTransform: 'lowercase',
         }}
@@ -130,25 +125,15 @@ interface Props {
 
 export default function AlbumsClient({ albums, totalCount, availableYears, monthFilter }: Props) {
   const router = useRouter()
-  const [isExiting, setIsExiting] = useState(false)
   const [navigating, setNavigating] = useState(false)
-  const [fadeIn] = useState(() => {
-    if (typeof sessionStorage === 'undefined') return true
-    const skip = sessionStorage.getItem('nofade')
-    if (skip) { sessionStorage.removeItem('nofade'); return false }
-    return true
-  })
 
   const { filters, actions } = useAlbumFilters()
   const { selectedRegion, selectedType, selectedYear, selectedMonth, featuredOnly, page } = filters
   const { setSelectedRegion, setSelectedType, setSelectedYear, setSelectedMonth, setFeaturedOnly, setPage } = actions
 
-  const handleExitToHome = () => {
-    setIsExiting(true)
-    setTimeout(() => router.push('/'), 350)
-  }
-
   const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
+
+  const hasFilters = featuredOnly || [selectedRegion, selectedType, selectedYear, selectedMonth].some(v => v !== 'all')
 
   const isMonthOnly = monthFilter !== 'all' && selectedYear === 'all'
   const displayAlbums = isMonthOnly
@@ -166,13 +151,12 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
   return (
     <div style={{
       height: '100vh',
-      background: '#000',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      animation: isExiting ? 'pageFadeOut 0.35s ease forwards' : (fadeIn ? 'pageFadeIn 0.4s steps(12, end) both' : undefined),
     }}>
-      <CategoryHeader onLogoClick={handleExitToHome} currentCategory="albums" />
+      <CategoryHeader currentCategory="albums" />
 
       {/* 필터 바 */}
       <div className="album-filter-bar" style={{
@@ -180,7 +164,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
         flexWrap: 'wrap',
         alignItems: 'center',
         gap: '0.4rem 0.6rem',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--line)',
         flexShrink: 0,
       }}>
         <button
@@ -210,8 +194,8 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           className="mono"
           style={{
             marginLeft: 'auto',
-            fontSize: '0.7rem',
-            color: 'var(--meta-color)',
+            fontSize: 'var(--fs-2xs)',
+            color: 'var(--ink-muted)',
             letterSpacing: '0.06em',
           }}
         >
@@ -220,7 +204,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       </div>
 
       {navigating && (
-        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'rgba(0,0,0,0.65)' }}>
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, background: 'var(--overlay)' }}>
           <Spinner />
         </div>
       )}
@@ -228,25 +212,16 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       {/* 앨범 그리드 */}
       <div className="album-grid-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
         {paginated.length === 0 && (
-          <p
-            className="mono"
-            style={{
-              color: 'var(--meta-color)',
-              fontSize: '0.9rem',
-              textAlign: 'center',
-              padding: '4rem 0',
-              letterSpacing: '0.05em',
-            }}
-          >
-            &gt; no records match the filter.
-          </p>
+          <div className="terminal-block" style={{ padding: 'var(--sp-8) 0', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
+            <div>&gt; no records match the filter.</div>
+            {hasFilters && <button onClick={() => router.replace('/albums')} className="bracket-btn">clear filters</button>}
+          </div>
         )}
         <div className="album-grid">
-          {paginated.map((album, index) => (
+          {paginated.map(album => (
             <AlbumCard
               key={album.id}
               album={album}
-              index={index}
               onArtistClick={(artist) => {
                 setNavigating(true)
                 router.push(`/artists/${encodeURIComponent(artist)}`)
@@ -271,15 +246,14 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page <= 1}
               className="bracket-btn"
-              style={{ opacity: page <= 1 ? 0.3 : 1 }}
             >
               prev
             </button>
             <span
               className="mono"
               style={{
-                fontSize: '0.85rem',
-                color: 'var(--meta-color)',
+                fontSize: 'var(--fs-sm)',
+                color: 'var(--ink-muted)',
                 letterSpacing: '0.08em',
                 padding: '0 0.5rem',
                 minWidth: '4.5rem',
@@ -292,7 +266,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page >= totalPages}
               className="bracket-btn"
-              style={{ opacity: page >= totalPages ? 0.3 : 1 }}
             >
               next
             </button>

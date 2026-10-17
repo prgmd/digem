@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Album, Artist } from '@/lib/types'
+import CategoryHeader from '@/components/CategoryHeader'
 
 interface Props {
   artist: Artist
@@ -13,38 +14,27 @@ export default function ArtistClient({ artist, albums }: Props) {
   const [hoveredAlbum, setHoveredAlbum] = useState<string | null>(null)
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#000',
-        padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
-        animation: 'pageFadeIn 0.4s steps(12, end) both',
-      }}
-    >
+    <div className="page-shell">
+      <CategoryHeader currentCategory="albums" />
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)',
+        }}
+      >
       <button
         onClick={() => router.back()}
         className="bracket-btn"
-        style={{ marginBottom: '2.5rem' }}
+        style={{ marginBottom: 'var(--sp-8)' }}
       >
         ← back
       </button>
 
-      <div
-        style={{
-          fontFamily: 'bjorkfont, sans-serif',
-          fontSize: '1.5rem',
-          color: 'var(--meta-color)',
-          letterSpacing: '0.04em',
-          marginBottom: '0.35rem',
-        }}
-      >
-        artist
-      </div>
-
       <h1
         style={{
-          fontFamily: 'Pretendard, sans-serif',
-          fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+          fontFamily: 'var(--font-text)',
+          fontSize: 'var(--fs-2xl)',
           fontWeight: 700,
           marginBottom: '0.4rem',
           lineHeight: 1.1,
@@ -56,7 +46,7 @@ export default function ArtistClient({ artist, albums }: Props) {
       {artist.name_ko && (
         <p
           className="mono"
-          style={{ fontSize: '0.8rem', color: 'var(--meta-color)', letterSpacing: '0.06em' }}
+          style={{ fontSize: 'var(--fs-xs)', color: 'var(--ink-muted)', letterSpacing: '0.06em' }}
         >
           {artist.name}
         </p>
@@ -67,11 +57,11 @@ export default function ArtistClient({ artist, albums }: Props) {
         style={{
           marginTop: '1.5rem',
           paddingBottom: '0.5rem',
-          fontSize: '0.72rem',
-          color: 'var(--meta-color)',
+          fontSize: 'var(--fs-2xs)',
+          color: 'var(--ink-muted)',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: '1px solid var(--line)',
         }}
       >
         discography · {String(albums.length).padStart(2, '0')} records
@@ -80,30 +70,18 @@ export default function ArtistClient({ artist, albums }: Props) {
       {albums.length === 0 ? (
         <p
           className="mono"
-          style={{ color: 'var(--meta-color)', marginTop: '2rem', fontSize: '0.85rem' }}
+          style={{ color: 'var(--ink-muted)', marginTop: 'var(--sp-8)', fontSize: 'var(--fs-sm)' }}
         >
           &gt; no records on file.
         </p>
       ) : (
-        <div
-          className="album-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-            gap: '1.6rem',
-            marginTop: '2rem',
-          }}
-        >
-          {albums.map((album, i) => (
+        <div className="album-grid" style={{ marginTop: 'var(--sp-8)' }}>
+          {albums.map(album => (
             <div
               key={album.id}
               className="album-card"
               onMouseEnter={() => setHoveredAlbum(album.id)}
               onMouseLeave={() => setHoveredAlbum(null)}
-              style={{
-                opacity: 0,
-                animation: `pixelFadeIn 0.4s steps(10, end) ${i * 35}ms forwards`,
-              }}
             >
               <div className="album-artwork">
                 {album.artwork_url
@@ -112,8 +90,8 @@ export default function ArtistClient({ artist, albums }: Props) {
                       className="mono"
                       style={{
                         fontSize: '1.8rem',
-                        fontWeight: 700,
-                        color: 'var(--border-bright)',
+                        fontWeight: 600,
+                        color: 'var(--line-strong)',
                         letterSpacing: '0.18em',
                       }}
                     >
@@ -123,16 +101,16 @@ export default function ArtistClient({ artist, albums }: Props) {
               </div>
               <p
                 style={{
-                  fontFamily: 'Pretendard, sans-serif',
-                  fontSize: '0.95rem',
-                  fontWeight: 500,
-                  color: 'var(--text-color)',
+                  fontFamily: 'var(--font-text)',
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 400,
+                  color: 'var(--ink)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   marginBottom: '0.25rem',
                   opacity: hoveredAlbum === album.id ? 1 : 0.92,
-                  transition: 'opacity 0.1s steps(3, end)',
+                  transition: 'opacity var(--t-hover)',
                 }}
               >
                 {album.title}
@@ -140,8 +118,8 @@ export default function ArtistClient({ artist, albums }: Props) {
               <p
                 className="mono"
                 style={{
-                  fontSize: '0.68rem',
-                  color: 'var(--meta-dim)',
+                  fontSize: 'var(--fs-2xs)',
+                  color: 'var(--ink-muted)',
                   letterSpacing: '0.06em',
                   textTransform: 'lowercase',
                 }}
@@ -153,6 +131,7 @@ export default function ArtistClient({ artist, albums }: Props) {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }
