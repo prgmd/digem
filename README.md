@@ -34,7 +34,7 @@ digem은 이 문제를 **수집과 번역을 파이프라인으로 고정하는 
 flowchart TB
     GA["GitHub Actions cron<br/>매일 09:00 KST"]
     MN["scripts/main.py<br/>매체별 실패 격리"]
-    SC["스크래퍼 5개<br/>Pitchfork, Stereogum, Consequence,<br/>Bandcamp Daily, Melon"]
+    SC["스크래퍼 4개<br/>Pitchfork, Stereogum, Consequence, Melon"]
     GM["Gemini 2.5 Flash"]
     DB[("Supabase PostgreSQL<br/>articles, albums, artists")]
     SV["Next.js Server Component<br/>목록, 필터, 페이지네이션"]
@@ -158,7 +158,7 @@ def repl(m):
 </details>
 
 <details>
-<summary><b>매체 5곳을 템플릿 메서드로 묶은 이유</b></summary>
+<summary><b>칼럼 수집기를 템플릿 메서드로 묶은 이유</b></summary>
 
 <br/>
 
@@ -175,50 +175,26 @@ BaseScraper (ABC)
 └── fetch_full_content()    @abstractmethod  매체마다 다름
 ```
 
-매체를 추가할 때 파이프라인 순서를 다시 쓰지 않아도 되고, 순서를 고치면 5곳에 한 번에 반영됩니다.
-
-예외는 `BandcampDailyScraper` 하나입니다. Cloudflare 때문에 Selenium을 쓰는데, `run()`을 오버라이드해 부모의 `run()`을 `try` 안에서 호출하고 `finally`에서 드라이버를 종료합니다. **예외가 나든 말든 브라우저 프로세스를 반드시 정리해야** 하기 때문입니다. 안 하면 러너에 좀비 프로세스가 남습니다.
+매체를 추가할 때 파이프라인 순서를 다시 쓰지 않아도 되고, 순서를 고치면 세 매체의 수집기에 한 번에 반영됩니다.
 
 </details>
 
 <details>
-<summary><b>Airflow를 걷어내고 cron 하나로 돌리는 이유</b></summary>
+<summary><b>GitHub Actions로 일일 배치를 실행하는 방식</b></summary>
 
 <br/>
 
-처음에는 GitHub Actions 러너 안에서 Airflow를 매번 새로 설치하고 `airflow dags test`로 DAG를 한 번 실행한 뒤 버렸습니다. 스케줄러를 상시 띄워 둘 서버가 없었기 때문입니다.
-
-운영 기록을 다시 보니 이 구성에서 Airflow가 실제로 하는 일이 없었습니다.
-
-- **스케줄링**은 처음부터 Actions의 cron이 맡고 있었습니다
-- **병렬 실행**은 일어나지 않았습니다. 메타 DB가 SQLite라 `SequentialExecutor`만 쓸 수 있어서, DAG에 병렬로 선언한 Task가 한 번에 하나씩 돌았습니다
-- **실행 이력과 UI**는 남지 않았습니다. 메타 DB가 러너와 함께 사라집니다
-- **재시도**는 로그가 남아 있는 최근 90회 실행에서 한 번도 발동하지 않았습니다. 실패한 Task 자체가 없었습니다
-
-남는 것은 비용뿐이었습니다. 매 실행마다 Airflow를 설치하고 메타 DB를 초기화하는 시간, 그리고 스크래퍼와 상관없는 의존성을 매일 새로 받아 오는 설치 표면입니다. 하는 일 없이 깨질 수만 있는 부품이라 뺐습니다.
-
-지금은 Actions의 cron이 `python -m scripts.main`을 바로 호출합니다.
+GitHub Actions cron이 매일 00:00 UTC(한국 시간 09:00)에 `python -u -m scripts.main`을 실행합니다. 하나의 진입점에서 Pitchfork, Stereogum, Consequence 칼럼 수집기와 Melon 수집기를 차례로 호출합니다.
 
 ```
-GitHub Actions      언제 돌릴 것인가, 실행 환경, 잡 30분 제한
+GitHub Actions      예약 실행, 실행 환경, 잡 전체 30분 제한
       ↓
-scripts/main.py     매체별로 실행하고, 실패를 격리하고, 종료 코드로 알린다
+scripts/main.py     매체별 순차 실행, 실패 격리, 종료 코드로 결과 전달
       ↓
-Python 스크래퍼     실제로 무엇을 할 것인가
+Python 스크래퍼     수집, 칼럼 번역, DB 저장
 ```
 
-Airflow가 주던 성질 중 지켜야 할 것은 진입점으로 옮겼습니다. DAG에서는 Task가 서로 독립이라 한 매체가 실패해도 나머지가 돌았습니다. `main.py`는 스크래퍼마다 예외를 따로 잡아 같은 성질을 지키고, 하나라도 실패하면 종료 코드 1로 끝나 Actions 실패 알림이 갑니다. Task별 1시간 타임아웃은 잡 전체 30분 제한으로 바꿨습니다.
-
-| 번역할 새 기사가 없던 날 | Airflow (29회 중앙값) | 지금 (3회) |
-| --- | ---: | ---: |
-| 의존성 설치 | 23초 | 9-11초 |
-| Airflow 초기화와 DAG 검증 | 6초 | 없음 |
-| 수집 실행 | 20초 | 8-10초 |
-| **잡 전체** | **58초** | **26-31초** |
-
-번역이 있는 날은 아직 측정하지 않았습니다. 줄어든 부분이 설치와 기동이라 번역량과 상관없이 같은 만큼 빠질 것으로 봅니다.
-
-Airflow가 다시 필요해지는 조건도 정해 두었습니다. 스케줄러를 상시 띄울 서버가 생기거나, 수집 뒤에 품질 검사와 공개처럼 서로를 기다려야 하는 단계가 생기거나, 지난 날짜를 다시 돌리는 백필이 필요해질 때입니다.
+수집기마다 예외를 따로 처리해 한 매체가 실패해도 나머지는 계속 수집합니다. 실행이 끝난 뒤 하나라도 실패했다면 종료 코드 1을 반환해 Actions가 잡을 실패로 표시하도록 했습니다. 실행 시간은 잡 전체에 30분 제한을 둡니다.
 
 </details>
 
@@ -246,14 +222,14 @@ Row Level Security로 `anon` 역할에 SELECT만 허용하고, 쓰기는 서버 
 
 | 영역 | 사용 기술 |
 | --- | --- |
-| **수집** | Python 3.11, requests, BeautifulSoup4, feedparser, lxml, Selenium(Bandcamp), Pydantic |
+| **수집** | Python 3.11, requests, BeautifulSoup4, feedparser, lxml, Pydantic |
 | **번역** | Gemini 2.5 Flash (REST 직접 호출, thinking 비활성) |
 | **스케줄링** | GitHub Actions cron |
 | **저장** | Supabase (PostgreSQL), Row Level Security |
 | **캐시** | Upstash Redis |
 | **프론트엔드** | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4 |
 | **배포** | Vercel |
-| **수집 대상** | Pitchfork, Stereogum, Consequence, Bandcamp Daily, Melon |
+| **수집 대상** | Pitchfork, Stereogum, Consequence, Melon |
 
 SDK 대신 Gemini REST API를 직접 호출합니다. `google-generativeai` 구버전에는 thinking 설정 자체가 없고 버전별 호환 문제가 보고되어 있어서, 요청 형식이 고정된 REST가 SDK 버전에 영향받지 않기 때문입니다.
 
@@ -269,8 +245,7 @@ digem/
 │   │   ├── base_scraper.py        파이프라인의 심장, 템플릿 메서드
 │   │   ├── pitchfork_scrapers.py  피드 2개 병합, 카테고리 화이트리스트
 │   │   ├── stereogum_scraper.py   태그 기반 필터
-│   │   ├── consequence_scraper.py Editorials만, RSS에서 크레딧 추출
-│   │   └── bandcamp_scraper.py    Selenium, 드라이버 정리
+│   │   └── consequence_scraper.py Editorials만, RSS에서 크레딧 추출
 │   ├── melon_scraper.py           앨범 메타, 번역 없음
 │   ├── google_translator.py       Gemini 번역과 규칙 기반 후처리
 │   └── database_loader.py         Supabase CRUD 전담
