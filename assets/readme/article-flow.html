@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+.step { position:absolute; top:40px; width:200px; height:200px; background:var(--raised); border:1px solid var(--line); padding:20px 20px; }
+.step .ico { margin:12px 0 16px; }
+.step .t { font-size:19px; }
+.grid { display:grid; grid-template-columns: 1.5fr 0.8fr 0.8fr 1.3fr; gap:12px; margin-top:18px; }
+.col { border:1px solid var(--line); padding:12px 14px; min-height:120px; }
+.col .k { font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600; color:var(--bright); letter-spacing:1px; }
+.col .v { font-family:'IBM Plex Mono',monospace; font-size:13px; line-height:1.7; color:var(--muted); margin-top:8px; }
+</style>
+</head>
+<body style="width:1680px;height:690px">
+<svg class="wires" width="1680" height="690">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#e8d5a0"/></marker>
+    <marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a7a5a"/></marker>
+  </defs>
+  <line x1="232" y1="140" x2="262" y2="140" stroke="#e8d5a0" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="468" y1="140" x2="498" y2="140" stroke="#e8d5a0" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="704" y1="140" x2="734" y2="140" stroke="#e8d5a0" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="940" y1="140" x2="970" y2="140" stroke="#e8d5a0" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="1176" y1="140" x2="1206" y2="140" stroke="#e8d5a0" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="1412" y1="140" x2="1442" y2="140" stroke="#e8d5a0" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="604" y1="240" x2="604" y2="334" stroke="#8a7a5a" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#m)"/>
+  <line x1="1076" y1="240" x2="1076" y2="334" stroke="#8a7a5a" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#m)"/>
+  <line x1="1548" y1="340" x2="1548" y2="246" stroke="#8a7a5a" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#m)"/>
+</svg>
+
+<div class="step" style="left:32px"><div class="no">01</div><div class="ico"><i data-lucide="rss"></i></div><div class="t">RSS 피드</div><div class="s">fetch_articles()</div></div>
+<div class="step" style="left:268px"><div class="no">02</div><div class="ico"><i data-lucide="list-filter"></i></div><div class="t">카테고리 필터</div><div class="s">롱폼 칼럼만</div></div>
+<div class="step" style="left:504px;border-color:#8a7a5a"><div class="no">03</div><div class="ico"><i data-lucide="copy-check"></i></div><div class="t">중복 확인</div><div class="s">source_url 한 번 조회</div></div>
+<div class="step" style="left:740px"><div class="no">04</div><div class="ico"><i data-lucide="file-text"></i></div><div class="t">본문 가져오기</div><div class="s">fetch_full_content()</div></div>
+<div class="step" style="left:976px;border-color:#8a7a5a"><div class="no">05</div><div class="ico"><i data-lucide="languages"></i></div><div class="t">Gemini 번역</div><div class="s">thinking 0</div></div>
+<div class="step" style="left:1212px"><div class="no">06</div><div class="ico"><i data-lucide="eraser"></i></div><div class="t">규칙 후처리</div><div class="s">병기 중복, 앞뒤 노이즈</div></div>
+<div class="step" style="left:1448px"><div class="no">07</div><div class="ico"><i data-lucide="database"></i></div><div class="t">저장</div><div class="s">articles INSERT</div></div>
+
+<div class="box dim" style="left:404px;top:340px;width:400px;height:150px">
+  <div class="head"><div class="ico"><i data-lucide="skip-forward"></i></div><div><div class="t">이미 있으면 건너뜀</div><div class="s">본문 요청과 번역 호출 0회</div></div></div>
+  <div class="d">비싼 단계 앞에 싼 판정을 둡니다. 실패한 기사도 DB에 남아 다음 실행에서 다시 번역되지 않습니다.</div>
+</div>
+
+<div class="box hi" style="left:840px;top:340px;width:808px;height:300px">
+  <div class="head"><div class="ico"><i data-lucide="file-warning"></i></div><div><div class="t">실패해도 원문과 사유를 저장</div><div class="s">translation_status = failed, 사유는 '단계: 유형: 상세' 한 줄</div></div></div>
+  <div class="grid">
+    <div class="col"><div class="k">[ RETRY ]</div><div class="v">timeout, network,<br>bad_response, empty_response,<br>http_5xx</div></div>
+    <div class="col"><div class="k">[ WAIT ]</div><div class="v">http_429</div></div>
+    <div class="col"><div class="k">[ SPLIT ]</div><div class="v">truncated</div></div>
+    <div class="col"><div class="k">[ HUMAN ]</div><div class="v">prompt_blocked,<br>no_content, incomplete,<br>그 밖의 유형</div></div>
+  </div>
+  <div class="d" style="color:#8a7a5a;font-size:14px">사유의 유형마다 다음 행동을 판정하는 함수와 테스트가 있습니다. 판정을 실제 재처리로 잇는 실행 경로는 아직 없습니다.</div>
+</div>
+
+<span class="tag" style="left:604px;top:288px">있음</span>
+<span class="tag" style="left:1076px;top:288px">실패</span>
+<span class="tag" style="left:1548px;top:288px">failed로 저장</span>
+<script>lucide.createIcons({attrs:{'stroke-width':1.6}})</script>
+</body>
+</html>
