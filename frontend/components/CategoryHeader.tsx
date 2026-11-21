@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ARTICLES_TAB_VISIBLE } from '@/lib/features'
+import { ARTICLES_ENABLED } from '@/lib/features'
 
 interface CategoryHeaderProps {
   currentCategory: 'articles' | 'albums' | 'info'
@@ -11,7 +11,7 @@ const ALL_CATEGORIES = [
   { label: 'info',     path: '/info',     key: 'info'     },
 ] as const
 
-const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_TAB_VISIBLE)
+const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_ENABLED)
 
 export default function CategoryHeader({ currentCategory }: CategoryHeaderProps) {
   return (

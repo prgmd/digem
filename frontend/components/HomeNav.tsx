@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { ARTICLES_TAB_VISIBLE } from '@/lib/features'
+import { ARTICLES_ENABLED } from '@/lib/features'
 
 const LINKS = [
   { href: '/albums', label: 'albums' },
-  ...(ARTICLES_TAB_VISIBLE ? [{ href: '/articles', label: 'articles' }] : []),
+  ...(ARTICLES_ENABLED ? [{ href: '/articles', label: 'articles' }] : []),
 ]
 
 export default function HomeNav() {

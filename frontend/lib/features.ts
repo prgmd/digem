@@ -23,7 +23,6 @@
  * 기본값 false (fail closed) — 환경변수가 없으면 비공개를 유지한다.
  */
 export const ARTICLES_ENABLED = process.env.NEXT_PUBLIC_ARTICLES_ENABLED === 'true'
-export const ARTICLES_TAB_VISIBLE = ARTICLES_ENABLED || process.env.NEXT_PUBLIC_ARTICLES_TAB_PREVIEW === 'true'
 
 /**
  * 프론트에 노출할 칼럼 출처 화이트리스트.
