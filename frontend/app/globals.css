@@ -641,6 +641,7 @@ body:has(.album-screen)::after { display: none; }
 
 .info-content {
   max-width: 44rem;
+  font-family: var(--font-mono);
   padding: var(--sp-12) var(--sp-8) var(--sp-16);
 }
 
@@ -649,7 +650,7 @@ body:has(.album-screen)::after { display: none; }
 .info-intro h1 {
   margin-bottom: var(--sp-4);
   font-size: var(--fs-2xl);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
 }
 
