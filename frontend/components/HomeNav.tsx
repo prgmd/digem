@@ -1,10 +1,9 @@
 import Link from 'next/link'
-import { ARTICLES_ENABLED } from '@/lib/features'
+import { ARTICLES_TAB_VISIBLE } from '@/lib/features'
 
 const LINKS = [
-  { href: '/albums', label: 'browse albums' },
-  // 칼럼 섹션 비공개 중에는 진입점 자체를 노출하지 않는다.
-  ...(ARTICLES_ENABLED ? [{ href: '/articles', label: 'articles' }] : []),
+  { href: '/albums', label: 'albums' },
+  ...(ARTICLES_TAB_VISIBLE ? [{ href: '/articles', label: 'articles' }] : []),
 ]
 
 export default function HomeNav() {
@@ -13,7 +12,6 @@ export default function HomeNav() {
       {LINKS.map(({ href, label }) => (
         <Link key={href} href={href} className="home-nav-btn">
           {label}
-          <span aria-hidden="true">→</span>
         </Link>
       ))}
     </nav>

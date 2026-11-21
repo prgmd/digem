@@ -1,18 +1,17 @@
 import Link from 'next/link'
-import { ARTICLES_ENABLED } from '@/lib/features'
+import { ARTICLES_TAB_VISIBLE } from '@/lib/features'
 
 interface CategoryHeaderProps {
   currentCategory: 'articles' | 'albums' | 'info'
 }
 
 const ALL_CATEGORIES = [
-  { label: 'articles', path: '/articles', key: 'articles' },
   { label: 'albums',   path: '/albums',   key: 'albums'   },
+  { label: 'articles', path: '/articles', key: 'articles' },
   { label: 'info',     path: '/info',     key: 'info'     },
 ] as const
 
-// 칼럼 섹션 비공개 중에는 메뉴에서 제외한다.
-const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_ENABLED)
+const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_TAB_VISIBLE)
 
 export default function CategoryHeader({ currentCategory }: CategoryHeaderProps) {
   return (

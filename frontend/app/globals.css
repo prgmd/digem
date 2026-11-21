@@ -352,7 +352,10 @@ select option { background: var(--surface-raised); color: var(--ink); }
 
 body:has(.home-screen)::before { animation: none; }
 
-.home-panel { width: min(100%, 32rem); }
+.home-panel {
+  width: min(100%, 32rem);
+  text-align: center;
+}
 
 .hero-logo {
   font-family: var(--font-display);
@@ -369,15 +372,21 @@ body:has(.home-screen)::before { animation: none; }
   letter-spacing: 0.08em;
 }
 
-.hero-nav { border-top: 1px solid var(--line-strong); }
+.hero-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-3);
+}
 
 .home-nav-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-1);
-  border-bottom: 1px solid var(--line-strong);
+  justify-content: center;
+  min-inline-size: 8rem;
+  min-block-size: 3rem;
+  padding-inline: var(--sp-4);
+  border: 1px solid var(--line-strong);
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: var(--fs-md);
