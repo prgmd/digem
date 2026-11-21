@@ -157,10 +157,11 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* 제목 */}
       <h1 style={{
+        fontFamily: 'var(--font-mono)',
         fontSize: 'clamp(1.8rem, 3.5vw, 2.85rem)',
         marginBottom: '1.5rem',
         lineHeight: 1.25,
-        fontWeight: 700,
+        fontWeight: 600,
         wordBreak: 'keep-all',
       }}>
         {language === 'en' ? article.title : (article.title_ko || article.title)}

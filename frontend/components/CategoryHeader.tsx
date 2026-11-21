@@ -6,12 +6,11 @@ interface CategoryHeaderProps {
 }
 
 const ALL_CATEGORIES = [
-  { label: 'articles', path: '/articles', key: 'articles' },
   { label: 'albums',   path: '/albums',   key: 'albums'   },
+  { label: 'articles', path: '/articles', key: 'articles' },
   { label: 'info',     path: '/info',     key: 'info'     },
 ] as const
 
-// 칼럼 섹션 비공개 중에는 메뉴에서 제외한다.
 const CATEGORIES = ALL_CATEGORIES.filter(c => c.key !== 'articles' || ARTICLES_ENABLED)
 
 export default function CategoryHeader({ currentCategory }: CategoryHeaderProps) {

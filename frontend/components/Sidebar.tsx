@@ -1,52 +1,6 @@
 'use client'
 import { Article } from '@/lib/types'
 
-const SVG_SOURCES: Record<string, string> = {
-  pitchfork: '/files/pitchfork.svg',
-  stereogum: '/files/stereogum.svg',
-  consequence: '/files/consequence.svg',
-  bandcamp: '/files/bandcamp.svg',
-}
-
-const INVERT_SOURCES = new Set(['pitchfork', 'bandcamp'])
-
-function SourceBadge({ source, active }: { source: string; active?: boolean }) {
-  const s = source.toLowerCase()
-  if (SVG_SOURCES[s]) {
-    return (
-      <img
-        src={SVG_SOURCES[s]}
-        alt={source}
-        style={{
-          width: 16,
-          height: 16,
-          objectFit: 'contain',
-          flexShrink: 0,
-          opacity: 0.85,
-          marginTop: 3,
-          filter: active
-            ? (INVERT_SOURCES.has(s) ? 'none' : 'invert(1)')
-            : (INVERT_SOURCES.has(s) ? 'invert(1)' : 'none'),
-        }}
-      />
-    )
-  }
-  return (
-    <span
-      className="mono"
-      style={{
-        fontSize: 'var(--fs-2xs)',
-        opacity: 0.7,
-        flexShrink: 0,
-        letterSpacing: '0.05em',
-        marginTop: 2,
-      }}
-    >
-      {source.slice(0, 2).toUpperCase()}
-    </span>
-  )
-}
-
 interface SidebarProps {
   articles: Article[]
   selectedId: number | null
@@ -130,7 +84,7 @@ export default function Sidebar({
               padding: '1rem 0.5rem',
             }}
           >
-            &gt; no records found.
+            No articles found.
           </li>
         )}
         {articles.map(article => (
@@ -139,14 +93,13 @@ export default function Sidebar({
             onClick={() => onSelect(article.id)}
             className={`list-item ${selectedId === article.id ? 'is-selected' : ''}`}
           >
-            <SourceBadge source={article.source} active={selectedId === article.id} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <span className="list-item-meta">
                 {article.source} · {fmtDate(article.published_at)}
               </span>
               <span
                 style={{
-                  fontFamily: 'var(--font-text)',
+                  fontFamily: 'var(--font-mono)',
                   fontWeight: 400,
                   fontSize: '1.05rem',
                   lineHeight: 1.35,

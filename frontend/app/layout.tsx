@@ -11,7 +11,7 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: 'dig-em',
-  description: 'dig your uncut gems',
+  description: 'dig your gems',
 }
 
 export const viewport: Viewport = {

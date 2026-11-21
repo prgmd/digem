@@ -1,11 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Album } from '@/lib/types'
 import CategoryHeader from '@/components/CategoryHeader'
 import Spinner from '@/components/Spinner'
 import { useAlbumFilters } from '@/components/useAlbumFilters'
-import MarqueeText from '@/components/MarqueeText'
 import { selectStyle } from '@/lib/styles'
 
 export type { Album }
@@ -19,6 +18,7 @@ const formatDate = (dateString: string) => {
 }
 
 const PAGE_SIZE_CLIENT = 30
+const MONTHS = Array.from({ length: 12 }, (_, index) => String(index + 1))
 
 interface AlbumCardProps {
   album: Album
@@ -26,93 +26,64 @@ interface AlbumCardProps {
 }
 
 function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const releaseDate = album.release_date ? formatDate(album.release_date) : null
 
   return (
-    <div
-      className={`album-card ${album.is_featured ? 'is-featured' : ''}`}
-      style={{ minWidth: 0 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div
-        className="album-artwork"
-        style={{
-          outline: album.is_featured ? '1px solid var(--ink)' : 'none',
-          outlineOffset: '2px',
-        }}
-      >
-        {album.is_featured && (
-          <span className="album-featured-mark">PICK</span>
-        )}
+    <article className="album-card">
+      <div className="album-artwork">
         {album.artwork_url ? (
           <img src={album.artwork_url} alt={album.title} />
         ) : (
           <span
             className="mono"
             style={{
-              fontSize: '2rem',
-              color: 'var(--line-strong)',
+              fontSize: 'var(--fs-xl)',
+              color: 'var(--ink-faint)',
               userSelect: 'none',
-              letterSpacing: '0.2em',
               fontWeight: 600,
             }}
+            aria-hidden="true"
           >
-            {album.title[0].toUpperCase()}
+            {album.title.slice(0, 1).toUpperCase()}
           </span>
         )}
       </div>
 
-      <MarqueeText
-        active={isHovered}
-        style={{
-          fontFamily: 'var(--font-text)',
-          fontWeight: 600,
-          fontSize: '1.1rem',
-          color: 'var(--ink)',
-          marginBottom: '0.25rem',
-        }}
-      >
-        {album.title}
-      </MarqueeText>
-
-      <p
-        onClick={(e) => {
-          e.stopPropagation()
-          onArtistClick(album.artist)
-        }}
-        style={{
-          fontFamily: 'var(--font-text)',
-          fontWeight: 400,
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--ink-muted)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          marginBottom: '0.35rem',
-          cursor: 'pointer',
-          transition: 'color var(--t-hover)',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-muted)')}
-      >
+      <h2 className="album-title" title={album.title}>{album.title}</h2>
+      <button type="button" className="album-artist" onClick={() => onArtistClick(album.artist)}>
         {album.artist}
+      </button>
+      <p className="album-meta">
+        <span>
+          {album.region === '국내' ? 'kr' : 'intl'}
+          {album.album_type ? ` · ${album.album_type === '정규' ? 'lp' : album.album_type.toLowerCase()}` : ''}
+          {releaseDate ? ` · ${releaseDate}` : ''}
+        </span>
+        {album.is_featured && <span className="album-featured-mark">pick</span>}
       </p>
+    </article>
+  )
+}
 
-      <p
-        className="mono"
-        style={{
-          fontSize: 'var(--fs-2xs)',
-          color: 'var(--ink-muted)',
-          letterSpacing: '0.05em',
-          textTransform: 'lowercase',
-        }}
-      >
-        {album.region === '국내' ? 'kr' : 'intl'}
-        {album.album_type ? ` · ${album.album_type.toLowerCase()}` : ''}
-        {album.release_date ? ` · ${formatDate(album.release_date)}` : ''}
-      </p>
-    </div>
+type AlbumFilterProps = {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  children: ReactNode
+}
+
+function AlbumFilter({ label, value, onChange, children }: AlbumFilterProps) {
+  return (
+    <select
+      aria-label={label}
+      value={value === 'all' ? '' : value}
+      onChange={event => onChange(event.target.value)}
+      style={selectStyle}
+    >
+      <option value="" hidden disabled>{label}</option>
+      <option value="all">all</option>
+      {children}
+    </select>
   )
 }
 
@@ -131,7 +102,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
   const { selectedRegion, selectedType, selectedYear, selectedMonth, featuredOnly, page } = filters
   const { setSelectedRegion, setSelectedType, setSelectedYear, setSelectedMonth, setFeaturedOnly, setPage } = actions
 
-  const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
 
   const hasFilters = featuredOnly || [selectedRegion, selectedType, selectedYear, selectedMonth].some(v => v !== 'all')
 
@@ -149,58 +119,36 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
     : displayAlbums
 
   return (
-    <div style={{
-      height: '100vh',
-      background: 'transparent',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-    }}>
+    <main className="page-shell album-screen">
       <CategoryHeader currentCategory="albums" />
 
       {/* 필터 바 */}
-      <div className="album-filter-bar" style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        gap: '0.4rem 0.6rem',
-        borderBottom: '1px solid var(--line)',
-        flexShrink: 0,
-      }}>
-        <button
-          onClick={() => setFeaturedOnly(!featuredOnly)}
-          className={`bracket-btn ${featuredOnly ? 'is-active' : ''}`}
-        >
-          ★ pick
-        </button>
-        <select value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)} style={selectStyle}>
-          <option value="all">region · all</option>
-          <option value="국내">region · kr</option>
-          <option value="해외">region · intl</option>
-        </select>
-        <select value={selectedType} onChange={e => setSelectedType(e.target.value)} style={selectStyle}>
-          <option value="all">type · all</option>
-          <option value="정규">type · LP</option>
-          <option value="EP">type · EP</option>
-        </select>
-        <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={selectStyle}>
-          {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? 'year · all' : `year · ${y}`}</option>)}
-        </select>
-        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={selectStyle}>
-          {availableMonths.map(m => <option key={m} value={m}>{m === 'all' ? 'month · all' : `month · ${m.padStart(2, '0')}`}</option>)}
-        </select>
-
-        <span
-          className="mono"
-          style={{
-            marginLeft: 'auto',
-            fontSize: 'var(--fs-2xs)',
-            color: 'var(--ink-muted)',
-            letterSpacing: '0.06em',
-          }}
-        >
-          {String(totalCount).padStart(4, '0')} records
-        </span>
+      <div className="album-filter-bar">
+        <h1 className="album-catalog-heading">albums</h1>
+        <div className="album-filters">
+          <button
+            type="button"
+            onClick={() => setFeaturedOnly(!featuredOnly)}
+            className={`bracket-btn ${featuredOnly ? 'is-active' : ''}`}
+            aria-pressed={featuredOnly}
+          >
+            pick
+          </button>
+          <AlbumFilter label="regions" value={selectedRegion} onChange={setSelectedRegion}>
+            <option value="국내">kr</option>
+            <option value="해외">intl</option>
+          </AlbumFilter>
+          <AlbumFilter label="formats" value={selectedType} onChange={setSelectedType}>
+            <option value="EP">ep</option>
+            <option value="정규">lp</option>
+          </AlbumFilter>
+          <AlbumFilter label="years" value={selectedYear} onChange={setSelectedYear}>
+            {availableYears.filter(year => year !== 'all').map(year => <option key={year} value={year}>{year}</option>)}
+          </AlbumFilter>
+          <AlbumFilter label="months" value={selectedMonth} onChange={setSelectedMonth}>
+            {MONTHS.map(month => <option key={month} value={month}>{month.padStart(2, '0')}</option>)}
+          </AlbumFilter>
+        </div>
       </div>
 
       {navigating && (
@@ -210,10 +158,10 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
       )}
 
       {/* 앨범 그리드 */}
-      <div className="album-grid-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
+      <div className="album-grid-wrapper">
         {paginated.length === 0 && (
           <div className="terminal-block" style={{ padding: 'var(--sp-8) 0', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--sp-4)' }}>
-            <div>&gt; no records match the filter.</div>
+            <div>No albums match these filters.</div>
             {hasFilters && <button onClick={() => router.replace('/albums')} className="bracket-btn">clear filters</button>}
           </div>
         )}
@@ -272,6 +220,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }
