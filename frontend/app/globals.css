@@ -523,19 +523,12 @@ body:has(.album-screen)::after { display: none; }
 }
 
 .album-catalog-heading {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
-}
-
-.album-catalog-heading h1 {
   font-family: var(--font-mono);
   font-size: var(--fs-lg);
   font-weight: 600;
   line-height: 1.15;
 }
 
-.album-result-count,
 .album-meta {
   color: var(--ink-muted);
   font-family: var(--font-mono);

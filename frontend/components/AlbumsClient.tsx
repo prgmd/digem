@@ -102,10 +102,7 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
 
       {/* 필터 바 */}
       <div className="album-filter-bar">
-        <div className="album-catalog-heading">
-          <h1>albums</h1>
-          <span className="album-result-count">{totalCount} records</span>
-        </div>
+        <h1 className="album-catalog-heading">albums</h1>
         <div className="album-filters">
           <button
             type="button"
