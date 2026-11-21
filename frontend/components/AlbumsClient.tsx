@@ -18,6 +18,7 @@ const formatDate = (dateString: string) => {
 }
 
 const PAGE_SIZE_CLIENT = 30
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 interface AlbumCardProps {
   album: Album
@@ -79,7 +80,6 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
   const { selectedRegion, selectedType, selectedYear, selectedMonth, featuredOnly, page } = filters
   const { setSelectedRegion, setSelectedType, setSelectedYear, setSelectedMonth, setFeaturedOnly, setPage } = actions
 
-  const availableMonths = ['all', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())]
 
   const hasFilters = featuredOnly || [selectedRegion, selectedType, selectedYear, selectedMonth].some(v => v !== 'all')
 
@@ -113,20 +113,21 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
             pick
           </button>
           <select aria-label="region" value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)} style={selectStyle}>
-            <option value="all">region · all</option>
-            <option value="국내">region · kr</option>
-            <option value="해외">region · intl</option>
+            <option value="all">all regions</option>
+            <option value="국내">KR</option>
+            <option value="해외">International</option>
           </select>
-          <select aria-label="type" value={selectedType} onChange={e => setSelectedType(e.target.value)} style={selectStyle}>
-            <option value="all">type · all</option>
-            <option value="정규">type · LP</option>
-            <option value="EP">type · EP</option>
+          <select aria-label="format" value={selectedType} onChange={e => setSelectedType(e.target.value)} style={selectStyle}>
+            <option value="all">all formats</option>
+            <option value="정규">LP</option>
+            <option value="EP">EP</option>
           </select>
           <select aria-label="year" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={selectStyle}>
-            {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? 'year · all' : `year · ${y}`}</option>)}
+            {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? 'all years' : y}</option>)}
           </select>
           <select aria-label="month" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={selectStyle}>
-            {availableMonths.map(m => <option key={m} value={m}>{m === 'all' ? 'month · all' : `month · ${m.padStart(2, '0')}`}</option>)}
+            <option value="all">all months</option>
+            {MONTHS.map((month, index) => <option key={month} value={String(index + 1)}>{month}</option>)}
           </select>
         </div>
       </div>
