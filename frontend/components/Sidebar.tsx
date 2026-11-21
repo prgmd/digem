@@ -99,7 +99,7 @@ export default function Sidebar({
               </span>
               <span
                 style={{
-                  fontFamily: 'var(--font-text)',
+                  fontFamily: 'var(--font-mono)',
                   fontWeight: 400,
                   fontSize: '1.05rem',
                   lineHeight: 1.35,

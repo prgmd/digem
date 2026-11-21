@@ -1,6 +1,6 @@
 # digem
 
-> dig your uncut gems
+> dig your gems
 
 해외 음악 미디어(Pitchfork, Stereogum, Consequence, Bandcamp)의 글을 번역해 모아보는 음악 큐레이션 서비스.
 

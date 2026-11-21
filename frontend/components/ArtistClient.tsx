@@ -124,7 +124,7 @@ export default function ArtistClient({ artist, albums }: Props) {
                   textTransform: 'lowercase',
                 }}
               >
-                {album.album_type ? album.album_type.toLowerCase() : ''}
+                {album.album_type === '정규' ? 'lp' : album.album_type?.toLowerCase()}
                 {album.release_date ? ` · ${album.release_date.slice(0, 4)}` : ''}
               </p>
             </div>

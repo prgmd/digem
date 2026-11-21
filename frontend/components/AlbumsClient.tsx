@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Album } from '@/lib/types'
 import CategoryHeader from '@/components/CategoryHeader'
@@ -18,7 +18,7 @@ const formatDate = (dateString: string) => {
 }
 
 const PAGE_SIZE_CLIENT = 30
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS = Array.from({ length: 12 }, (_, index) => String(index + 1))
 
 interface AlbumCardProps {
   album: Album
@@ -56,12 +56,34 @@ function AlbumCard({ album, onArtistClick }: AlbumCardProps) {
       <p className="album-meta">
         <span>
           {album.region === '국내' ? 'kr' : 'intl'}
-          {album.album_type ? ` · ${album.album_type.toLowerCase()}` : ''}
+          {album.album_type ? ` · ${album.album_type === '정규' ? 'lp' : album.album_type.toLowerCase()}` : ''}
           {releaseDate ? ` · ${releaseDate}` : ''}
         </span>
         {album.is_featured && <span className="album-featured-mark">pick</span>}
       </p>
     </article>
+  )
+}
+
+type AlbumFilterProps = {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  children: ReactNode
+}
+
+function AlbumFilter({ label, value, onChange, children }: AlbumFilterProps) {
+  return (
+    <select
+      aria-label={label}
+      value={value === 'all' ? '' : value}
+      onChange={event => onChange(event.target.value)}
+      style={selectStyle}
+    >
+      <option value="" hidden disabled>{label}</option>
+      <option value="all">all</option>
+      {children}
+    </select>
   )
 }
 
@@ -112,23 +134,20 @@ export default function AlbumsClient({ albums, totalCount, availableYears, month
           >
             pick
           </button>
-          <select aria-label="region" value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)} style={selectStyle}>
-            <option value="all">all regions</option>
-            <option value="국내">KR</option>
-            <option value="해외">International</option>
-          </select>
-          <select aria-label="format" value={selectedType} onChange={e => setSelectedType(e.target.value)} style={selectStyle}>
-            <option value="all">all formats</option>
-            <option value="정규">LP</option>
-            <option value="EP">EP</option>
-          </select>
-          <select aria-label="year" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={selectStyle}>
-            {availableYears.map(y => <option key={y} value={y}>{y === 'all' ? 'all years' : y}</option>)}
-          </select>
-          <select aria-label="month" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={selectStyle}>
-            <option value="all">all months</option>
-            {MONTHS.map((month, index) => <option key={month} value={String(index + 1)}>{month}</option>)}
-          </select>
+          <AlbumFilter label="regions" value={selectedRegion} onChange={setSelectedRegion}>
+            <option value="국내">kr</option>
+            <option value="해외">intl</option>
+          </AlbumFilter>
+          <AlbumFilter label="formats" value={selectedType} onChange={setSelectedType}>
+            <option value="EP">ep</option>
+            <option value="정규">lp</option>
+          </AlbumFilter>
+          <AlbumFilter label="years" value={selectedYear} onChange={setSelectedYear}>
+            {availableYears.filter(year => year !== 'all').map(year => <option key={year} value={year}>{year}</option>)}
+          </AlbumFilter>
+          <AlbumFilter label="months" value={selectedMonth} onChange={setSelectedMonth}>
+            {MONTHS.map(month => <option key={month} value={month}>{month.padStart(2, '0')}</option>)}
+          </AlbumFilter>
         </div>
       </div>
 

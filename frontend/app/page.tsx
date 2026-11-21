@@ -5,7 +5,7 @@ export default function Home() {
     <main className="home-screen">
       <div className="home-panel">
         <h1 className="hero-logo">digem.</h1>
-        <p className="hero-tagline">dig your uncut gems</p>
+        <p className="hero-tagline">dig your gems</p>
         <HomeNav />
       </div>
     </main>
