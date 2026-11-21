@@ -5,7 +5,7 @@ import { GATE_COOKIE, deriveGateToken, safeEqual } from '@/lib/gate'
  * 사이트 전체 암호 게이트.
  *
  * 동작 조건
- *   SITE_PASSWORD + GATE_SECRET 이 모두 설정돼 있을 때만 게이트가 켜진다.
+ *   SITE_GATE_ENABLED=true 일 때 SITE_PASSWORD 와 GATE_SECRET 을 확인한다.
  *   - 로컬 개발: 미설정 시 그냥 통과 (편의)
  *   - 프로덕션: 미설정 시 503 으로 차단 (조용한 fail-open 방지)
  *
@@ -23,6 +23,14 @@ function isOpenPath(pathname: string): boolean {
 }
 
 export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl
+  if (process.env.SITE_GATE_ENABLED !== 'true') {
+    if (pathname === '/gate' || pathname === '/api/gate') {
+      return NextResponse.redirect(new URL('/', req.url), 303)
+    }
+    return NextResponse.next()
+  }
+
   const password = process.env.SITE_PASSWORD
   const secret = process.env.GATE_SECRET
 
@@ -36,7 +44,6 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  const { pathname } = req.nextUrl
   if (isOpenPath(pathname)) return NextResponse.next()
 
   const cookie = req.cookies.get(GATE_COOKIE)?.value
