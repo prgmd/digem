@@ -2,7 +2,7 @@
 
 # digem
 
-**dig your uncut gems**
+**dig your gems**
 
 해외 음악 웹진의 칼럼을 매일 자동으로 모아 한국어로 번역해 쌓아 둡니다.
 
